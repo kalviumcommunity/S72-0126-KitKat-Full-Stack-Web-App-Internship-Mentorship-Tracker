@@ -1,96 +1,157 @@
-PROJECT: Unified Internship & Mentorship Portal (UIMP)
-1. FULL MVP DEFINITION (NO FLUFF)
-Core Users
+# Unified Internship & Mentorship Portal (UIMP)
 
-Student
+## 1. Project Overview
 
-Mentor
+The **Unified Internship & Mentorship Portal (UIMP)** is a full‑stack, production‑grade web platform designed to centralize **internship application tracking** and **mentor‑driven feedback** into a single, cohesive system.
 
-Admin (minimal, internal)
+The system is intentionally scoped as an **MVP with strict boundaries**. Every feature included is essential for real‑world usability; no experimental or speculative components are part of the baseline.
 
-MVP FEATURES (LOCKED SCOPE)
-Authentication & Access
+---
 
-Email + password signup/login
+## 2. Core Users
 
-JWT + HttpOnly cookies
+### 2.1 Student
 
-Role-Based Access Control (RBAC)
+Primary consumer of the platform. Students manage internship applications and receive structured mentorship feedback.
 
-Internship Application Tracking
+**Capabilities**:
 
-Create / edit / delete applications
+* Create and manage internship applications
+* Track application status across a defined pipeline
+* Upload and manage resume versions
+* View mentor feedback and act on recommendations
+* Receive notifications for important events
 
-Status pipeline:
+---
 
+### 2.2 Mentor
+
+Provides structured guidance to assigned students.
+
+**Capabilities**:
+
+* View assigned students
+* Review student applications
+* Leave structured, prioritized feedback
+* Track feedback status (given vs pending)
+
+---
+
+### 2.3 Admin (Minimal / Internal)
+
+Operational role with limited exposure.
+
+**Capabilities**:
+
+* Manage user access
+* Assign mentors to students
+* Monitor system health (no business dashboards in MVP)
+
+---
+
+## 3. MVP Feature Set (Locked Scope)
+
+### 3.1 Authentication & Access Control
+
+* Email + password based signup and login
+* Secure authentication using **JWT stored in HttpOnly cookies**
+* **Role‑Based Access Control (RBAC)** enforced at API and service layers
+
+Roles:
+
+* `STUDENT`
+* `MENTOR`
+* `ADMIN`
+
+---
+
+### 3.2 Internship Application Tracking
+
+Students can manage applications with full CRUD support.
+
+#### Application Status Pipeline
+
+```
 Draft → Applied → Shortlisted → Interview → Offer → Rejected
+```
 
+#### Application Fields
 
-Fields:
+* Company
+* Role
+* Platform (LinkedIn, Careers Page, Referral, etc.)
+* Resume Version (linked file)
+* Notes
+* Deadlines
 
-Company
+---
 
-Role
+### 3.3 Mentorship Feedback System
 
-Platform
+Mentors provide structured feedback tied to specific applications.
 
-Resume version
+**Feedback Attributes**:
 
-Notes
+* Linked Application
+* Content (textual feedback)
+* Skill Tags:
 
-Deadlines
+  * Resume
+  * DSA
+  * System Design
+  * Communication
+* Priority Level:
 
-Mentorship Feedback
+  * Low
+  * Medium
+  * High
 
-Mentor can:
+---
 
-View assigned students
+### 3.4 Dashboards
 
-Leave structured feedback
+#### Student Dashboard
 
-Feedback linked to:
+* Applications grouped by status
+* Recent mentor feedback
+* Pending actions (e.g., interview prep, resume update)
 
-Application
+#### Mentor Dashboard
 
-Skill tags (Resume, DSA, System Design, Communication)
+* Assigned students
+* Feedback given vs pending
 
-Priority (Low/Medium/High)
+---
 
-Dashboard
+### 3.5 Notifications
 
-Student dashboard:
+#### Email Notifications
 
-Applications by status
+Triggered on:
 
-Recent feedback
+* New mentor feedback
+* Application status change
 
-Pending actions
+#### In‑App Notifications
 
-Mentor dashboard:
+* Toast notifications for real‑time events
+* Persistent notification list
 
-Students assigned
+---
 
-Feedback given / pending
+### 3.6 File Uploads
 
-Notifications
+* Resume upload (PDF only)
+* Stored using **AWS S3 or Azure Blob Storage**
+* Secure, signed access URLs
 
-Email on:
+---
 
-New feedback
+## 4. High‑Level Architecture (HLD)
 
-Status change
+This architecture represents the **minimum acceptable production standard**.
 
-In-app toast notifications
-
-File Upload
-
-Resume upload (PDF)
-
-Stored on S3 / Azure Blob
-
-2. HIGH-LEVEL ARCHITECTURE (HLD)
-4
-System Architecture
+```
 Browser
   ↓
 Next.js App Router
@@ -113,51 +174,75 @@ Data Layer
   ├─ Prisma ORM
   ├─ Redis (Caching)
   ↓
-Infra
+Infrastructure
   ├─ Docker
   ├─ GitHub Actions
   ├─ AWS ECS / Azure App Service
+```
 
+---
 
-This is minimum acceptable production architecture.
+## 5. Low‑Level Design (LLD)
 
-3. LOW-LEVEL DESIGN (LLD)
-Database Schema (Core Tables)
-User
-- id
-- email
-- passwordHash
-- role (STUDENT | MENTOR | ADMIN)
-- createdAt
+### 5.1 Database Schema
 
-Application
-- id
-- userId
-- company
-- role
-- platform
-- status
-- resumeUrl
-- notes
-- createdAt
+#### User
 
-Feedback
-- id
-- applicationId
-- mentorId
-- content
-- tags[]
-- priority
-- createdAt
+| Field        | Type                     |
+| ------------ | ------------------------ |
+| id           | UUID                     |
+| email        | String (unique)          |
+| passwordHash | String                   |
+| role         | STUDENT / MENTOR / ADMIN |
+| createdAt    | Timestamp                |
 
-Notification
-- id
-- userId
-- type
-- read
-- createdAt
+---
 
-4. PROJECT STRUCTURE
+#### Application
+
+| Field     | Type      |
+| --------- | --------- |
+| id        | UUID      |
+| userId    | FK → User |
+| company   | String    |
+| role      | String    |
+| platform  | String    |
+| status    | Enum      |
+| resumeUrl | String    |
+| notes     | Text      |
+| createdAt | Timestamp |
+
+---
+
+#### Feedback
+
+| Field         | Type                |
+| ------------- | ------------------- |
+| id            | UUID                |
+| applicationId | FK → Application    |
+| mentorId      | FK → User           |
+| content       | Text                |
+| tags          | String[]            |
+| priority      | Low / Medium / High |
+| createdAt     | Timestamp           |
+
+---
+
+#### Notification
+
+| Field     | Type      |
+| --------- | --------- |
+| id        | UUID      |
+| userId    | FK → User |
+| type      | String    |
+| read      | Boolean   |
+| createdAt | Timestamp |
+
+---
+
+## 6. Project Structure
+
+```
 /app
   /(auth)
     /login
@@ -167,29 +252,37 @@ Notification
     /mentor
   /applications
   /feedback
+
 /api
   /auth
   /applications
   /feedback
   /upload
+
 /lib
   prisma.ts
   auth.ts
   rbac.ts
   email.ts
   redis.ts
+
 /prisma
   schema.prisma
   migrations/
+
 /docker
   Dockerfile
   docker-compose.yml
+```
 
-5. README.md (STARTING POINT)
-README.md (Skeleton)
+---
+
+## 7. README.md (Initial Version)
+
+```md
 # Unified Internship & Mentorship Portal (UIMP)
 
-A full-stack platform to track internship applications and mentorship feedback in one place.
+A full‑stack platform to track internship applications and mentorship feedback in one place.
 
 ## Tech Stack
 - Next.js (App Router)
@@ -202,19 +295,32 @@ A full-stack platform to track internship applications and mentorship feedback i
 ## Features
 - Internship application tracking
 - Mentor feedback system
-- Role-based access control
+- Role‑based access control
 - Email notifications
 - Resume uploads
 
 ## Setup
-1. Clone repo
-2. Setup env variables
-3. docker-compose up
-4. npm run dev
+1. Clone the repository
+2. Configure environment variables
+3. Run `docker-compose up`
+4. Start development server with `npm run dev`
 
 ## Deployment
-CI/CD via GitHub Actions
-Dockerized deployment to AWS/Azure
+- CI/CD via GitHub Actions
+- Dockerized deployment to AWS or Azure
+```
 
+> **Note:** This README is a living document. If it stops evolving, the project is decaying.
 
-This README grows daily. If it doesn’t, your project is decaying.
+---
+
+## 8. Engineering Principle
+
+This project is designed to reflect **real production thinking**:
+
+* Explicit scope boundaries
+* Clean separation of concerns
+* Strong defaults
+* No accidental complexity
+
+Anything not defined here is **out of scope by design**.
