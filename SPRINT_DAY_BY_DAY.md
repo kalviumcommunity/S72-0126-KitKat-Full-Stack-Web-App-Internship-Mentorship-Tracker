@@ -1,407 +1,430 @@
-Project: Unified Internship & Mentorship Portal (UIMP)
+# Unified Internship & Mentorship Portal (UIMP)
 
-Team
+## Project Execution Plan (4 Weeks)
 
-Backend: Heramb
+This document defines the **execution roadmap**, **role ownership**, and **delivery discipline** for the UIMP MVP. The plan is designed to eliminate ambiguity, enforce accountability, and ensure production readiness by the end of Week 4.
 
-Frontend (Pro): Gaurav
+---
 
-Frontend (Noob): Mallu
+## Team Structure
 
-WEEK 1 — Setup & Design
+* **Backend**: Heramb
+* **Frontend 1**: Gaurav
+* **Frontend 2**: Mallu
 
-Goal: Project foundation, architecture locked, zero ambiguity.
+---
 
-Day 1 — Project Kickoff & Repo Setup
+## WEEK 1 — Setup & Design
 
-Heramb (Backend)
+**Goal**: Establish project foundation, lock architecture, and remove ambiguity.
 
-Initialize repo
+---
 
-Setup .env.example
+### Day 1 — Project Kickoff & Repository Setup
 
-Docker Compose skeleton (Postgres + Redis)
+#### Backend (Heramb)
 
-Gaurav (Frontend Pro)
+* Initialize repository
+* Configure `.env.example`
+* Create Docker Compose skeleton (PostgreSQL + Redis)
 
-Define App Router structure
+#### Frontend 1 (Gaurav)
 
-Layout & route grouping plan
+* Define Next.js App Router structure
+* Plan layout hierarchy and route grouping
 
-Mallu (Frontend Noob)
+#### Frontend 2 (Mallu)
 
-Setup local dev environment
+* Setup local development environment
+* Learn core App Router concepts
 
-Learn basic App Router concepts
+**Deliverables**:
 
-Deliverables
+* Repository live
+* README v1 committed
+* Branching strategy documented
 
-Repo live
+---
 
-README v1
+### Day 2 — HLD & LLD Finalization
 
-Branching strategy documented
+#### Backend (Heramb)
 
-Day 2 — HLD & LLD Finalization
+* Define API contracts (Auth, Applications, Feedback)
+* Prepare security checklist
 
-Heramb
+#### Frontend 1 (Gaurav)
 
-API contracts (Auth, Applications, Feedback)
+* Finalize component hierarchy
+* Map Server vs Client Components
 
-Security checklist
+#### Frontend 2 (Mallu)
 
-Gaurav
+* Review wireframes
+* Identify reusable UI components
 
-Component hierarchy
+**Deliverables**:
 
-Server vs Client component map
+* High-Level Architecture (HLD) diagram
+* Low-Level Design (LLD) document
 
-Mallu
+---
 
-Review wireframes
+### Day 3 — Database Design
 
-Identify reusable UI components
+#### Backend (Heramb)
 
-Deliverables
+* Design Prisma schema
+* Finalize entity relationships
 
-HLD diagram
+#### Frontend 1 (Gaurav)
 
-LLD document
+* Review schema for frontend data requirements
 
-Day 3 — Database Design
+#### Frontend 2 (Mallu)
 
-Heramb
+* Observe design decisions and document learnings
 
-Prisma schema design
+**Deliverables**:
 
-Relationships finalized
+* `schema.prisma`
+* Entity Relationship (ER) diagram
 
-Gaurav
+---
 
-Review schema for frontend needs
+### Day 4 — Project Initialization
 
-Mallu
+#### Backend (Heramb)
 
-None (observe + learn)
+* Setup Prisma and run migrations
+* Implement seed scripts
 
-Deliverables
+#### Frontend 1 (Gaurav)
 
-schema.prisma
+* Scaffold App Router structure
+* Implement base layout and authentication routes
 
-ER diagram
+#### Frontend 2 (Mallu)
 
-Day 4 — Project Initialization
+* Build static login and signup UI
 
-Heramb
+**Deliverables**:
 
-Prisma setup & migrations
+* Database running locally
+* Authentication pages visible
 
-Seed scripts
+---
 
-Gaurav
+### Day 5 — Standards & Tooling
 
-App Router scaffolding
+#### Backend (Heramb)
 
-Base layout & auth routes
+* Implement global error handler
+* Establish Zod validation base
 
-Mallu
+#### Frontend 1 (Gaurav)
 
-Implement static login & signup UI
+* Configure ESLint and TypeScript
 
-Deliverables
+#### Frontend 2 (Mallu)
 
-DB running locally
+* Implement client-side form validation UI
 
-Auth pages visible
+**Deliverables**:
 
-Day 5 — Standards & Tooling
+* Linting enforced
+* Validation patterns standardized
 
-Heramb
+---
 
-Global error handler
+## WEEK 2 — Core Development
 
-Zod validation base
+**Goal**: Functional backend with a usable frontend.
 
-Gaurav
+---
 
-ESLint & TypeScript config
+### Day 6 — Authentication
 
-Mallu
+#### Backend (Heramb)
 
-Form validation UI (client-side)
+* Implement signup and login APIs
+* JWT authentication with HttpOnly cookies
+* RBAC middleware
 
-Deliverables
+#### Frontend 1 (Gaurav)
 
-Linting enforced
+* Integrate authentication flow
+* Configure protected routes
 
-Validation patterns set
+#### Frontend 2 (Mallu)
 
-WEEK 2 — Core Development
+* Connect login and signup forms to APIs
 
-Goal: Functional backend + usable frontend.
+**Deliverables**:
 
-Day 6 — Authentication
+* End-to-end authentication working
 
-Heramb
+---
 
-Signup/Login APIs
+### Day 7 — Application APIs
 
-JWT + HttpOnly cookies
+#### Backend (Heramb)
 
-RBAC middleware
+* Build application CRUD APIs
+* Add input validation
 
-Gaurav
+#### Frontend 1 (Gaurav)
 
-Auth flow integration
+* Applications list page (Server Component)
 
-Protected routes
+#### Frontend 2 (Mallu)
 
-Mallu
+* Application create/edit form UI
 
-Hook up login/signup forms
+**Deliverables**:
 
-Deliverables
+* Internship applications fully manageable
 
-Auth end-to-end working
+---
 
-Day 7 — Application APIs
+### Day 8 — Feedback System
 
-Heramb
+#### Backend (Heramb)
 
-Application CRUD APIs
+* Implement feedback APIs
+* Enforce mentor authorization
 
-Input validation
+#### Frontend 1 (Gaurav)
 
-Gaurav
+* Feedback display components
 
-Applications list page (server component)
+#### Frontend 2 (Mallu)
 
-Mallu
+* Feedback submission form UI
 
-Application create/edit form UI
+**Deliverables**:
 
-Deliverables
+* Mentor feedback loop functional
 
-Applications manageable
+---
 
-Day 8 — Feedback System
+### Day 9 — Dashboards
 
-Heramb
+#### Backend (Heramb)
 
-Feedback APIs
+* Optimize database queries
+* Integrate Redis caching
 
-Mentor authorization
+#### Frontend 1 (Gaurav)
 
-Gaurav
+* Build Student and Mentor dashboards
 
-Feedback display components
+#### Frontend 2 (Mallu)
 
-Mallu
+* UI polish for dashboards
 
-Feedback form UI
+**Deliverables**:
 
-Deliverables
+* Dashboards load efficiently
 
-Mentor feedback loop functional
+---
 
-Day 9 — Dashboards
+### Day 10 — File Upload & Notifications
 
-Heramb
+#### Backend (Heramb)
 
-Optimized queries
+* Implement S3 / Azure Blob upload APIs
+* Integrate email notification service
 
-Redis caching
+#### Frontend 1 (Gaurav)
 
-Gaurav
+* Resume upload flow integration
 
-Student & Mentor dashboards
+#### Frontend 2 (Mallu)
 
-Mallu
+* Upload UI with progress indicators
 
-Dashboard UI polish
+**Deliverables**:
 
-Deliverables
+* Resume upload functional
+* Email notifications delivered
 
-Dashboards load fast
+---
 
-Day 10 — File Upload & Notifications
+## WEEK 3 — Integration & Testing
 
-Heramb
+**Goal**: Stability, correctness, and automation.
 
-S3 / Azure Blob upload API
+---
 
-Email service integration
+### Day 11 — Integration
 
-Gaurav
+#### Backend (Heramb)
 
-Resume upload flow
+* End-to-end API verification
 
-Mallu
+#### Frontend 1 (Gaurav)
 
-Upload UI + progress state
+* Complete frontend-backend wiring
 
-Deliverables
+#### Frontend 2 (Mallu)
 
-Resume upload works
+* Resolve UI defects
 
-Emails sent
+**Deliverables**:
 
-WEEK 3 — Integration & Testing
+* Feature-complete MVP
 
-Goal: Stability, correctness, automation.
+---
 
-Day 11 — Integration
+### Day 12 — Error Handling & Security
 
-Heramb
+#### Backend (Heramb)
 
-End-to-end API verification
+* OWASP security hardening
+* Secure HTTP headers
 
-Gaurav
+#### Frontend 1 (Gaurav)
 
-Full frontend-backend wiring
+* Error and empty states
 
-Mallu
+#### Frontend 2 (Mallu)
 
-Fix UI bugs
+* UX improvements
 
-Deliverables
+**Deliverables**:
 
-Feature-complete MVP
+* Application fails safely
 
-Day 12 — Error Handling & Security
+---
 
-Heramb
+### Day 13 — Testing
 
-OWASP hardening
+#### Backend (Heramb)
 
-Secure headers
+* API unit tests
+* Integration tests
 
-Gaurav
+#### Frontend 1 (Gaurav)
 
-Error & empty states
+* UI sanity testing
 
-Mallu
+#### Frontend 2 (Mallu)
 
-UX improvements
+* Manual test cases
 
-Deliverables
+**Deliverables**:
 
-App fails safely
+* All tests passing
 
-Day 13 — Testing
+---
 
-Heramb
+### Day 14 — CI/CD
 
-API unit tests
+#### Backend (Heramb)
 
-Integration tests
+* Configure GitHub Actions
+* Docker build and push pipeline
 
-Gaurav
+#### Frontend 1 (Gaurav)
 
-UI sanity testing
+* Deployment verification
 
-Mallu
+#### Frontend 2 (Mallu)
 
-Manual test cases
+* Regression testing
 
-Deliverables
+**Deliverables**:
 
-Tests passing
+* Automated CI/CD pipeline
 
-Day 14 — CI/CD
+---
 
-Heramb
+## WEEK 4 — Finalization & Deployment
 
-GitHub Actions
+**Goal**: Production-ready MVP.
 
-Docker build & push
+---
 
-Gaurav
+### Day 15 — Feature Freeze
 
-Deployment verification
+**All Team Members**
 
-Mallu
+* No new features
+* Bug fixes only
 
-Regression testing
+---
 
-Deliverables
+### Day 16 — UI Polish
 
-Automated pipeline
+#### Frontend 1 (Gaurav)
 
-WEEK 4 — Finalization & Deployment
+* Performance tuning
 
-Goal: Production-ready MVP.
+#### Frontend 2 (Mallu)
 
-Day 15 — Feature Freeze
+* Visual consistency improvements
 
-All
+---
 
-No new features
+### Day 17 — Documentation
 
-Bug fixes only
+#### Backend (Heramb)
 
-Day 16 — UI Polish
+* API documentation
 
-Gaurav
+#### Frontend 1 (Gaurav)
 
-Performance tuning
+* Frontend technical documentation
 
-Mallu
+#### Frontend 2 (Mallu)
 
-Visual consistency
+* User walkthrough documentation
 
-Day 17 — Documentation
+---
 
-Heramb
+### Day 18 — Deployment
 
-API docs
+#### Backend (Heramb)
 
-Gaurav
+* Cloud deployment
+* SSL and domain configuration
 
-Frontend docs
+#### Frontend 1 (Gaurav)
 
-Mallu
+* Production sanity checks
 
-User walkthrough
+#### Frontend 2 (Mallu)
 
-Day 18 — Deployment
+* User Acceptance Testing (UAT)
 
-Heramb
+---
 
-Cloud deployment
+### Day 19 — Buffer & Fixes
 
-SSL & domain
+**All Team Members**
 
-Gaurav
+* Resolve last-minute issues
 
-Production sanity checks
+---
 
-Mallu
+### Day 20 — Final Submission
 
-UAT testing
+**All Team Members**
 
-Day 19 — Buffer & Fixes
+* Live demo
+* Final README
+* Team retrospective
 
-All
+---
 
-Fix last-minute issues
+## Rules & Enforcement
 
-Day 20 — Final Submission
+* Daily commits are mandatory
+* No skipped working days
+* Pull Requests required for all merges
+* Repository owner is accountable for delivery
 
-All
+---
 
-Demo
-
-README final
-
-Retrospective
-
-RULES
-
-Daily commits required
-
-No skipped days
-
-PRs mandatory
-
-Owner = accountable
+This execution plan is intentionally strict. Deviations must be justified; silence is not an excuse.

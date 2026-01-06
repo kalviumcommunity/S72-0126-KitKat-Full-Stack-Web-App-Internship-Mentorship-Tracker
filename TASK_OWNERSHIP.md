@@ -1,246 +1,237 @@
-Project: Unified Internship & Mentorship Portal (UIMP)
+# Unified Internship & Mentorship Portal (UIMP)
 
-This document defines clear task ownership for each team member.
-If a task fails, the owner is accountable.
+## Task Ownership & Responsibility Matrix
 
-Team Members
+This document defines **explicit task ownership** for the UIMP project. Every task has a single accountable owner. If a task fails, the owner is responsible for resolution.
 
-Backend Engineer: Heramb
+Ambiguity is not acceptable.
 
-Frontend Engineer (Pro): Gaurav
+---
 
-Frontend Engineer (Noob): Mallu
+## Team Members
 
-1. BACKEND TASKS — Owner: Heramb
+* **Backend Engineer**: Heramb
+* **Frontend Engineer 1**: Gaurav
+* **Frontend Engineer 2**: Mallu
 
-Scope: Everything behind the API boundary.
-No UI work. No styling. No frontend opinions.
+---
 
-1.1 Project & Infrastructure
+## 1. Backend Responsibilities — Owner: Heramb
 
-Initialize backend structure inside Next.js
+**Scope**: Everything behind the API boundary.
 
-Configure environment variables
+* No UI work
+* No styling
+* No frontend-driven architectural decisions
 
-Docker & docker-compose for:
+---
 
-Next.js
+### 1.1 Project & Infrastructure
 
-PostgreSQL
+* Initialize backend structure within Next.js
+* Configure environment variables
+* Setup Docker and `docker-compose` for:
 
-Redis
+  * Next.js
+  * PostgreSQL
+  * Redis
+* Ensure cloud readiness (AWS / Azure compatible)
 
-Cloud readiness (AWS/Azure compatible)
+---
 
-1.2 Database & ORM
+### 1.2 Database & ORM
 
-Design Prisma schema
+* Design Prisma schema
+* Define relationships:
 
-Define relations:
+  * User ↔ Applications
+  * Application ↔ Feedback
+* Write database migrations
+* Create seed scripts for development and testing
 
-User ↔ Applications
+---
 
-Application ↔ Feedback
+### 1.3 Authentication & Authorization
 
-Write migrations
+* Implement Signup and Login APIs
+* Secure password hashing
+* JWT-based authentication using HttpOnly cookies
+* Role-Based Access Control (RBAC):
 
-Seed scripts for dev/testing
+  * STUDENT
+  * MENTOR
+  * ADMIN
+* Authorization middleware enforcement
 
-1.3 Authentication & Authorization
+---
 
-Signup / Login APIs
+### 1.4 API Development
 
-Password hashing
+* Internship Applications CRUD APIs
+* Feedback APIs
+* Notification APIs
+* File upload APIs (AWS S3 / Azure Blob)
+* Global API response standardization
+* Centralized error-handling middleware
 
-JWT + HttpOnly cookies
+---
 
-Role-Based Access Control (RBAC):
+### 1.5 Security & Compliance
 
-STUDENT
+* Input validation using Zod
+* Input sanitization
+* OWASP security best practices
+* Secure HTTP headers
+* HTTPS enforcement
 
-MENTOR
+---
 
-ADMIN
+### 1.6 Performance & Reliability
 
-Authorization middleware
+* Redis caching for dashboard queries
+* Database query optimization
+* Transaction safety and consistency
+* Logging and monitoring hooks
 
-1.4 API Development
+---
 
-Applications CRUD APIs
+### 1.7 CI/CD & Deployment
 
-Feedback APIs
+* Author Dockerfile
+* Configure GitHub Actions for:
 
-Notification APIs
+  * Build
+  * Test
+  * Image push
+* Deployment to AWS ECS or Azure App Service
+* Deployment verification and rollback strategy
 
-File upload API (S3 / Azure Blob)
+---
 
-Global API response handler
+## 2. Frontend Responsibilities — Owner: Gaurav (Frontend Engineer 1)
 
-Error-handling middleware
+**Scope**: Frontend architecture, correctness, performance, and governance.
 
-1.5 Security & Compliance
+* Mentors Frontend Engineer 2
+* Reviews all frontend-related Pull Requests
 
-Input validation (Zod)
+---
 
-Input sanitization
+### 2.1 Application Architecture
 
-OWASP best practices
+* Next.js App Router setup
+* Route grouping and layout strategy
+* Server vs Client component decisions
+* Finalize frontend folder structure
 
-Secure headers
+---
 
-HTTPS enforcement
+### 2.2 Data Strategy
 
-1.6 Performance & Reliability
+* Server Components for dashboards
+* Client-side data fetching (SWR / fetch)
+* API integration patterns
+* Error boundaries and loading states
 
-Redis caching for dashboards
+---
 
-Query optimization
+### 2.3 Core Screens
 
-Transaction safety
+* Student dashboard layout
+* Mentor dashboard layout
+* Application list and detail pages
+* Feedback views (read and write)
 
-Logging & monitoring hooks
+---
 
-1.7 CI/CD & Deployment
+### 2.4 State Management & UX
 
-Dockerfile
+* Global state using Context and custom hooks
+* Toast notifications and modal flows
+* Role-based UI rendering
+* Responsive and themed design decisions
 
-GitHub Actions:
+---
 
-Build
+### 2.5 Code Quality & Reviews
 
-Test
+* Enforce TypeScript strict mode
+* Maintain ESLint rules
+* Mandatory Pull Request reviews
+* Frontend performance optimization
 
-Push image
+---
 
-Deployment to AWS ECS / Azure App Service
+## 3. Frontend Responsibilities — Owner: Mallu (Frontend Engineer 2)
 
-Deployment verification & rollback plan
+**Scope**: UI implementation only.
 
-2. FRONTEND TASKS (PRO) — Owner: Gaurav
+* No architectural decisions
+* Works strictly under Frontend Engineer 1 guidance
 
-Scope: Architecture, correctness, performance.
-Mentors Mallu. Reviews all UI PRs.
+---
 
-2.1 App Architecture
+### 3.1 UI Components
 
-Next.js App Router setup
+* Forms (Login, Signup, Application Create/Edit)
+* Client-side input validation UI
+* Error messages and helper text
+* Buttons, modals, and card components
 
-Route grouping & layouts
+---
 
-Server vs Client component decisions
+### 3.2 Styling & Responsiveness
 
-Folder structure finalization
+* Responsive layouts
+* Mobile-friendly screens
+* Consistent spacing and typography
+* Dark/light theme support (if assigned)
 
-2.2 Data Strategy
+---
 
-Server Components for dashboards
+### 3.3 UX States
 
-Client-side fetching (SWR / fetch)
+* Loading skeletons
+* Empty states
+* Error states
+* Success toasts
 
-API integration patterns
+---
 
-Error boundaries & loading states
+### 3.4 Learning Deliverables
 
-2.3 Core Screens
+Must demonstrate understanding of:
 
-Student dashboard layout
+* Next.js App Router basics
+* Client Components
+* Props and React hooks
 
-Mentor dashboard layout
+**Constraints**:
 
-Application list & details pages
+* No backend API calls without review
+* No direct API modifications
 
-Feedback views (read-only + write)
+---
 
-2.4 State & UX
+## 4. Collaboration Rules (Mandatory)
 
-Global state using Context + hooks
+* Feature branches only
+* Pull Requests required for every merge
+* Backend Pull Requests reviewed by Frontend Engineer 1
+* Frontend Pull Requests reviewed by Frontend Engineer 1
+* No direct pushes to `main`
 
-Toasts, modals, feedback UI
+---
 
-Role-based UI rendering
+## 5. Definition of Done (DoD)
 
-Responsive & themed design
+A task is considered **DONE** only if all conditions below are met:
 
-2.5 Code Quality
+* Code is merged into the main branch
+* Feature works end-to-end
+* Error and edge states are handled
+* README or documentation updated (if applicable)
 
-TypeScript strictness
+---
 
-ESLint rules
-
-PR reviews (mandatory)
-
-Performance optimization
-
-3. FRONTEND TASKS (NOOB) — Owner: Mallu
-
-Scope: UI implementation only.
-No architectural decisions.
-Works strictly under Gaurav’s guidance.
-
-3.1 UI Components
-
-Forms (login, signup, application create/edit)
-
-Input validation UI
-
-Error messages & helper text
-
-Buttons, modals, cards
-
-3.2 Styling & Responsiveness
-
-Responsive layouts
-
-Mobile-friendly screens
-
-Consistent spacing & typography
-
-Dark/light theme support (if assigned)
-
-3.3 UX States
-
-Loading skeletons
-
-Empty states
-
-Error states
-
-Success toasts
-
-3.4 Learning Deliverables
-
-Understand:
-
-App Router basics
-
-Client components
-
-Props & hooks
-
-No backend calls without review
-
-No direct API changes
-
-4. COLLABORATION RULES (MANDATORY)
-
-Feature branches only
-
-PRs required for every merge
-
-Backend PRs reviewed by Gaurav
-
-Frontend PRs reviewed by Gaurav
-
-No direct pushes to main
-
-5. DEFINITION OF DONE (DoD)
-
-A task is DONE only if:
-
-Code is merged
-
-Feature works end-to-end
-
-Error states handled
-
-README updated (if needed)
+This responsibility matrix is non-negotiable. Ownership implies accountability.
