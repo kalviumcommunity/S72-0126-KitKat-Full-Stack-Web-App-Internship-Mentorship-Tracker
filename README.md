@@ -324,3 +324,11 @@ This project is designed to reflect **real production thinking**:
 * No accidental complexity
 
 Anything not defined here is **out of scope by design**.
+
+---
+
+## 9. Local Quickstart (current state)
+
+- Frontend: `cd client && npm install --legacy-peer-deps && npm run dev` then open `http://localhost:3000`.
+- Backend: folder scaffold exists but implementation is pending; environment and dependencies will be added in upcoming PRs.
+- Docs: see `server/README.md` for placeholder env expectations while backend work progresses.
