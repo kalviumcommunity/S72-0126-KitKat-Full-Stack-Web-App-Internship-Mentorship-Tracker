@@ -1,25 +1,290 @@
-Server setup scaffolding (work in progress). These steps outline the expected local setup once dependencies are defined.
+# UIMP Backend Server
+
+Backend API server for the Unified Internship & Mentorship Portal (UIMP).
+
+## Tech Stack
+
+- **Runtime**: Node.js 20+
+- **Framework**: Express.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Cache**: Redis
+- **Language**: TypeScript
+- **Validation**: Zod
 
 ## Prerequisites
-- Node.js 20+
-- PostgreSQL and Redis running locally (or connection strings to cloud services)
 
-## Environment
-Copy `.env.example` to `.env` and adjust values:
-```
-cp .env.example .env
+- Node.js 20+ installed
+- PostgreSQL database (local or remote)
+- Redis (optional, for caching)
+- npm or yarn
+
+## Quick Start
+
+### Option 1: Automated Setup (Recommended)
+
+**Linux/Mac:**
+```bash
+chmod +x setup.sh
+./setup.sh
 ```
 
-Key variables:
-- `DATABASE_URL` – Postgres connection string
-- `REDIS_URL` – Redis connection string
-- `JWT_SECRET` – random secret for signing tokens
-- `SMTP_*` – mail transport for notifications
-
-## Install & run (placeholder)
+**Windows (PowerShell):**
+```powershell
+.\setup.ps1
 ```
-npm install
+
+### Option 2: Manual Setup
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Configure environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database credentials
+   ```
+
+3. **Setup database with Docker (optional)**
+   ```bash
+   docker-compose up -d postgres redis
+   ```
+
+4. **Generate Prisma Client**
+   ```bash
+   npm run prisma:generate
+   ```
+
+5. **Run migrations**
+   ```bash
+   npm run prisma:migrate
+   ```
+
+6. **Seed database**
+   ```bash
+   npm run prisma:seed
+   ```
+
+### Quick Setup (All at once)
+```bash
+npm run db:setup
+```
+
+## Development
+
+### Start Development Server
+```bash
 npm run dev
 ```
 
-> Note: package.json and services are still being implemented; this file ensures the backend folder is initialized for future PRs.
+Server runs on `http://localhost:3001` (or PORT from .env)
+
+### View Database (Prisma Studio)
+```bash
+npm run prisma:studio
+```
+
+Opens at `http://localhost:5555`
+
+## Available Scripts
+
+### Development
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+
+### Database
+- `npm run prisma:generate` - Generate Prisma Client
+- `npm run prisma:migrate` - Create and apply migrations
+- `npm run prisma:migrate:deploy` - Apply migrations (production)
+- `npm run prisma:migrate:reset` - Reset database
+- `npm run prisma:studio` - Open Prisma Studio
+- `npm run prisma:seed` - Seed database
+- `npm run db:setup` - Complete setup (generate + migrate + seed)
+- `npm run db:reset` - Reset database (⚠️ deletes all data)
+
+## Environment Variables
+
+Create a `.env` file with:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/uimp_db?schema=public"
+
+# JWT
+JWT_SECRET="your-super-secret-jwt-key-min-32-characters"
+JWT_EXPIRES_IN="24h"
+
+# Server
+NODE_ENV="development"
+PORT=3001
+CORS_ORIGIN="http://localhost:3000"
+
+# Redis (Optional)
+REDIS_URL="redis://localhost:6379"
+
+# AWS S3 (Optional - for file uploads)
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+AWS_REGION="us-east-1"
+AWS_S3_BUCKET=""
+
+# Email Service (Optional)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER=""
+SMTP_PASS=""
+```
+
+## Database Setup with Docker
+
+Start PostgreSQL and Redis:
+```bash
+docker-compose up -d
+```
+
+This starts:
+- PostgreSQL on port `5432`
+- Redis on port `6379`
+
+Default credentials:
+- User: `postgres`
+- Password: `postgres`
+- Database: `uimp_db`
+
+## API Documentation
+
+See [API_CONTRACTS.md](./API_CONTRACTS.md) for complete API documentation.
+
+### Base URL
+```
+http://localhost:3001/api
+```
+
+### Endpoints
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user
+- `GET /api/applications` - List applications
+- `POST /api/applications` - Create application
+- `GET /api/applications/:id` - Get application
+- `PUT /api/applications/:id` - Update application
+- `DELETE /api/applications/:id` - Delete application
+- `GET /api/feedback` - List feedback
+- `POST /api/feedback` - Create feedback
+- `GET /api/feedback/:id` - Get feedback
+- `PUT /api/feedback/:id` - Update feedback
+- `DELETE /api/feedback/:id` - Delete feedback
+
+## Test Credentials (from seed data)
+
+After running `npm run prisma:seed`, you can use:
+
+- **Admin**: `admin@uimp.com` / `Admin123!`
+- **Mentor1**: `mentor1@uimp.com` / `Mentor123!`
+- **Mentor2**: `mentor2@uimp.com` / `Mentor123!`
+- **Student1**: `student1@uimp.com` / `Student123!`
+- **Student2**: `student2@uimp.com` / `Student123!`
+- **Student3**: `student3@uimp.com` / `Student123!`
+
+## Project Structure
+
+```
+server/
+├── prisma/
+│   ├── schema.prisma       # Database schema
+│   ├── seed.ts              # Seed script
+│   └── migrations/         # Database migrations
+├── src/
+│   ├── api/                 # API routes
+│   │   ├── auth/           # Authentication
+│   │   ├── applications/   # Applications CRUD
+│   │   └── feedback/       # Feedback CRUD
+│   ├── lib/                # Utilities
+│   │   ├── prisma.ts       # Prisma client
+│   │   ├── jwt.ts          # JWT utilities
+│   │   ├── password.ts     # Password hashing
+│   │   └── logger.ts       # Logging
+│   ├── middlewares/        # Express middlewares
+│   │   ├── auth.middleware.ts
+│   │   ├── rbac.middleware.ts
+│   │   ├── validate.middleware.ts
+│   │   └── error.middleware.ts
+│   ├── config/             # Configuration
+│   ├── types/              # TypeScript types
+│   ├── app.ts              # Express app
+│   ├── routes.ts           # Route definitions
+│   └── server.ts           # Server entry point
+├── tests/                  # Test files
+├── docker-compose.yml      # Docker services
+├── package.json
+└── tsconfig.json
+```
+
+## Database Schema
+
+See [prisma/SCHEMA_DOCUMENTATION.md](./prisma/SCHEMA_DOCUMENTATION.md) for detailed schema documentation.
+
+### Main Entities
+- **User**: Students, Mentors, Admins
+- **Application**: Internship applications
+- **Feedback**: Mentor feedback on applications
+- **Notification**: User notifications
+- **MentorAssignment**: Mentor-Student relationships
+
+## Security
+
+- JWT authentication with HttpOnly cookies
+- Role-based access control (RBAC)
+- Password hashing with bcrypt (12 rounds)
+- Input validation with Zod
+- SQL injection prevention via Prisma ORM
+
+## Troubleshooting
+
+### Database Connection Issues
+- Ensure PostgreSQL is running
+- Check `DATABASE_URL` in `.env`
+- Verify credentials are correct
+
+### Prisma Client Errors
+```bash
+npm run prisma:generate
+```
+
+### Migration Issues
+```bash
+npm run db:reset  # ⚠️ Deletes all data
+```
+
+### Port Already in Use
+Change `PORT` in `.env` or stop the process using port 3001
+
+## Additional Documentation
+
+- [Prisma Setup Guide](./PRISMA_SETUP.md)
+- [API Contracts](./API_CONTRACTS.md)
+- [Schema Documentation](./prisma/SCHEMA_DOCUMENTATION.md)
+- [Entity Relationships](./prisma/RELATIONSHIPS.md)
+
+## Development Workflow
+
+1. Make changes to code
+2. If schema changed: `npm run prisma:migrate`
+3. Test locally: `npm run dev`
+4. View data: `npm run prisma:studio`
+
+## Production Deployment
+
+1. Set `NODE_ENV=production` in `.env`
+2. Build: `npm run build`
+3. Run migrations: `npm run prisma:migrate:deploy`
+4. Start: `npm start`
+
+---
+
+**Last Updated**: 2024-01-15  
+**Maintained By**: Backend Team (Heramb)
