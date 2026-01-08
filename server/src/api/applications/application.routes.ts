@@ -1,58 +1,116 @@
 import { Router } from "express";
 import { applicationController } from "./application.controller";
-import { validate } from "../../middlewares/validate.middleware";
-import {
-  createApplicationSchema,
-  updateApplicationSchema,
-  getApplicationSchema,
-  listApplicationsSchema,
-  deleteApplicationSchema,
-} from "./application.schema";
 import { authenticate } from "../../middlewares/auth.middleware";
-import { requireRole } from "../../middlewares/rbac.middleware";
-import { UserRole } from "../../types/roles";
+import { requireStudent } from "../../middlewares/rbac.middleware";
+import { validateBody, validateParams, validateQuery } from "../../middlewares/validation.middleware";
+import { schemas } from "../../lib/validation";
+import { rateLimiters } from "../../middlewares/rate-limit.middleware";
+import {
+  requireApplicationAccess,
+  requireModifiableApplication,
+  preventDuplicateApplication,
+  validateStatusTransition,
+  logApplicationAccess,
+  sanitizeApplicationData,
+  checkApplicationLimits,
+} from "../../middlewares/application-security.middleware";
+import { z } from "zod";
 
 const router = Router();
 
 // All routes require authentication
 router.use(authenticate);
 
-// List applications - all authenticated users
+// Apply logging to all application routes
+router.use(logApplicationAccess());
+
+// List applications with filtering and pagination
+// Students see their own, mentors see assigned students', admins see all
 router.get(
   "/",
-  validate(listApplicationsSchema),
-  applicationController.listApplications.bind(applicationController)
+  rateLimiters.general,
+  validateQuery(schemas.application.list),
+  applicationController.listApplications
 );
 
-// Get application by ID - all authenticated users (with permission checks)
+// Get application statistics
+router.get(
+  "/stats/overview",
+  rateLimiters.general,
+  applicationController.getApplicationStats
+);
+
+// Export applications (Students only, own applications)
+router.get(
+  "/export/data",
+  requireStudent,
+  rateLimiters.general,
+  validateQuery(z.object({
+    status: schemas.application.create.shape.status.optional(),
+    platform: schemas.application.create.shape.platform.optional(),
+    startDate: z.string().datetime().optional(),
+    endDate: z.string().datetime().optional(),
+  })),
+  applicationController.exportApplications
+);
+
+// Get application by ID with comprehensive access control
 router.get(
   "/:id",
-  validate(getApplicationSchema),
-  applicationController.getApplication.bind(applicationController)
+  rateLimiters.general,
+  validateParams(schemas.application.getById),
+  requireApplicationAccess(),
+  applicationController.getApplication
 );
 
-// Create application - STUDENT only
+// Create new application (Students only) with comprehensive security
 router.post(
   "/",
-  requireRole(UserRole.STUDENT),
-  validate(createApplicationSchema),
-  applicationController.createApplication.bind(applicationController)
+  requireStudent,
+  rateLimiters.general,
+  sanitizeApplicationData(),
+  checkApplicationLimits(),
+  preventDuplicateApplication(),
+  validateBody(schemas.application.create),
+  applicationController.createApplication
 );
 
-// Update application - STUDENT only
+// Update application with comprehensive security
 router.put(
   "/:id",
-  requireRole(UserRole.STUDENT),
-  validate(updateApplicationSchema),
-  applicationController.updateApplication.bind(applicationController)
+  requireStudent,
+  rateLimiters.general,
+  validateParams(schemas.application.getById),
+  requireApplicationAccess(),
+  requireModifiableApplication(),
+  sanitizeApplicationData(),
+  preventDuplicateApplication(),
+  validateStatusTransition(),
+  validateBody(schemas.application.update),
+  applicationController.updateApplication
 );
 
-// Delete application - STUDENT only
+// Delete application with comprehensive security
 router.delete(
   "/:id",
-  requireRole(UserRole.STUDENT),
-  validate(deleteApplicationSchema),
-  applicationController.deleteApplication.bind(applicationController)
+  requireStudent,
+  rateLimiters.general,
+  validateParams(schemas.application.delete),
+  requireApplicationAccess(),
+  requireModifiableApplication(),
+  applicationController.deleteApplication
+);
+
+// Bulk update application status (Students only) with security
+router.patch(
+  "/bulk/status",
+  requireStudent,
+  rateLimiters.general,
+  validateBody(z.object({
+    applicationIds: z.array(z.string().uuid()).min(1).max(50), // Max 50 applications at once
+    status: schemas.application.create.shape.status,
+  })),
+  applicationController.bulkUpdateStatus
 );
 
 export default router;

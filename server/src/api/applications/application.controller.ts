@@ -1,258 +1,199 @@
 import { Request, Response } from "express";
 import { applicationService } from "./application.service";
-import { ApiResponse } from "../../types/api";
+import { ApiResponse, PaginatedResponse } from "../../types/api";
+import { asyncHandler } from "../../middlewares/error.middleware";
+import { AuthenticationError, AuthorizationError, NotFoundError } from "../../middlewares/error.middleware";
+import { SUCCESS_MESSAGES } from "../../constants/errors";
 import { logger } from "../../lib/logger";
 import { UserRole } from "../../types/roles";
 
 export class ApplicationController {
-  async createApplication(req: Request, res: Response) {
-    try {
-      if (!req.user) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "UNAUTHORIZED",
-            message: "Authentication required",
-          },
-        };
-        return res.status(401).json(response);
-      }
-
-      if (req.user.role !== UserRole.STUDENT) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "FORBIDDEN",
-            message: "Only students can create applications",
-          },
-        };
-        return res.status(403).json(response);
-      }
-
-      const application = await applicationService.createApplication(req.user.id, req.body);
-
-      const response: ApiResponse = {
-        success: true,
-        data: { application },
-        message: "Application created successfully",
-      };
-
-      res.status(201).json(response);
-    } catch (error) {
-      logger.error("Create application controller error", error);
-      throw error;
+  // Create new application (Students only)
+  createApplication = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
     }
-  }
 
-  async getApplication(req: Request, res: Response) {
-    try {
-      if (!req.user) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "UNAUTHORIZED",
-            message: "Authentication required",
-          },
-        };
-        return res.status(401).json(response);
-      }
-
-      const application = await applicationService.getApplicationById(req.params.id, req.user);
-
-      const response: ApiResponse = {
-        success: true,
-        data: { application },
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      logger.error("Get application controller error", error);
-      
-      if (error instanceof Error) {
-        if (error.message === "Application not found") {
-          const response: ApiResponse = {
-            success: false,
-            error: {
-              code: "NOT_FOUND",
-              message: error.message,
-            },
-          };
-          return res.status(404).json(response);
-        }
-        if (error.message === "Forbidden") {
-          const response: ApiResponse = {
-            success: false,
-            error: {
-              code: "FORBIDDEN",
-              message: "Insufficient permissions",
-            },
-          };
-          return res.status(403).json(response);
-        }
-      }
-
-      throw error;
+    // Only students can create applications
+    if (req.user.role !== UserRole.STUDENT) {
+      throw new AuthorizationError("Only students can create applications");
     }
-  }
 
-  async listApplications(req: Request, res: Response) {
-    try {
-      if (!req.user) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "UNAUTHORIZED",
-            message: "Authentication required",
-          },
-        };
-        return res.status(401).json(response);
-      }
+    const application = await applicationService.createApplication(req.user.id, req.body);
 
-      const result = await applicationService.listApplications(req.user, req.query as any);
+    logger.info("Application created", {
+      applicationId: application.id,
+      userId: req.user.id,
+      company: application.company,
+      role: application.role,
+    });
 
-      const response: ApiResponse = {
-        success: true,
-        data: {
-          applications: result.applications,
-          pagination: result.pagination,
-        },
-      };
+    const response: ApiResponse = {
+      success: true,
+      data: { application },
+      message: SUCCESS_MESSAGES.APPLICATION_CREATED,
+    };
 
-      res.status(200).json(response);
-    } catch (error) {
-      logger.error("List applications controller error", error);
-      throw error;
+    res.status(201).json(response);
+  });
+
+  // Get application by ID (Owner, assigned mentor, or admin)
+  getApplication = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
     }
-  }
 
-  async updateApplication(req: Request, res: Response) {
-    try {
-      if (!req.user) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "UNAUTHORIZED",
-            message: "Authentication required",
-          },
-        };
-        return res.status(401).json(response);
-      }
+    const { id } = req.params;
+    const application = await applicationService.getApplicationById(id, req.user);
 
-      if (req.user.role !== UserRole.STUDENT) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "FORBIDDEN",
-            message: "Only students can update applications",
-          },
-        };
-        return res.status(403).json(response);
-      }
+    const response: ApiResponse = {
+      success: true,
+      data: { application },
+    };
 
-      const application = await applicationService.updateApplication(
-        req.params.id,
-        req.user.id,
-        req.body
-      );
+    res.json(response);
+  });
 
-      const response: ApiResponse = {
-        success: true,
-        data: { application },
-        message: "Application updated successfully",
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      logger.error("Update application controller error", error);
-      
-      if (error instanceof Error) {
-        if (error.message === "Application not found") {
-          const response: ApiResponse = {
-            success: false,
-            error: {
-              code: "NOT_FOUND",
-              message: error.message,
-            },
-          };
-          return res.status(404).json(response);
-        }
-        if (error.message === "Forbidden") {
-          const response: ApiResponse = {
-            success: false,
-            error: {
-              code: "FORBIDDEN",
-              message: "You can only update your own applications",
-            },
-          };
-          return res.status(403).json(response);
-        }
-      }
-
-      throw error;
+  // List applications with filtering and pagination
+  listApplications = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
     }
-  }
 
-  async deleteApplication(req: Request, res: Response) {
-    try {
-      if (!req.user) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "UNAUTHORIZED",
-            message: "Authentication required",
-          },
-        };
-        return res.status(401).json(response);
-      }
+    const result = await applicationService.listApplications(req.user, req.query);
 
-      if (req.user.role !== UserRole.STUDENT) {
-        const response: ApiResponse = {
-          success: false,
-          error: {
-            code: "FORBIDDEN",
-            message: "Only students can delete applications",
-          },
-        };
-        return res.status(403).json(response);
-      }
+    const response: ApiResponse<PaginatedResponse<any>> = {
+      success: true,
+      data: {
+        items: result.applications,
+        pagination: result.pagination,
+      },
+    };
 
-      await applicationService.deleteApplication(req.params.id, req.user.id);
+    res.json(response);
+  });
 
-      const response: ApiResponse = {
-        success: true,
-        message: "Application deleted successfully",
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      logger.error("Delete application controller error", error);
-      
-      if (error instanceof Error) {
-        if (error.message === "Application not found") {
-          const response: ApiResponse = {
-            success: false,
-            error: {
-              code: "NOT_FOUND",
-              message: error.message,
-            },
-          };
-          return res.status(404).json(response);
-        }
-        if (error.message === "Forbidden") {
-          const response: ApiResponse = {
-            success: false,
-            error: {
-              code: "FORBIDDEN",
-              message: "You can only delete your own applications",
-            },
-          };
-          return res.status(403).json(response);
-        }
-      }
-
-      throw error;
+  // Update application (Owner only)
+  updateApplication = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
     }
-  }
+
+    // Only students can update applications
+    if (req.user.role !== UserRole.STUDENT) {
+      throw new AuthorizationError("Only students can update applications");
+    }
+
+    const { id } = req.params;
+    const application = await applicationService.updateApplication(id, req.user.id, req.body);
+
+    logger.info("Application updated", {
+      applicationId: id,
+      userId: req.user.id,
+      updatedFields: Object.keys(req.body),
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      data: { application },
+      message: SUCCESS_MESSAGES.APPLICATION_UPDATED,
+    };
+
+    res.json(response);
+  });
+
+  // Delete application (Owner only)
+  deleteApplication = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
+    }
+
+    // Only students can delete applications
+    if (req.user.role !== UserRole.STUDENT) {
+      throw new AuthorizationError("Only students can delete applications");
+    }
+
+    const { id } = req.params;
+    await applicationService.deleteApplication(id, req.user.id);
+
+    logger.info("Application deleted", {
+      applicationId: id,
+      userId: req.user.id,
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: SUCCESS_MESSAGES.APPLICATION_DELETED,
+    };
+
+    res.json(response);
+  });
+
+  // Get application statistics (Owner, assigned mentor, or admin)
+  getApplicationStats = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
+    }
+
+    const stats = await applicationService.getApplicationStats(req.user);
+
+    const response: ApiResponse = {
+      success: true,
+      data: { stats },
+    };
+
+    res.json(response);
+  });
+
+  // Bulk update application status (Students only)
+  bulkUpdateStatus = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
+    }
+
+    if (req.user.role !== UserRole.STUDENT) {
+      throw new AuthorizationError("Only students can update application status");
+    }
+
+    const { applicationIds, status } = req.body;
+    const result = await applicationService.bulkUpdateStatus(applicationIds, status, req.user.id);
+
+    logger.info("Bulk status update", {
+      userId: req.user.id,
+      applicationIds,
+      status,
+      updatedCount: result.updatedCount,
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      data: { updatedCount: result.updatedCount },
+      message: `${result.updatedCount} applications updated successfully`,
+    };
+
+    res.json(response);
+  });
+
+  // Export applications (Owner only)
+  exportApplications = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
+    }
+
+    if (req.user.role !== UserRole.STUDENT) {
+      throw new AuthorizationError("Only students can export their applications");
+    }
+
+    const exportData = await applicationService.exportApplications(req.user.id, req.query);
+
+    const response: ApiResponse = {
+      success: true,
+      data: { applications: exportData },
+      message: "Applications exported successfully",
+    };
+
+    res.json(response);
+  });
 }
 
 export const applicationController = new ApplicationController();
