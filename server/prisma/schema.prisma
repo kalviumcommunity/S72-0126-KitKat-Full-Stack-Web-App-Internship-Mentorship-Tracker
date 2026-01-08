@@ -1,0 +1,173 @@
+// Prisma Schema for Unified Internship & Mentorship Portal (UIMP)
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  STUDENT
+  MENTOR
+  ADMIN
+}
+
+enum ApplicationStatus {
+  DRAFT
+  APPLIED
+  SHORTLISTED
+  INTERVIEW
+  OFFER
+  REJECTED
+}
+
+enum ApplicationPlatform {
+  LINKEDIN
+  COMPANY_WEBSITE
+  REFERRAL
+  JOB_BOARD
+  CAREER_FAIR
+  OTHER
+}
+
+enum FeedbackTag {
+  RESUME
+  DSA
+  SYSTEM_DESIGN
+  COMMUNICATION
+}
+
+enum FeedbackPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum NotificationType {
+  FEEDBACK_RECEIVED
+  APPLICATION_STATUS_CHANGED
+  MENTOR_ASSIGNED
+  SYSTEM_ANNOUNCEMENT
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  passwordHash String @map("password_hash")
+  role      UserRole
+  firstName String?  @map("first_name")
+  lastName  String?  @map("last_name")
+  profileImageUrl String? @map("profile_image_url")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  lastLoginAt DateTime? @map("last_login_at")
+
+  // Relations
+  applications      Application[]
+  feedbackGiven     Feedback[]     @relation("MentorFeedback")
+  notifications     Notification[]
+  mentorAssignments MentorAssignment[] @relation("MentorAssignments")
+  studentAssignments MentorAssignment[] @relation("StudentAssignments")
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Application {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  company   String
+  role      String
+  platform  ApplicationPlatform
+  status    ApplicationStatus @default(DRAFT)
+  resumeUrl String?  @map("resume_url")
+  notes     String?  @db.Text
+  deadline  DateTime?
+  appliedDate DateTime? @map("applied_date")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feedback Feedback[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([company])
+  @@index([createdAt])
+  @@map("applications")
+}
+
+model Feedback {
+  id            String          @id @default(uuid())
+  applicationId String          @map("application_id")
+  mentorId      String          @map("mentor_id")
+  content       String          @db.Text
+  tags          FeedbackTag[]
+  priority      FeedbackPriority
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  mentor      User        @relation("MentorFeedback", fields: [mentorId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@index([mentorId])
+  @@index([createdAt])
+  @@map("feedback")
+}
+
+model Notification {
+  id        String          @id @default(uuid())
+  userId    String          @map("user_id")
+  type      NotificationType
+  title     String
+  message   String          @db.Text
+  read      Boolean         @default(false)
+  expiresAt DateTime?       @map("expires_at")
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model MentorAssignment {
+  id        String   @id @default(uuid())
+  mentorId  String   @map("mentor_id")
+  studentId String   @map("student_id")
+  isActive  Boolean  @default(true) @map("is_active")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  mentor  User @relation("MentorAssignments", fields: [mentorId], references: [id], onDelete: Cascade)
+  student User @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([mentorId, studentId])
+  @@index([mentorId])
+  @@index([studentId])
+  @@index([isActive])
+  @@map("mentor_assignments")
+}
+
