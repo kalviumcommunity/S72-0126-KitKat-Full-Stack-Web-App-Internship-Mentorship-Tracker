@@ -1,39 +1,101 @@
+import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
+
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <div className="text-center sm:text-left">
-          <h1 className="text-4xl font-bold mb-4">
-            Welcome to UIMP
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">U</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">UIMP</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/about">
+                <Button variant="ghost">About</Button>
+              </Link>
+              <Link href="/login">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/signup">
+                <Button>Get Started</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+            Unified Internship &<br />
+            <span className="text-blue-600">Mentorship Portal</span>
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-            Unified Internship & Mentorship Portal
-          </p>
-          <p className="text-lg max-w-2xl">
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             A comprehensive platform for internship application tracking and mentorship feedback.
             Manage your applications, receive structured feedback from mentors, and track your progress.
           </p>
+          
+          <div className="flex gap-4 justify-center mb-16">
+            <Link href="/signup">
+              <Button size="lg" className="px-8">
+                Start Your Journey
+              </Button>
+            </Link>
+            <Link href="/about">
+              <Button variant="outline" size="lg" className="px-8">
+                Learn More
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="/auth/login"
-          >
-            Get Started
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="/about"
-          >
-            Learn More
-          </a>
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+          <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="text-4xl mb-4">📋</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Application Tracking
+            </h3>
+            <p className="text-gray-600">
+              Keep track of all your internship applications in one place with status updates and deadlines.
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="text-4xl mb-4">👨‍🏫</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Mentor Feedback
+            </h3>
+            <p className="text-gray-600">
+              Receive structured feedback from experienced mentors to improve your applications and skills.
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="text-4xl mb-4">📊</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Progress Analytics
+            </h3>
+            <p className="text-gray-600">
+              Visualize your application progress and success rates with comprehensive analytics.
+            </p>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <p className="text-sm text-gray-500">
-          Built for internship tracking and mentorship
-        </p>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-gray-500">
+            <p>&copy; 2024 UIMP. Built for internship tracking and mentorship.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
