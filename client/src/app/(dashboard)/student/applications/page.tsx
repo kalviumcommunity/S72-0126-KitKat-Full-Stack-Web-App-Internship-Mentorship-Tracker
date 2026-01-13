@@ -1,32 +1,38 @@
 // Student Applications List - Server Component
-// Displays all applications for the student
+// Displays all applications for the student with server-side rendering
 
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { ApplicationList } from '@/components/features/applications/ApplicationList';
-import { Button } from '@/components/ui/Button';
+import { Metadata } from 'next/types';
+
+import { StudentRoute } from '@/components/auth/ProtectedRoute';
+import { ApplicationListServer } from '@/components/features/applications/ApplicationListServer';
 
 export const metadata: Metadata = {
   title: 'My Applications - UIMP',
   description: 'View and manage your internship applications',
 };
 
-export default function StudentApplicationsPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Applications</h1>
-          <p className="text-gray-600 mt-1">
-            Track and manage your internship applications
-          </p>
-        </div>
-        <Link href="/student/applications/new">
-          <Button>New Application</Button>
-        </Link>
-      </div>
+interface StudentApplicationsPageProps {
+  searchParams?: {
+    status?: string;
+    platform?: string;
+    company?: string;
+    page?: string;
+  };
+}
 
-      <ApplicationList />
-    </div>
+export default function StudentApplicationsPage({ 
+  searchParams 
+}: StudentApplicationsPageProps) {
+  // TODO: Get actual user ID from authentication context
+  // For now, using a mock user ID
+  const userId = 'mock-user-id';
+
+  return (
+    <StudentRoute>
+      <ApplicationListServer 
+        userId={userId}
+        searchParams={searchParams}
+      />
+    </StudentRoute>
   );
 }
