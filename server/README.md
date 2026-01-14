@@ -263,12 +263,85 @@ npm run db:reset  # ⚠️ Deletes all data
 ### Port Already in Use
 Change `PORT` in `.env` or stop the process using port 3001
 
+## Testing
+
+### Quick Test
+
+Run all tests:
+
+**Windows:**
+```powershell
+.\run-all-tests.ps1
+```
+
+**Linux/Mac:**
+```bash
+./run-all-tests.sh
+```
+
+### Individual Test Suites
+
+**End-to-End Tests** (45+ tests):
+```bash
+# Windows
+.\test-e2e.ps1
+
+# Linux/Mac
+./test-e2e.sh
+```
+
+**Feedback API Tests** (15+ tests):
+```bash
+# Windows
+.\test-feedback.ps1
+
+# Linux/Mac
+./test-feedback.sh
+```
+
+### Test Documentation
+
+- [Testing Overview](../Docs/TESTING_OVERVIEW.md) - Complete testing strategy
+- [E2E Testing Guide](../Docs/E2E_TESTING_GUIDE.md) - End-to-end test documentation
+- [Feedback API](../Docs/FEEDBACK_API.md) - Feedback API tests and documentation
+- [Testing Quick Start](../Docs/TESTING_QUICK_START.md) - Quick reference guide
+
+### Prerequisites for Testing
+
+1. Server must be running: `npm run dev`
+2. Database must be migrated: `npm run db:migrate`
+3. Optional: Seed test data: `npm run db:seed`
+
+### Test Coverage
+
+- ✅ Authentication flows (6 tests)
+- ✅ User management (2 tests)
+- ✅ Application CRUD (5 tests)
+- ✅ Mentor assignments (1 test)
+- ✅ Feedback system (20 tests)
+- ✅ Authorization rules (5 tests)
+- ✅ Validation (4 tests)
+- ✅ Pagination (4 tests)
+- ✅ Filtering (6 tests)
+- ✅ Sorting (3 tests)
+- ✅ Rate limiting (5 tests)
+- ✅ Error handling (5 tests)
+
+**Total: 60+ comprehensive tests**
+
 ## Additional Documentation
 
-- [Prisma Setup Guide](./PRISMA_SETUP.md)
-- [API Contracts](./API_CONTRACTS.md)
-- [Schema Documentation](./prisma/SCHEMA_DOCUMENTATION.md)
-- [Entity Relationships](./prisma/RELATIONSHIPS.md)
+- [Testing Overview](../Docs/TESTING_OVERVIEW.md)
+- [E2E Testing Guide](../Docs/E2E_TESTING_GUIDE.md)
+- [Testing Quick Start](../Docs/TESTING_QUICK_START.md)
+- [Feedback API](../Docs/FEEDBACK_API.md)
+- [Upload & Email Guide](../Docs/UPLOAD_AND_EMAIL_GUIDE.md)
+- [Performance Guide](../Docs/PERFORMANCE_GUIDE.md)
+- [Optimization & Caching](../Docs/OPTIMIZATION_AND_CACHING.md)
+- [Prisma Setup Guide](../Docs/PRISMA_SETUP.md)
+- [API Contracts](../Docs/API_CONTRACTS.md)
+- [Authentication & RBAC](../Docs/AUTHENTICATION_AND_RBAC.md)
+- [Validation & Error Handling](../Docs/VALIDATION_AND_ERROR_HANDLING.md)
 
 ## Development Workflow
 
