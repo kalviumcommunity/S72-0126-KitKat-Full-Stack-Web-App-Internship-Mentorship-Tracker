@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import { emailService } from "../../lib/email";
 import { NotFoundError, AuthorizationError, ValidationError } from "../../middlewares/error.middleware";
 import { UserRole } from "../../types/roles";
 import { RequestUser } from "../../types/api";
@@ -71,6 +72,19 @@ export class FeedbackService {
         message: `You received new feedback from ${feedback.mentor.firstName || "your mentor"} on your ${application.company} application`,
       },
     });
+
+    // Send email notification
+    const mentorName = `${feedback.mentor.firstName || ""} ${feedback.mentor.lastName || ""}`.trim() || "Your mentor";
+    const studentName = `${application.user.firstName || ""} ${application.user.lastName || ""}`.trim() || "Student";
+    const feedbackPreview = data.content.substring(0, 150) + (data.content.length > 150 ? "..." : "");
+
+    await emailService.sendFeedbackNotification(
+      application.user.email,
+      studentName,
+      mentorName,
+      application.company,
+      feedbackPreview
+    );
 
     logger.info("Feedback created", {
       feedbackId: feedback.id,

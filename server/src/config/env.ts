@@ -10,14 +10,30 @@ export const env = {
   JWT_SECRET: process.env.JWT_SECRET || "",
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "24h",
   CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3000",
+  
+  // Storage Configuration
+  STORAGE_PROVIDER: process.env.STORAGE_PROVIDER || "local", // s3, azure, local
+  
+  // AWS S3
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
-  AWS_REGION: process.env.AWS_REGION || "",
+  AWS_REGION: process.env.AWS_REGION || "us-east-1",
   AWS_S3_BUCKET: process.env.AWS_S3_BUCKET || "",
+  
+  // Azure Blob Storage
+  AZURE_STORAGE_ACCOUNT_NAME: process.env.AZURE_STORAGE_ACCOUNT_NAME || "",
+  AZURE_STORAGE_ACCOUNT_KEY: process.env.AZURE_STORAGE_ACCOUNT_KEY || "",
+  AZURE_STORAGE_CONTAINER: process.env.AZURE_STORAGE_CONTAINER || "uploads",
+  
+  // Local Storage
+  LOCAL_UPLOAD_DIR: process.env.LOCAL_UPLOAD_DIR || "./uploads",
+  
+  // Email Configuration
   SMTP_HOST: process.env.SMTP_HOST || "",
   SMTP_PORT: parseInt(process.env.SMTP_PORT || "587", 10),
   SMTP_USER: process.env.SMTP_USER || "",
   SMTP_PASS: process.env.SMTP_PASS || "",
+  SMTP_FROM: process.env.SMTP_FROM || "",
 } as const;
 
 // Validate required environment variables
