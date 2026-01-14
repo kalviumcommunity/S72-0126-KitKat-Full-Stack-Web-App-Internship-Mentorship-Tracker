@@ -1,33 +1,47 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
 import { logger } from "./lib/logger";
-import { closeRedisConnection } from "./lib/redis";
+import { redis } from "./lib/redis";
 
-const app = createApp();
+// Initialize Redis connection
+async function initializeServer() {
+  try {
+    // Connect to Redis
+    await redis.connect();
+    logger.info("Redis connection initialized");
+  } catch (error) {
+    logger.warn("Redis connection failed, continuing without cache", { error });
+  }
 
-const server = app.listen(env.PORT, () => {
-  logger.info(`Server running on port ${env.PORT}`);
-  logger.info(`Environment: ${env.NODE_ENV}`);
-});
+  const app = createApp();
 
-// Graceful shutdown
-process.on("SIGTERM", async () => {
-  logger.info("SIGTERM signal received: closing HTTP server");
-  server.close(async () => {
-    logger.info("HTTP server closed");
-    await closeRedisConnection();
-    process.exit(0);
+  const server = app.listen(env.PORT, () => {
+    logger.info(`Server running on port ${env.PORT}`);
+    logger.info(`Environment: ${env.NODE_ENV}`);
   });
+
+  // Graceful shutdown
+  const shutdown = async (signal: string) => {
+    logger.info(`${signal} signal received: closing HTTP server`);
+    server.close(async () => {
+      logger.info("HTTP server closed");
+      await redis.disconnect();
+      logger.info("Redis connection closed");
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+
+  return server;
+}
+
+// Start server
+initializeServer().catch((error) => {
+  logger.error("Failed to start server", { error });
+  process.exit(1);
 });
 
-process.on("SIGINT", async () => {
-  logger.info("SIGINT signal received: closing HTTP server");
-  server.close(async () => {
-    logger.info("HTTP server closed");
-    await closeRedisConnection();
-    process.exit(0);
-  });
-});
-
-export default server;
+export default initializeServer;
 
