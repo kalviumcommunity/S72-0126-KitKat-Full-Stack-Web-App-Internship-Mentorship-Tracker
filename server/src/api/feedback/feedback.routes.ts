@@ -1,59 +1,124 @@
 import { Router } from "express";
+import { z } from "zod";
 import { feedbackController } from "./feedback.controller";
-import { validate } from "../../middlewares/validate.middleware";
-import {
-  createFeedbackSchema,
-  updateFeedbackSchema,
-  getFeedbackSchema,
-  listFeedbackSchema,
-  deleteFeedbackSchema,
-} from "./feedback.schema";
 import { authenticate } from "../../middlewares/auth.middleware";
-import { requireRole } from "../../middlewares/rbac.middleware";
+import { requireRole, requireMentor, requireMentorOrAdmin } from "../../middlewares/rbac.middleware";
+import { validate } from "../../middlewares/validation.middleware";
+import { 
+  createFeedbackSchema, 
+  updateFeedbackSchema, 
+  feedbackQuerySchema,
+  uuidParamSchema 
+} from "./feedback.schema";
+import { createRateLimiter } from "../../middlewares/rate-limit.middleware";
 import { UserRole } from "../../types/roles";
 
 const router = Router();
 
-// All routes require authentication
+// All feedback routes require authentication
 router.use(authenticate);
 
-// List feedback - all authenticated users
-router.get(
-  "/",
-  validate(listFeedbackSchema),
-  feedbackController.listFeedback.bind(feedbackController)
-);
+// Rate limiters
+const feedbackCreateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // 20 feedback per 15 minutes
+  message: "Too many feedback submissions, please try again later",
+});
 
-// Get feedback by ID - all authenticated users (with permission checks)
-router.get(
-  "/:id",
-  validate(getFeedbackSchema),
-  feedbackController.getFeedback.bind(feedbackController)
-);
+const feedbackReadLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 100, // 100 requests per 15 minutes
+  message: "Too many requests, please try again later",
+});
 
-// Create feedback - MENTOR only
+/**
+ * @route   POST /api/feedback
+ * @desc    Create new feedback (Mentors only)
+ * @access  Private (Mentor)
+ */
 router.post(
   "/",
-  requireRole(UserRole.MENTOR),
+  requireMentor,
+  feedbackCreateLimiter,
   validate(createFeedbackSchema),
-  feedbackController.createFeedback.bind(feedbackController)
+  feedbackController.createFeedback
 );
 
-// Update feedback - MENTOR only
-router.put(
+/**
+ * @route   GET /api/feedback
+ * @desc    List all feedback with filters (role-based access)
+ * @access  Private (All authenticated users)
+ */
+router.get(
+  "/",
+  feedbackReadLimiter,
+  validate(feedbackQuerySchema),
+  feedbackController.listFeedback
+);
+
+/**
+ * @route   GET /api/feedback/stats
+ * @desc    Get feedback statistics
+ * @access  Private (All authenticated users)
+ */
+router.get(
+  "/stats",
+  feedbackReadLimiter,
+  feedbackController.getFeedbackStats
+);
+
+/**
+ * @route   GET /api/feedback/application/:applicationId
+ * @desc    Get all feedback for a specific application
+ * @access  Private (Student owner, assigned mentor, or admin)
+ */
+router.get(
+  "/application/:applicationId",
+  feedbackReadLimiter,
+  validate(z.object({
+    params: z.object({
+      applicationId: z.string().uuid("Invalid application ID"),
+    }),
+  })),
+  feedbackController.getApplicationFeedback
+);
+
+/**
+ * @route   GET /api/feedback/:id
+ * @desc    Get feedback by ID
+ * @access  Private (Student owner, mentor who created it, assigned mentor, or admin)
+ */
+router.get(
   "/:id",
-  requireRole(UserRole.MENTOR),
-  validate(updateFeedbackSchema),
-  feedbackController.updateFeedback.bind(feedbackController)
+  feedbackReadLimiter,
+  validate(uuidParamSchema),
+  feedbackController.getFeedback
 );
 
-// Delete feedback - MENTOR only
+/**
+ * @route   PATCH /api/feedback/:id
+ * @desc    Update feedback (Mentor who created it only)
+ * @access  Private (Mentor owner)
+ */
+router.patch(
+  "/:id",
+  requireMentor,
+  feedbackCreateLimiter,
+  validate(uuidParamSchema),
+  validate(updateFeedbackSchema),
+  feedbackController.updateFeedback
+);
+
+/**
+ * @route   DELETE /api/feedback/:id
+ * @desc    Delete feedback (Mentor who created it or admin)
+ * @access  Private (Mentor owner or Admin)
+ */
 router.delete(
   "/:id",
-  requireRole(UserRole.MENTOR),
-  validate(deleteFeedbackSchema),
-  feedbackController.deleteFeedback.bind(feedbackController)
+  requireMentorOrAdmin,
+  validate(uuidParamSchema),
+  feedbackController.deleteFeedback
 );
 
 export default router;
-
