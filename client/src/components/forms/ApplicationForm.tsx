@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Card, CardContent } from '@/components/ui/Card';
+import { FileUpload } from '@/components/ui/FileUpload';
 import { applicationSchema, type ApplicationFormData } from '@/lib/validations';
 import { applications } from '@/lib/api';
 import { getValidationErrors } from '@/lib/validations';
@@ -31,9 +32,11 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
     deadline: initialData?.deadline || '',
     appliedDate: initialData?.appliedDate || '',
   });
+  const [selectedResume, setSelectedResume] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleInputChange = (field: keyof ApplicationFormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -42,7 +45,7 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
       ...prev,
       [field]: e.target.value
     }));
-    
+
     // Clear field error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -52,22 +55,53 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
     }
   };
 
+  const handleFileSelect = (file: File) => {
+    setSelectedResume(file);
+    // Clear potential upload errors if any (though we handle general errors mostly)
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setGeneralError('');
     setErrors({});
+    setUploadProgress(0);
 
     try {
       // Validate form data
+      // Note: applicationSchema might not include validation for 'resumeFile' as it's optional and handled separately for upload
       const validatedData = applicationSchema.parse(formData);
-      
-      // Call API
+
+      // 1. Create/Update Application first
       const response = isEditing && applicationId
         ? await applications.update(applicationId, validatedData)
         : await applications.create(validatedData);
-      
-      if (response.success) {
+
+      if (response.success && response.data) {
+        const newAppId = response.data.id;
+
+        // 2. Upload Resume if selected
+        if (selectedResume) {
+          // Simulate progress for UX since duplicate calls are fast or if needed we'd hook into XHR
+          // But here we rely on the promise. 
+          // For a real progress bar we need axios or XHR. 
+          // We will fake it slightly or just set to 50% then 100%
+          setUploadProgress(30);
+
+          const uploadResponse = await applications.uploadResume(newAppId, selectedResume);
+          setUploadProgress(100);
+
+          if (!uploadResponse.success) {
+            // Application created but resume failed
+            setGeneralError(`Application saved but resume upload failed: ${uploadResponse.error}`);
+            // We generally might still redirect but let's show error.
+            // But actually, for better UX, maybe we should warn and redirect.
+            // For now, let's stop and show error.
+            setIsLoading(false);
+            return;
+          }
+        }
+
         router.push('/student/applications');
       } else {
         setGeneralError(response.error || 'Failed to save application. Please try again.');
@@ -79,6 +113,11 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
         setGeneralError('An unexpected error occurred. Please try again.');
       }
     } finally {
+      if (!generalError) {
+        // Only stop loading if we are NOT redirecting (on error). 
+        // If success, we redirect, and unmount.
+        // But if we had an error in catch, we stop loading.
+      }
       setIsLoading(false);
     }
   };
@@ -199,20 +238,15 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
       <Card>
         <CardContent>
           <h3 className="text-lg font-medium text-gray-900 mb-4">Resume</h3>
-          <div className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <div className="text-gray-400 text-4xl mb-2">📄</div>
-              <p className="text-sm text-gray-600 mb-2">
-                Upload your resume for this application
-              </p>
-              <Button variant="outline" size="sm" disabled={isLoading}>
-                Choose File
-              </Button>
-              <p className="text-xs text-gray-500 mt-2">
-                PDF, DOC, or DOCX up to 5MB
-              </p>
-            </div>
-          </div>
+          <FileUpload
+            label="Upload Resume"
+            onFileSelect={handleFileSelect}
+            acceptedFileTypes={['.pdf', '.doc', '.docx']}
+            maxFileSize={5 * 1024 * 1024}
+            helperText="Upload your resume (PDF, DOC, DOCX up to 5MB)"
+            isUploading={isLoading && !!uploadProgress}
+            uploadProgress={uploadProgress}
+          />
         </CardContent>
       </Card>
 
@@ -231,8 +265,8 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
           disabled={isLoading}
           loading={isLoading}
         >
-          {isLoading 
-            ? (isEditing ? 'Updating...' : 'Creating...') 
+          {isLoading
+            ? (uploadProgress > 0 ? 'Uploading Resume...' : (isEditing ? 'Updating...' : 'Creating...'))
             : (isEditing ? 'Update Application' : 'Create Application')
           }
         </Button>

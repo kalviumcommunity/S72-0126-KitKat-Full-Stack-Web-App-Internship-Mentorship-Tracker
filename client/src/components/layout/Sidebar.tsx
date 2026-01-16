@@ -90,7 +90,7 @@ export function Sidebar() {
 
   const userInitials = user.firstName && user.lastName
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
-    : (user.email?.[0] || 'U').toUpperCase();
+    : (user.email ? user.email.charAt(0) : 'U').toUpperCase();
 
   const userDisplayName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`
