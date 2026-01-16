@@ -7,7 +7,7 @@ import { NotificationBell } from '@/components/features/notifications/Notificati
 
 export function Header() {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
@@ -22,20 +22,20 @@ export function Header() {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex space-x-8">
-            <Link 
-              href="/student" 
+            <Link
+              href="/student"
               className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
             >
               Dashboard
             </Link>
-            <Link 
-              href="/student/applications" 
+            <Link
+              href="/student/applications"
               className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
             >
               Applications
             </Link>
-            <Link 
-              href="/student/feedback" 
+            <Link
+              href="/student/feedback"
               className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
             >
               Feedback
