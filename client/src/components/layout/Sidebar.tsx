@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
 
 interface NavigationItem {
   name: string;

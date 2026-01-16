@@ -5,10 +5,11 @@ import Link from 'next/link';
 
 import { StudentRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { NotificationList } from '@/components/features/notifications/NotificationList';
 import { MarkAllAsReadButton } from '@/components/features/notifications/MarkAllAsReadButton';
 import type { Notification } from '@/lib/types';
+import { NotificationType } from '@/lib/types';
 
 // Mock function to get notifications
 async function getNotifications(userId: string): Promise<Notification[]> {
@@ -20,7 +21,7 @@ async function getNotifications(userId: string): Promise<Notification[]> {
     {
       id: 'n1',
       userId: userId,
-      type: 'FEEDBACK_RECEIVED',
+      type: NotificationType.FEEDBACK_RECEIVED,
       title: 'New Feedback Received',
       message: 'John Doe provided feedback on your Google Software Engineer Intern application.',
       read: false,
@@ -30,7 +31,7 @@ async function getNotifications(userId: string): Promise<Notification[]> {
     {
       id: 'n2',
       userId: userId,
-      type: 'APPLICATION_STATUS_CHANGED',
+      type: NotificationType.APPLICATION_STATUS_CHANGED,
       title: 'Application Status Updated',
       message: 'Your Microsoft Product Manager Intern application status changed to INTERVIEW.',
       read: false,
@@ -40,7 +41,7 @@ async function getNotifications(userId: string): Promise<Notification[]> {
     {
       id: 'n3',
       userId: userId,
-      type: 'MENTOR_ASSIGNED',
+      type: NotificationType.MENTOR_ASSIGNED,
       title: 'New Mentor Assigned',
       message: 'Jane Smith has been assigned as your mentor. They will help guide you through your internship applications.',
       read: true,
@@ -50,7 +51,7 @@ async function getNotifications(userId: string): Promise<Notification[]> {
     {
       id: 'n4',
       userId: userId,
-      type: 'SYSTEM_ANNOUNCEMENT',
+      type: NotificationType.SYSTEM_ANNOUNCEMENT,
       title: 'System Maintenance Scheduled',
       message: 'The platform will undergo maintenance on January 20th from 2:00 AM to 4:00 AM EST. Some features may be temporarily unavailable.',
       read: true,
@@ -60,7 +61,7 @@ async function getNotifications(userId: string): Promise<Notification[]> {
     {
       id: 'n5',
       userId: userId,
-      type: 'FEEDBACK_RECEIVED',
+      type: NotificationType.FEEDBACK_RECEIVED,
       title: 'New Feedback Received',
       message: 'Jane Smith provided feedback on your Amazon SDE Intern application.',
       read: true,

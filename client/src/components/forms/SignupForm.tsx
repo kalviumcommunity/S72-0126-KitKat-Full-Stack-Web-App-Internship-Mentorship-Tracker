@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { signupSchema, type SignupFormData } from '@/lib/validations';
 import { USER_ROLE_OPTIONS } from '@/lib/constants';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
 
 export function SignupForm() {
   const { signup, isLoading } = useAuth();
@@ -32,7 +33,7 @@ export function SignupForm() {
       confirmPassword: '',
       firstName: '',
       lastName: '',
-      role: 'STUDENT' as const,
+      role: UserRole.STUDENT as const,
     },
     validateOnChange: true,
     validateOnBlur: true,

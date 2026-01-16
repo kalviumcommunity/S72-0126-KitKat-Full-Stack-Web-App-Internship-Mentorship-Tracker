@@ -11,6 +11,7 @@ import { StudentsList } from '@/components/features/dashboard/StudentsList';
 import { RecentApplications } from '@/components/features/dashboard/RecentApplications';
 import { FeedbackActivity } from '@/components/features/dashboard/FeedbackActivity';
 import type { MentorDashboardData } from '@/lib/types';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority } from '@/lib/types';
 
 // Mock function to get mentor dashboard data
 async function getMentorDashboard(userId: string): Promise<MentorDashboardData> {
@@ -22,7 +23,7 @@ async function getMentorDashboard(userId: string): Promise<MentorDashboardData> 
     user: {
       id: userId,
       email: 'mentor@example.com',
-      role: 'MENTOR',
+      role: UserRole.MENTOR,
       firstName: 'Jane',
       lastName: 'Mentor',
       profileImageUrl: undefined,
@@ -67,8 +68,8 @@ async function getMentorDashboard(userId: string): Promise<MentorDashboardData> 
           userId: 's1',
           company: 'Google',
           role: 'Software Engineer Intern',
-          platform: 'COMPANY_WEBSITE',
-          status: 'INTERVIEW',
+          platform: ApplicationPlatform.COMPANY_WEBSITE,
+          status: ApplicationStatus.INTERVIEW,
           resumeUrl: '/resumes/resume-google.pdf',
           notes: 'Technical interview scheduled.',
           deadline: '2024-01-20T23:59:59Z',
@@ -87,8 +88,8 @@ async function getMentorDashboard(userId: string): Promise<MentorDashboardData> 
           userId: 's2',
           company: 'Microsoft',
           role: 'Product Manager Intern',
-          platform: 'LINKEDIN',
-          status: 'APPLIED',
+          platform: ApplicationPlatform.LINKEDIN,
+          status: ApplicationStatus.APPLIED,
           resumeUrl: '/resumes/resume-microsoft.pdf',
           notes: 'Waiting for response.',
           deadline: '2024-01-25T23:59:59Z',
@@ -107,11 +108,11 @@ async function getMentorDashboard(userId: string): Promise<MentorDashboardData> 
           userId: 's1',
           company: 'Amazon',
           role: 'SDE Intern',
-          platform: 'REFERRAL',
-          status: 'SHORTLISTED',
+          platform: ApplicationPlatform.REFERRAL,
+          status: ApplicationStatus.SHORTLISTED,
           resumeUrl: '/resumes/resume-amazon.pdf',
           notes: 'Employee referral.',
-          deadline: null,
+          deadline: undefined,
           appliedDate: '2024-01-13T09:15:00Z',
           createdAt: '2024-01-13T09:15:00Z',
           updatedAt: '2024-01-17T16:45:00Z',
@@ -133,7 +134,7 @@ async function getMentorDashboard(userId: string): Promise<MentorDashboardData> 
           mentorId: userId,
           content: 'Great progress on the technical assessment! Focus on system design concepts.',
           tags: ['DSA', 'SYSTEM_DESIGN'],
-          priority: 'HIGH',
+          priority: FeedbackPriority.HIGH,
           createdAt: '2024-01-16T09:00:00Z',
           updatedAt: '2024-01-16T09:00:00Z',
           mentor: {
@@ -147,8 +148,8 @@ async function getMentorDashboard(userId: string): Promise<MentorDashboardData> 
             userId: 's1',
             company: 'Google',
             role: 'Software Engineer Intern',
-            platform: 'COMPANY_WEBSITE',
-            status: 'INTERVIEW',
+            platform: ApplicationPlatform.COMPANY_WEBSITE,
+            status: ApplicationStatus.INTERVIEW,
             resumeUrl: '/resumes/resume-google.pdf',
             notes: 'Technical interview scheduled.',
             deadline: '2024-01-20T23:59:59Z',

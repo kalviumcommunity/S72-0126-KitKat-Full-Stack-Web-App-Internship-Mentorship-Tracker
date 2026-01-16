@@ -342,11 +342,5 @@ function inputClass(error?: string) {
 function textareaClass(error?: string) {
   return `w-full rounded-xl border px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 resize-none ${
     error ? "border-red-400" : "border-gray-200"
-   
-    return (
-      <div className="p-6">
-        <ApplicationForm mode="create" />
-      </div>
-    );
   }`;
 }

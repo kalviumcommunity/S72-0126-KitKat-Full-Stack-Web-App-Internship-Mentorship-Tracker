@@ -53,7 +53,7 @@ export function ApplicationCreateForm() {
     company: '',
     role: '',
     platform: '',
-    status: 'DRAFT',
+    status: ApplicationStatus.DRAFT,
     notes: '',
     deadline: '',
     appliedDate: '',

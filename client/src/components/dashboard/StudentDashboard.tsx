@@ -5,6 +5,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
 
 // TODO: Replace with real data from API
 const mockData = {
@@ -19,21 +20,21 @@ const mockData = {
       id: '1',
       company: 'Google',
       role: 'Software Engineer Intern',
-      status: 'INTERVIEW',
+      status: ApplicationStatus.INTERVIEW,
       appliedDate: '2024-01-15',
     },
     {
       id: '2',
       company: 'Microsoft',
       role: 'Product Manager Intern',
-      status: 'APPLIED',
+      status: ApplicationStatus.APPLIED,
       appliedDate: '2024-01-14',
     },
     {
       id: '3',
       company: 'Amazon',
       role: 'SDE Intern',
-      status: 'SHORTLISTED',
+      status: ApplicationStatus.SHORTLISTED,
       appliedDate: '2024-01-13',
     },
   ],
@@ -42,14 +43,14 @@ const mockData = {
       id: '1',
       mentor: 'John Doe',
       content: 'Great improvement in your resume structure. Consider adding more quantifiable achievements.',
-      priority: 'MEDIUM',
+      priority: FeedbackPriority.MEDIUM,
       createdAt: '2024-01-16',
     },
     {
       id: '2',
       mentor: 'Jane Smith',
       content: 'Your DSA skills are solid. Focus on system design for upcoming interviews.',
-      priority: 'HIGH',
+      priority: FeedbackPriority.HIGH,
       createdAt: '2024-01-15',
     },
   ],

@@ -1,14 +1,7 @@
 // Application constants for UIMP Frontend
 // Based on Prisma schema analysis and business requirements
 
-import { 
-  ApplicationStatus, 
-  ApplicationPlatform, 
-  FeedbackTag, 
-  FeedbackPriority, 
-  NotificationType,
-  UserRole 
-} from './types';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
 
 // ============================================
 // APPLICATION CONSTANTS

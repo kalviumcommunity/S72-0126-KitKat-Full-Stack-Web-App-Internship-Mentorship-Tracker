@@ -5,6 +5,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
 
 // TODO: Replace with real data from API
 const mockData = {
@@ -43,7 +44,7 @@ const mockData = {
       student: 'Alice Johnson',
       company: 'Google',
       role: 'Software Engineer Intern',
-      status: 'APPLIED',
+      status: ApplicationStatus.APPLIED,
       needsReview: true,
     },
     {
@@ -51,7 +52,7 @@ const mockData = {
       student: 'Bob Smith',
       company: 'Microsoft',
       role: 'Product Manager Intern',
-      status: 'INTERVIEW',
+      status: ApplicationStatus.INTERVIEW,
       needsReview: false,
     },
     {
@@ -59,7 +60,7 @@ const mockData = {
       student: 'Carol Davis',
       company: 'Amazon',
       role: 'SDE Intern',
-      status: 'SHORTLISTED',
+      status: ApplicationStatus.SHORTLISTED,
       needsReview: true,
     },
   ],

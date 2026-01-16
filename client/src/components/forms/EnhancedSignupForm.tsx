@@ -16,6 +16,7 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { signupSchema, type SignupFormData } from '@/lib/validations';
 import { auth } from '@/lib/api';
 import { USER_ROLE_OPTIONS } from '@/lib/constants';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
 
 export function EnhancedSignupForm() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export function EnhancedSignupForm() {
       confirmPassword: '',
       firstName: '',
       lastName: '',
-      role: 'STUDENT' as const,
+      role: UserRole.STUDENT as const,
     },
     validateOnChange: true,
     validateOnBlur: true,

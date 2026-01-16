@@ -9,6 +9,7 @@ import { FeedbackList } from '@/components/features/feedback/FeedbackList';
 import { FeedbackFilters } from '@/components/features/feedback/FeedbackFilters';
 import { FeedbackStats } from '@/components/features/feedback/FeedbackStats';
 import type { FeedbackWithRelations, FeedbackFilters as FilterType } from '@/lib/types';
+import { ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority } from '@/lib/types';
 
 // Mock function to get feedback
 async function getFeedback(
@@ -32,7 +33,7 @@ async function getFeedback(
       mentorId: 'm1',
       content: 'Great progress on the technical assessment! Your coding skills are solid. For the upcoming interview, I recommend focusing on system design concepts. Practice designing scalable systems and be prepared to discuss trade-offs. Also, review common data structures and algorithms, especially trees and graphs.',
       tags: ['DSA', 'SYSTEM_DESIGN'],
-      priority: 'HIGH',
+      priority: FeedbackPriority.HIGH,
       createdAt: '2024-01-16T09:00:00Z',
       updatedAt: '2024-01-16T09:00:00Z',
       mentor: {
@@ -46,8 +47,8 @@ async function getFeedback(
         userId: userId,
         company: 'Google',
         role: 'Software Engineer Intern',
-        platform: 'COMPANY_WEBSITE',
-        status: 'INTERVIEW',
+        platform: ApplicationPlatform.COMPANY_WEBSITE,
+        status: ApplicationStatus.INTERVIEW,
         resumeUrl: '/resumes/resume-google.pdf',
         notes: 'Applied through university career portal.',
         deadline: '2024-01-20T23:59:59Z',
@@ -68,7 +69,7 @@ async function getFeedback(
       mentorId: 'm1',
       content: 'Resume looks good. Consider adding more quantifiable achievements in your project descriptions. Instead of saying "improved performance," try "improved performance by 40%." This makes your impact more concrete and impressive to recruiters.',
       tags: ['RESUME'],
-      priority: 'MEDIUM',
+      priority: FeedbackPriority.MEDIUM,
       createdAt: '2024-01-15T11:00:00Z',
       updatedAt: '2024-01-15T11:00:00Z',
       mentor: {
@@ -82,8 +83,8 @@ async function getFeedback(
         userId: userId,
         company: 'Microsoft',
         role: 'Product Manager Intern',
-        platform: 'LINKEDIN',
-        status: 'APPLIED',
+        platform: ApplicationPlatform.LINKEDIN,
+        status: ApplicationStatus.APPLIED,
         resumeUrl: '/resumes/resume-microsoft.pdf',
         notes: 'Referred by alumni.',
         deadline: '2024-01-25T23:59:59Z',
@@ -104,7 +105,7 @@ async function getFeedback(
       mentorId: 'm2',
       content: 'Excellent technical skills demonstrated. Prepare for behavioral questions focusing on leadership principles. Amazon values their leadership principles highly, so make sure you have specific examples ready for each one.',
       tags: ['DSA', 'COMMUNICATION'],
-      priority: 'HIGH',
+      priority: FeedbackPriority.HIGH,
       createdAt: '2024-01-17T10:00:00Z',
       updatedAt: '2024-01-17T10:00:00Z',
       mentor: {
@@ -118,11 +119,11 @@ async function getFeedback(
         userId: userId,
         company: 'Amazon',
         role: 'SDE Intern',
-        platform: 'REFERRAL',
-        status: 'SHORTLISTED',
+        platform: ApplicationPlatform.REFERRAL,
+        status: ApplicationStatus.SHORTLISTED,
         resumeUrl: '/resumes/resume-amazon.pdf',
         notes: 'Employee referral from previous internship mentor.',
-        deadline: null,
+        deadline: undefined,
         appliedDate: '2024-01-13T09:15:00Z',
         createdAt: '2024-01-13T09:15:00Z',
         updatedAt: '2024-01-17T16:45:00Z',
@@ -140,7 +141,7 @@ async function getFeedback(
       mentorId: 'm1',
       content: 'Great referral connection. Make sure to research Amazon\'s leadership principles thoroughly. Have concrete examples from your experience that demonstrate each principle.',
       tags: ['COMMUNICATION'],
-      priority: 'MEDIUM',
+      priority: FeedbackPriority.MEDIUM,
       createdAt: '2024-01-16T15:30:00Z',
       updatedAt: '2024-01-16T15:30:00Z',
       mentor: {
@@ -154,11 +155,11 @@ async function getFeedback(
         userId: userId,
         company: 'Amazon',
         role: 'SDE Intern',
-        platform: 'REFERRAL',
-        status: 'SHORTLISTED',
+        platform: ApplicationPlatform.REFERRAL,
+        status: ApplicationStatus.SHORTLISTED,
         resumeUrl: '/resumes/resume-amazon.pdf',
         notes: 'Employee referral.',
-        deadline: null,
+        deadline: undefined,
         appliedDate: '2024-01-13T09:15:00Z',
         createdAt: '2024-01-13T09:15:00Z',
         updatedAt: '2024-01-17T16:45:00Z',
@@ -176,7 +177,7 @@ async function getFeedback(
       mentorId: 'm2',
       content: 'Don\'t be discouraged by the rejection. Your technical skills are strong. Focus on improving data science portfolio projects. Consider adding a project that demonstrates end-to-end ML pipeline development.',
       tags: ['RESUME'],
-      priority: 'MEDIUM',
+      priority: FeedbackPriority.MEDIUM,
       createdAt: '2024-01-18T09:00:00Z',
       updatedAt: '2024-01-18T09:00:00Z',
       mentor: {
@@ -190,8 +191,8 @@ async function getFeedback(
         userId: userId,
         company: 'Meta',
         role: 'Data Science Intern',
-        platform: 'JOB_BOARD',
-        status: 'REJECTED',
+        platform: ApplicationPlatform.JOB_BOARD,
+        status: ApplicationStatus.REJECTED,
         resumeUrl: '/resumes/resume-meta.pdf',
         notes: 'Applied through Indeed.',
         deadline: '2024-01-15T23:59:59Z',

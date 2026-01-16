@@ -1,4 +1,4 @@
-// Resume Upload Page - Client Component
+// Resume Upload Page - Server Component
 // Dedicated page for uploading resume to an application
 
 import { Metadata } from 'next/types';
@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 import { StudentRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from '@/components/ui/Button';
-import { ResumeUpload } from '@/components/features/upload/ResumeUpload';
+import { ResumeUploadClient } from '@/components/features/upload/ResumeUploadClient';
 
 // Mock function to get application
 async function getApplication(id: string) {
@@ -95,36 +95,5 @@ export default async function ResumeUploadPage({ params }: ResumeUploadPageProps
         </div>
       </div>
     </StudentRoute>
-  );
-}
-
-// Client component wrapper for upload functionality
-'use client';
-
-function ResumeUploadClient({ 
-  applicationId, 
-  currentResumeUrl 
-}: { 
-  applicationId: string; 
-  currentResumeUrl?: string;
-}) {
-  const handleUploadComplete = (url: string) => {
-    // Show success message
-    alert('Resume uploaded successfully!');
-    // Redirect back to application page
-    window.location.href = `/student/applications/${applicationId}`;
-  };
-
-  const handleUploadError = (error: string) => {
-    console.error('Upload error:', error);
-  };
-
-  return (
-    <ResumeUpload
-      applicationId={applicationId}
-      currentResumeUrl={currentResumeUrl}
-      onUploadComplete={handleUploadComplete}
-      onUploadError={handleUploadError}
-    />
   );
 }
