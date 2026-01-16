@@ -79,19 +79,19 @@ export function Sidebar() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user } = useAuth();
-  
+
   if (!user) {
     return null;
   }
 
   const userRole = user.role;
-  const filteredNavigation = navigation.filter(item => 
+  const filteredNavigation = navigation.filter(item =>
     item.roles.includes(userRole)
   );
 
-  const userInitials = user.firstName && user.lastName 
+  const userInitials = user.firstName && user.lastName
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
-    : user.email[0].toUpperCase();
+    : (user.email?.[0] || 'U').toUpperCase();
 
   const userDisplayName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`
@@ -99,8 +99,8 @@ export function Sidebar() {
 
   return (
     <div className={cn(
-      'bg-white border-r border-gray-200 transition-all duration-300',
-      isCollapsed ? 'w-16' : 'w-64'
+      'bg-white/80 backdrop-blur-md border-r border-gray-100 transition-all duration-300 min-h-[calc(100vh-4rem)]',
+      isCollapsed ? 'w-20' : 'w-72'
     )}>
       <div className="flex flex-col h-full">
         {/* Collapse Toggle */}
@@ -119,24 +119,31 @@ export function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2">
           {filteredNavigation.map((item) => {
-            const isActive = pathname === item.href || 
+            const isActive = pathname === item.href ||
               (item.href !== '/student' && item.href !== '/mentor' && item.href !== '/admin' && pathname.startsWith(item.href));
-            
+
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                  'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group relative overflow-hidden',
                   isActive
-                    ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'bg-blue-50 text-blue-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                 )}
                 title={isCollapsed ? item.name : undefined}
               >
-                <span className="text-lg mr-3">{item.icon}</span>
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 rounded-r-full" />
+                )}
+                <span className={cn(
+                  "text-xl transition-transform duration-200",
+                  isActive ? "scale-110" : "group-hover:scale-110",
+                  !isCollapsed && "mr-3"
+                )}>{item.icon}</span>
                 {!isCollapsed && (
-                  <span className="truncate">{item.name}</span>
+                  <span className="truncate font-semibold">{item.name}</span>
                 )}
               </Link>
             );

@@ -19,17 +19,17 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <AuthenticatedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/50">
         {/* Header */}
         <Header />
-        
+
         <div className="flex">
           {/* Sidebar */}
           <Sidebar />
-          
+
           {/* Main Content */}
           <main className="flex-1 p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-7xl mx-auto space-y-8">
               {children}
             </div>
           </main>
