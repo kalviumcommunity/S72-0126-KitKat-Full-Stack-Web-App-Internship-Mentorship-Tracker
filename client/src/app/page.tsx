@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import ApplicationForm from "../_components/ApplicationForm";
 
 export default function Home() {
   return (
