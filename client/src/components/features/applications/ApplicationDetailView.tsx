@@ -187,10 +187,18 @@ export function ApplicationDetailView({ application }: ApplicationDetailViewProp
             <Button variant="outline" className="w-full justify-start">
               📊 Update Status
             </Button>
-            {!application.resumeUrl && (
-              <Button variant="outline" className="w-full justify-start">
-                📄 Upload Resume
-              </Button>
+            {!application.resumeUrl ? (
+              <Link href={`/student/applications/${application.id}/upload-resume`} className="block">
+                <Button variant="outline" className="w-full justify-start">
+                  📄 Upload Resume
+                </Button>
+              </Link>
+            ) : (
+              <Link href={`/student/applications/${application.id}/upload-resume`} className="block">
+                <Button variant="outline" className="w-full justify-start">
+                  🔄 Replace Resume
+                </Button>
+              </Link>
             )}
             <Button variant="outline" className="w-full justify-start">
               💬 Request Feedback
