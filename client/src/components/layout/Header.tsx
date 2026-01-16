@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { UserMenu } from './UserMenu';
-import { NotificationBell } from './NotificationBell';
+import { NotificationBell } from '@/components/features/notifications/NotificationBell';
 
 export function Header() {
   return (
