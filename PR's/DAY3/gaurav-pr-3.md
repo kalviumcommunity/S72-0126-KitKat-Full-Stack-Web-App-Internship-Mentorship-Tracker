@@ -123,4 +123,5 @@ client/
 - Authentication flow: 2-3 hours
 - Base UI components: 2-3 hours  
 - Application form: 2 hours
-- Dashboard layouts: 1-2 hours
+- Dashboard layouts: 1-2 
+
