@@ -14,6 +14,7 @@ import { applicationSchema, type ApplicationFormData } from '@/lib/validations';
 import { applications } from '@/lib/api';
 import { getValidationErrors } from '@/lib/validations';
 import { APPLICATION_STATUS_OPTIONS, APPLICATION_PLATFORM_OPTIONS } from '@/lib/constants';
+import { ApplicationPlatform, ApplicationStatus } from '@/lib/types';
 
 interface ApplicationFormProps {
   initialData?: Partial<ApplicationFormData>;
@@ -26,8 +27,8 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
   const [formData, setFormData] = useState<ApplicationFormData>({
     company: initialData?.company || '',
     role: initialData?.role || '',
-    platform: initialData?.platform || 'COMPANY_WEBSITE',
-    status: initialData?.status || 'DRAFT',
+    platform: initialData?.platform || ApplicationPlatform.COMPANY_WEBSITE,
+    status: initialData?.status || ApplicationStatus.DRAFT,
     notes: initialData?.notes || '',
     deadline: initialData?.deadline || '',
     appliedDate: initialData?.appliedDate || '',
@@ -140,7 +141,7 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
               type="text"
               value={formData.company}
               onChange={handleInputChange('company')}
-              error={errors.company}
+              error={errors.company || ''}
               placeholder="e.g., Google, Microsoft, Amazon"
               required
               disabled={isLoading}
@@ -151,7 +152,7 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
               type="text"
               value={formData.role}
               onChange={handleInputChange('role')}
-              error={errors.role}
+              error={errors.role || ''}
               placeholder="e.g., Software Engineer Intern"
               required
               disabled={isLoading}
@@ -161,7 +162,7 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
               label="Application Platform"
               value={formData.platform}
               onChange={handleInputChange('platform')}
-              error={errors.platform}
+              error={errors.platform || ''}
               options={APPLICATION_PLATFORM_OPTIONS}
               required
               disabled={isLoading}
@@ -171,7 +172,7 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
               label="Application Status"
               value={formData.status}
               onChange={handleInputChange('status')}
-              error={errors.status}
+              error={errors.status || ''}
               options={APPLICATION_STATUS_OPTIONS}
               required
               disabled={isLoading}
@@ -188,9 +189,9 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
             <Input
               label="Application Deadline"
               type="datetime-local"
-              value={formData.deadline}
+              value={formData.deadline || ''}
               onChange={handleInputChange('deadline')}
-              error={errors.deadline}
+              error={errors.deadline || ''}
               disabled={isLoading}
               helperText="When is the application due?"
             />
@@ -198,9 +199,9 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
             <Input
               label="Applied Date"
               type="datetime-local"
-              value={formData.appliedDate}
+              value={formData.appliedDate || ''}
               onChange={handleInputChange('appliedDate')}
-              error={errors.appliedDate}
+              error={errors.appliedDate || ''}
               disabled={isLoading}
               helperText="When did you submit the application?"
             />
@@ -217,7 +218,7 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
               Notes
             </label>
             <textarea
-              value={formData.notes}
+              value={formData.notes || ''}
               onChange={handleInputChange('notes')}
               placeholder="Add any additional notes about this application..."
               rows={4}
@@ -228,7 +229,7 @@ export function ApplicationForm({ initialData, isEditing = false, applicationId 
               <p className="text-sm text-red-600">{errors.notes}</p>
             )}
             <p className="text-sm text-gray-500">
-              {formData.notes.length}/1000 characters
+              {(formData.notes || '').length}/1000 characters
             </p>
           </div>
         </CardContent>
