@@ -156,7 +156,7 @@ This document defines the **execution roadmap**, **role ownership**, and **deliv
 * Integrate authentication flow
 * Configure protected routes
 
-#### Frontend 2 (Mallu)
+#### Frontend 2 (Mallu) 
 
 * Connect login and signup forms to APIs
 
@@ -178,6 +178,8 @@ This document defines the **execution roadmap**, **role ownership**, and **deliv
 * Applications list page (Server Component)
 
 #### Frontend 2 (Mallu)
+
+
 
 * Application create/edit form UI
 
