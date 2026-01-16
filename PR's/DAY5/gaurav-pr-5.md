@@ -284,3 +284,6 @@ client/
 - Complete development standards documentation
 
 **Code Quality**: Zero linting errors, 100% TypeScript coverage, accessibility compliant, performance optimized
+
+
+https://github.com/kalviumcommunity/S72-0126-KitKat-Full-Stack-Web-App-Internship-Mentorship-Tracker/pull/18
