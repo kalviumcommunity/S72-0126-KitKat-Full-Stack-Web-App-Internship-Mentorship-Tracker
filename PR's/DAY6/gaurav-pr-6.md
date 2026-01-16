@@ -285,3 +285,5 @@ client/
 **Security**: JWT token management, secure route protection, role-based access control  
 **Performance**: Optimized context updates, efficient middleware, minimal re-renders  
 **UX**: Consistent loading states, graceful error handling, intuitive navigation
+
+https://github.com/kalviumcommunity/S72-0126-KitKat-Full-Stack-Web-App-Internship-Mentorship-Tracker/pull/19
