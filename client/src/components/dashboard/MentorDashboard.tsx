@@ -4,6 +4,8 @@
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { EmptyState, NoStudentsState } from '@/components/ui/EmptyState';
+import { DashboardAction } from './DashboardAction';
 import Link from 'next/link';
 
 // TODO: Replace with real data from API
@@ -137,27 +139,31 @@ export function MentorDashboard() {
             }
           />
           <CardContent>
-            <div className="space-y-4">
-              {assignedStudents.map((student) => (
-                <div key={student.id} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors group">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 rounded-full flex items-center justify-center font-bold shadow-sm">
-                      {student.name.split(' ').map(n => n[0]).join('')}
+            {assignedStudents.length > 0 ? (
+              <div className="space-y-4">
+                {assignedStudents.map((student) => (
+                  <div key={student.id} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors group">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 rounded-full flex items-center justify-center font-bold shadow-sm">
+                        {student.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{student.name}</h4>
+                        <p className="text-sm text-gray-500">{student.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{student.name}</h4>
-                      <p className="text-sm text-gray-500">{student.email}</p>
+                    <div className="text-right text-xs text-gray-400">
+                      <div className="mb-1">
+                        <span className="font-medium text-gray-600">{student.applications}</span> applications
+                      </div>
+                      <div>Last active: {student.lastActivity}</div>
                     </div>
                   </div>
-                  <div className="text-right text-xs text-gray-400">
-                    <div className="mb-1">
-                      <span className="font-medium text-gray-600">{student.applications}</span> applications
-                    </div>
-                    <div>Last active: {student.lastActivity}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <NoStudentsState />
+            )}
           </CardContent>
         </Card>
 
@@ -173,46 +179,58 @@ export function MentorDashboard() {
             }
           />
           <CardContent>
-            <div className="space-y-4">
-              {recentApplications.map((application) => (
-                <div key={application.id} className="p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-orange-100 group">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{application.company}</h4>
-                      <p className="text-sm text-gray-500 mb-1">{application.role}</p>
-                      <div className="flex items-center text-xs text-gray-400">
-                        <span className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center mr-2 text-[10px] font-bold">
-                          {application.student[0]}
-                        </span>
-                        <span>{application.student}</span>
+            {recentApplications.length > 0 ? (
+              <div className="space-y-4">
+                {recentApplications.map((application) => (
+                  <div key={application.id} className="p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-orange-100 group">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{application.company}</h4>
+                        <p className="text-sm text-gray-500 mb-1">{application.role}</p>
+                        <div className="flex items-center text-xs text-gray-400">
+                          <span className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center mr-2 text-[10px] font-bold">
+                            {application.student[0]}
+                          </span>
+                          <span>{application.student}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end space-y-2">
+                        <Badge
+                          variant={
+                            application.status === 'INTERVIEW' ? 'info' :
+                              application.status === 'APPLIED' ? 'neutral' :
+                                application.status === 'SHORTLISTED' ? 'warning' : 'default'
+                          }
+                        >
+                          {application.status}
+                        </Badge>
+                        {application.needsReview && (
+                          <div className="flex items-center text-orange-600 text-xs font-medium animate-pulse">
+                            <span className="w-2 h-2 bg-orange-500 rounded-full mr-1"></span>
+                            Needs Review
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="flex flex-col items-end space-y-2">
-                      <Badge
-                        variant={
-                          application.status === 'INTERVIEW' ? 'info' :
-                            application.status === 'APPLIED' ? 'neutral' :
-                              application.status === 'SHORTLISTED' ? 'warning' : 'default'
-                        }
-                      >
-                        {application.status}
-                      </Badge>
-                      {application.needsReview && (
-                        <div className="flex items-center text-orange-600 text-xs font-medium animate-pulse">
-                          <span className="w-2 h-2 bg-orange-500 rounded-full mr-1"></span>
-                          Needs Review
-                        </div>
-                      )}
-                    </div>
+                    {application.needsReview && (
+                      <DashboardAction
+                        size="sm"
+                        className="w-full mt-2 bg-white border border-gray-200 text-gray-700 hover:border-blue-300 hover:text-blue-600 transition-all"
+                        label="Provide Feedback"
+                        toastTitle="Feedback Form Opened"
+                        toastMessage={`Opening feedback form for ${application.student}'s application at ${application.company}`}
+                      />
+                    )}
                   </div>
-                  {application.needsReview && (
-                    <Button size="sm" className="w-full mt-2 bg-white border border-gray-200 text-gray-700 hover:border-blue-300 hover:text-blue-600 transition-all">
-                      Provide Feedback
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="No pending reviews"
+                description="You're all caught up! There are no new applications needing your review."
+                icon="🎉"
+              />
+            )}
           </CardContent>
         </Card>
       </div>

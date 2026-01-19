@@ -4,6 +4,7 @@
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { NoApplicationsState, NoFeedbackState } from '@/components/ui/EmptyState';
 import Link from 'next/link';
 
 // TODO: Replace with real data from API
@@ -127,34 +128,38 @@ export function StudentDashboard() {
             }
           />
           <CardContent>
-            <div className="space-y-4">
-              {recentApplications.map((application) => (
-                <div key={application.id} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors group">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center shadow-sm text-lg font-bold text-gray-700">
-                      {application.company[0]}
+            {recentApplications.length > 0 ? (
+              <div className="space-y-4">
+                {recentApplications.map((application) => (
+                  <div key={application.id} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors group">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center shadow-sm text-lg font-bold text-gray-700">
+                        {application.company[0]}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{application.company}</h4>
+                        <p className="text-sm text-gray-500">{application.role}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">{application.company}</h4>
-                      <p className="text-sm text-gray-500">{application.role}</p>
+                    <div className="text-right">
+                      <Badge
+                        variant={
+                          application.status === 'INTERVIEW' ? 'info' :
+                            application.status === 'APPLIED' ? 'neutral' :
+                              application.status === 'SHORTLISTED' ? 'warning' : 'default'
+                        }
+                        className="mb-1"
+                      >
+                        {application.status}
+                      </Badge>
+                      <p className="text-xs text-gray-400">Applied {application.appliedDate}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge
-                      variant={
-                        application.status === 'INTERVIEW' ? 'info' :
-                          application.status === 'APPLIED' ? 'neutral' :
-                            application.status === 'SHORTLISTED' ? 'warning' : 'default'
-                      }
-                      className="mb-1"
-                    >
-                      {application.status}
-                    </Badge>
-                    <p className="text-xs text-gray-400">Applied {application.appliedDate}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <NoApplicationsState />
+            )}
           </CardContent>
         </Card>
 
@@ -170,33 +175,37 @@ export function StudentDashboard() {
             }
           />
           <CardContent>
-            <div className="space-y-4">
-              {recentFeedback.map((feedback) => (
-                <div key={feedback.id} className="p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
-                        {feedback.mentor[0]}
+            {recentFeedback.length > 0 ? (
+              <div className="space-y-4">
+                {recentFeedback.map((feedback) => (
+                  <div key={feedback.id} className="p-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                          {feedback.mentor[0]}
+                        </div>
+                        <p className="text-sm font-semibold text-gray-900">{feedback.mentor}</p>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">{feedback.mentor}</p>
+                      <span className="text-xs text-gray-400">{feedback.createdAt}</span>
                     </div>
-                    <span className="text-xs text-gray-400">{feedback.createdAt}</span>
+                    <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{feedback.content}</p>
+                    <div className="mt-3">
+                      <Badge
+                        variant={
+                          feedback.priority === 'HIGH' ? 'error' :
+                            feedback.priority === 'MEDIUM' ? 'warning' : 'success'
+                        }
+                        size="sm"
+                      >
+                        {feedback.priority} Priority
+                      </Badge>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{feedback.content}</p>
-                  <div className="mt-3">
-                    <Badge
-                      variant={
-                        feedback.priority === 'HIGH' ? 'error' :
-                          feedback.priority === 'MEDIUM' ? 'warning' : 'success'
-                      }
-                      size="sm"
-                    >
-                      {feedback.priority} Priority
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <NoFeedbackState />
+            )}
           </CardContent>
         </Card>
       </div>

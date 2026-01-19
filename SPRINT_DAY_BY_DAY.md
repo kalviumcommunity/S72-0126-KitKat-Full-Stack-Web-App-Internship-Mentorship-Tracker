@@ -270,8 +270,8 @@ This document defines the **execution roadmap**, **role ownership**, and **deliv
 * Complete frontend-backend wiring
 
 #### Frontend 2 (Mallu)
-
-* Resolve UI defects
+ Resolve UI defects
+*
 
 **Deliverables**:
 
