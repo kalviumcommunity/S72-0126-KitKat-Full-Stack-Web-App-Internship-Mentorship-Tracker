@@ -17,29 +17,7 @@ const mockData = {
     feedbackGiven: 23,
     pendingReviews: 5,
   },
-  assignedStudents: [
-    {
-      id: '1',
-      name: 'Alice Johnson',
-      email: 'alice@example.com',
-      applications: 6,
-      lastActivity: '2024-01-16',
-    },
-    {
-      id: '2',
-      name: 'Bob Smith',
-      email: 'bob@example.com',
-      applications: 4,
-      lastActivity: '2024-01-15',
-    },
-    {
-      id: '3',
-      name: 'Carol Davis',
-      email: 'carol@example.com',
-      applications: 8,
-      lastActivity: '2024-01-14',
-    },
-  ],
+  assignedStudents: [],
   recentApplications: [
     {
       id: '1',
