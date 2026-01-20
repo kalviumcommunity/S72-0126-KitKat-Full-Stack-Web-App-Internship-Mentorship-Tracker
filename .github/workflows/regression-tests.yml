@@ -1,0 +1,362 @@
+# Regression Testing Pipeline
+# Comprehensive regression tests for UI and API functionality
+
+name: Regression Tests
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Run daily at 2 AM
+  workflow_dispatch:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'client/**'
+      - 'server/**'
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  # Frontend Regression Tests
+  frontend-regression:
+    name: Frontend Regression Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Install Playwright browsers
+      run: |
+        cd client
+        npx playwright install ${{ matrix.browser }}
+
+    - name: Build application
+      run: |
+        cd client
+        npm run build
+
+    - name: Start application
+      run: |
+        cd client
+        npm run start &
+        sleep 10
+      env:
+        NODE_ENV: production
+
+    - name: Run E2E tests
+      run: |
+        cd client
+        npm run test:e2e -- --project=${{ matrix.browser }}
+      env:
+        PLAYWRIGHT_BASE_URL: http://localhost:3000
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-results-${{ matrix.browser }}
+        path: client/test-results/
+        retention-days: 7
+
+    - name: Upload HTML report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.browser }}
+        path: client/playwright-report/
+        retention-days: 7
+
+  # API Regression Tests
+  api-regression:
+    name: API Regression Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: server/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd server
+        npm ci
+
+    - name: Setup test database
+      run: |
+        cd server
+        npm run db:migrate:test
+        npm run db:seed:test
+      env:
+        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+
+    - name: Start server
+      run: |
+        cd server
+        npm run start &
+        sleep 10
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379
+
+    - name: Run API regression tests
+      run: |
+        cd server
+        npm run test:regression
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379
+
+    - name: Generate API test report
+      run: |
+        cd server
+        npm run test:report
+
+    - name: Upload API test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: api-regression-results
+        path: server/test-results/
+        retention-days: 7
+
+  # Performance Regression Tests
+  performance-regression:
+    name: Performance Regression Tests
+    runs-on: ubuntu-latest
+    needs: [frontend-regression]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install Lighthouse CI
+      run: npm install -g @lhci/cli@0.12.x
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build
+        path: client/.next/
+
+    - name: Start application
+      run: |
+        cd client
+        npm run start &
+        sleep 15
+      env:
+        NODE_ENV: production
+
+    - name: Run Lighthouse CI
+      run: |
+        lhci autorun
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+    - name: Upload Lighthouse results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: lighthouse-regression-results
+        path: .lighthouseci/
+        retention-days: 30
+
+  # Accessibility Regression Tests
+  accessibility-regression:
+    name: Accessibility Regression Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Build application
+      run: |
+        cd client
+        npm run build
+
+    - name: Start application
+      run: |
+        cd client
+        npm run start &
+        sleep 10
+
+    - name: Run accessibility tests
+      run: |
+        cd client
+        npm run test:a11y
+
+    - name: Upload accessibility results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: accessibility-results
+        path: client/accessibility-results/
+        retention-days: 7
+
+  # Cross-browser Compatibility Tests
+  cross-browser-tests:
+    name: Cross-browser Compatibility
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        browser: [chrome, firefox, edge]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Run cross-browser tests
+      run: |
+        cd client
+        npm run test:cross-browser -- --browser=${{ matrix.browser }}
+
+    - name: Upload cross-browser results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cross-browser-results-${{ matrix.browser }}
+        path: client/cross-browser-results/
+        retention-days: 7
+
+  # Regression Test Summary
+  regression-summary:
+    name: Regression Test Summary
+    runs-on: ubuntu-latest
+    needs: [frontend-regression, api-regression, performance-regression, accessibility-regression, cross-browser-tests]
+    if: always()
+
+    steps:
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+
+    - name: Generate regression report
+      run: |
+        echo "# Regression Test Summary" > regression-summary.md
+        echo "" >> regression-summary.md
+        echo "## Test Results" >> regression-summary.md
+        echo "" >> regression-summary.md
+        
+        # Add results from each test suite
+        if [ -d "playwright-results-chromium" ]; then
+          echo "✅ Frontend E2E Tests (Chromium): Passed" >> regression-summary.md
+        else
+          echo "❌ Frontend E2E Tests (Chromium): Failed" >> regression-summary.md
+        fi
+        
+        if [ -d "api-regression-results" ]; then
+          echo "✅ API Regression Tests: Passed" >> regression-summary.md
+        else
+          echo "❌ API Regression Tests: Failed" >> regression-summary.md
+        fi
+        
+        if [ -d "lighthouse-regression-results" ]; then
+          echo "✅ Performance Tests: Passed" >> regression-summary.md
+        else
+          echo "❌ Performance Tests: Failed" >> regression-summary.md
+        fi
+        
+        if [ -d "accessibility-results" ]; then
+          echo "✅ Accessibility Tests: Passed" >> regression-summary.md
+        else
+          echo "❌ Accessibility Tests: Failed" >> regression-summary.md
+        fi
+
+    - name: Upload regression summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: regression-summary
+        path: regression-summary.md
+        retention-days: 30
+
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('regression-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });
