@@ -12,20 +12,6 @@ export interface RateLimitOptions {
   message?: string; // Custom error message
 }
 
-import { Request, Response, NextFunction } from "express";
-import { redis } from "../lib/redis";
-import { RateLimitError } from "./error.middleware";
-import { logger } from "../lib/logger";
-
-export interface RateLimitOptions {
-  windowMs: number; // Time window in milliseconds
-  maxRequests: number; // Maximum requests per window
-  keyGenerator?: (req: Request) => string; // Custom key generator
-  skipSuccessfulRequests?: boolean; // Don't count successful requests
-  skipFailedRequests?: boolean; // Don't count failed requests
-  message?: string; // Custom error message
-}
-
 export function rateLimit(options: RateLimitOptions) {
   const {
     windowMs,
@@ -42,18 +28,32 @@ export function rateLimit(options: RateLimitOptions) {
       const now = Date.now();
       const windowStart = now - windowMs;
 
+      // Check if Redis is available
+      if (!redis.isReady()) {
+        logger.warn("Redis not available, allowing request without rate limiting");
+        next();
+        return;
+      }
+
+      const client = redis.getClient();
+      if (!client) {
+        logger.warn("Redis client not available, allowing request without rate limiting");
+        next();
+        return;
+      }
+
       // Use Redis sliding window approach with sorted sets
-      const multi = redis.multi();
+      const multi = client.multi();
       
       // Remove expired entries
-      multi.zremrangebyscore(key, 0, windowStart);
+      multi.zRemRangeByScore(key, 0, windowStart);
       
       // Count current requests in window
-      multi.zcard(key);
+      multi.zCard(key);
       
       // Add current request
       const requestId = `${now}-${Math.random()}`;
-      multi.zadd(key, now, requestId);
+      multi.zAdd(key, { score: now, value: requestId });
       
       // Set expiration
       multi.expire(key, Math.ceil(windowMs / 1000));
@@ -65,11 +65,11 @@ export function rateLimit(options: RateLimitOptions) {
       }
       
       // Get current request count (before adding new one)
-      const currentRequests = results[1][1] as number;
+      const currentRequests = results[1] as number;
 
       if (currentRequests >= maxRequests) {
         // Remove the request we just added since we're rejecting it
-        await redis.zrem(key, requestId);
+        await client.zRem(key, requestId);
         
         logger.warn("Rate limit exceeded", {
           key,
@@ -97,7 +97,7 @@ export function rateLimit(options: RateLimitOptions) {
 
           if (shouldSkip) {
             // Remove the request we added
-            redis.zrem(key, requestId).catch((err: any) => {
+            client.zRem(key, requestId).catch((err: any) => {
               logger.error("Failed to remove rate limit entry", err);
             });
           }

@@ -10,6 +10,7 @@ import { ApplicationFilters } from './ApplicationFilters';
 import { ApplicationCard } from './ApplicationCard';
 import { EmptyApplicationsState } from './EmptyApplicationsState';
 import type { ApplicationWithFeedback, ApplicationFilters as FilterType } from '@/lib/types';
+import { ApplicationPlatform, ApplicationStatus, FeedbackPriority, FeedbackTag } from '@/lib/types';
 
 // Mock data - replace with actual API call
 async function getApplications(
@@ -46,7 +47,7 @@ async function getApplications(
           applicationId: '1',
           mentorId: 'm1',
           content: 'Great progress on the technical assessment. Focus on system design concepts for the upcoming interview.',
-          tags: ['DSA', 'SYSTEM_DESIGN'],
+          tags: [FeedbackTag.DSA, FeedbackTag.SYSTEM_DESIGN],
           priority: FeedbackPriority.HIGH,
           createdAt: '2024-01-16T09:00:00Z',
           updatedAt: '2024-01-16T09:00:00Z',
@@ -78,7 +79,7 @@ async function getApplications(
           applicationId: '2',
           mentorId: 'm1',
           content: 'Resume looks good. Consider adding more quantifiable achievements in your project descriptions.',
-          tags: ['RESUME'],
+          tags: [FeedbackTag.RESUME],
           priority: FeedbackPriority.MEDIUM,
           createdAt: '2024-01-15T11:00:00Z',
           updatedAt: '2024-01-15T11:00:00Z',
@@ -110,7 +111,7 @@ async function getApplications(
           applicationId: '3',
           mentorId: 'm2',
           content: 'Excellent technical skills demonstrated. Prepare for behavioral questions focusing on leadership principles.',
-          tags: ['DSA', 'COMMUNICATION'],
+          tags: [FeedbackTag.DSA, FeedbackTag.COMMUNICATION],
           priority: FeedbackPriority.HIGH,
           createdAt: '2024-01-17T10:00:00Z',
           updatedAt: '2024-01-17T10:00:00Z',
@@ -126,7 +127,7 @@ async function getApplications(
           applicationId: '3',
           mentorId: 'm1',
           content: 'Great referral connection. Make sure to research Amazon\'s leadership principles thoroughly.',
-          tags: ['COMMUNICATION'],
+          tags: [FeedbackTag.COMMUNICATION],
           priority: FeedbackPriority.MEDIUM,
           createdAt: '2024-01-16T15:30:00Z',
           updatedAt: '2024-01-16T15:30:00Z',
@@ -158,7 +159,7 @@ async function getApplications(
           applicationId: '4',
           mentorId: 'm2',
           content: 'Don\'t be discouraged by the rejection. Your technical skills are strong. Focus on improving data science portfolio projects.',
-          tags: ['RESUME'],
+          tags: [FeedbackTag.RESUME],
           priority: FeedbackPriority.MEDIUM,
           createdAt: '2024-01-18T09:00:00Z',
           updatedAt: '2024-01-18T09:00:00Z',

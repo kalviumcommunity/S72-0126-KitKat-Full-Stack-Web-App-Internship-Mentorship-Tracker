@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuth } from '@/contexts/AuthContext';
-import type { UserRole } from '@/lib/types';
+import { UserRole } from '@/lib/types';
 
 interface UseAuthRedirectOptions {
   requireAuth?: boolean;
@@ -95,21 +95,21 @@ export function useRequireAuth() {
 export function useRequireStudent() {
   return useAuthRedirect({ 
     requireAuth: true, 
-    allowedRoles: ['STUDENT'] 
+    allowedRoles: [UserRole.STUDENT] 
   });
 }
 
 export function useRequireMentor() {
   return useAuthRedirect({ 
     requireAuth: true, 
-    allowedRoles: ['MENTOR'] 
+    allowedRoles: [UserRole.MENTOR] 
   });
 }
 
 export function useRequireAdmin() {
   return useAuthRedirect({ 
     requireAuth: true, 
-    allowedRoles: ['ADMIN'] 
+    allowedRoles: [UserRole.ADMIN] 
   });
 }
 

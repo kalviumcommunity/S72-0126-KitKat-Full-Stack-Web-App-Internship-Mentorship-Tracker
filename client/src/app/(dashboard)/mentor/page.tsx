@@ -137,7 +137,7 @@ async function getMentorDashboard(userId: string): Promise<MentorDashboardData> 
           applicationId: '1',
           mentorId: userId,
           content: 'Great progress on the technical assessment! Focus on system design concepts.',
-          tags: ['DSA', 'SYSTEM_DESIGN'],
+          tags: [FeedbackTag.DSA, FeedbackTag.SYSTEM_DESIGN],
           priority: FeedbackPriority.HIGH,
           createdAt: '2024-01-16T09:00:00Z',
           updatedAt: '2024-01-16T09:00:00Z',

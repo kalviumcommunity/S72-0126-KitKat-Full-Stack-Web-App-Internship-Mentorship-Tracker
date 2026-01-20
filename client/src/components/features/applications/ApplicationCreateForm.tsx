@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { applications } from '@/lib/api';
-import type { ApplicationStatus, ApplicationPlatform } from '@/lib/types';
+import { ApplicationStatus, ApplicationPlatform } from '@/lib/types';
 
 interface ApplicationCreateData {
   company: string;

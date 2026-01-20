@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
@@ -130,11 +130,10 @@ export function FeedbackSubmissionForm() {
 
     return (
         <Card className="w-full max-w-2xl mx-auto">
-            <CardHeader>
-                <CardTitle>Submit Feedback</CardTitle>
-                <CardDescription>
+            <CardHeader title="Submit Feedback">
+                <p className="text-sm text-gray-600 mt-1">
                     Share your thoughts about your mentorship sessions or platform experience.
-                </CardDescription>
+                </p>
             </CardHeader>
             <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
