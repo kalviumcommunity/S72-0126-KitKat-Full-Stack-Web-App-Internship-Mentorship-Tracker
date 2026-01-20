@@ -8,7 +8,7 @@ import {
   uploadMultipleDocuments,
   handleMulterError,
 } from "../../middlewares/upload.middleware";
-import { createRateLimiter } from "../../middlewares/rate-limit.middleware";
+import { createUserRateLimit } from "../../middlewares/rate-limit.middleware";
 
 const router = Router();
 
@@ -16,11 +16,7 @@ const router = Router();
 router.use(authenticate);
 
 // Rate limiter for uploads
-const uploadLimiter = createRateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 uploads per 15 minutes
-  message: "Too many upload requests, please try again later",
-});
+const uploadLimiter = createUserRateLimit(20, 15 * 60 * 1000); // 20 uploads per 15 minutes
 
 /**
  * @route   POST /api/upload/resume

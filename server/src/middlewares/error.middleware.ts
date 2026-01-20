@@ -231,7 +231,7 @@ export function errorHandler(
     },
   };
 
-  res.status(500).json(response);
+  return res.status(500).json(response);
 }
 
 // Async error wrapper

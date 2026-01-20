@@ -5,11 +5,14 @@ import { env } from "./config/env";
 import routes from "./routes";
 import { errorHandler } from "./middlewares/error.middleware";
 import { logger } from "./lib/logger";
+import helmet from "helmet";
+import hpp from "hpp";
+import rateLimit from "express-rate-limit";
 
 // Request logging middleware
 function requestLogger(req: Request, res: Response, next: NextFunction) {
   const start = Date.now();
-  
+
   // Log request
   logger.info("Incoming request", {
     method: req.method,
@@ -34,33 +37,7 @@ function requestLogger(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// Security headers middleware
-function securityHeaders(req: Request, res: Response, next: NextFunction) {
-  // Prevent MIME type sniffing
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  
-  // Prevent clickjacking
-  res.setHeader("X-Frame-Options", "DENY");
-  
-  // Enable XSS protection
-  res.setHeader("X-XSS-Protection", "1; mode=block");
-  
-  // Referrer policy
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-  
-  // Content Security Policy (basic)
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'"
-  );
 
-  // HSTS (only in production with HTTPS)
-  if (env.NODE_ENV === "production") {
-    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-  }
-
-  next();
-}
 
 // 404 handler
 function notFoundHandler(req: Request, res: Response) {
@@ -79,8 +56,8 @@ export function createApp(): Express {
   // Trust proxy (for accurate IP addresses behind load balancers)
   app.set("trust proxy", 1);
 
-  // Security headers
-  app.use(securityHeaders);
+  // Security headers (Helmet)
+  app.use(helmet());
 
   // Request logging
   if (env.NODE_ENV !== "test") {
@@ -100,10 +77,23 @@ export function createApp(): Express {
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
   app.use(cookieParser());
 
+  // Rate limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: "Too many requests from this IP, please try again later",
+  });
+  app.use(limiter);
+
+  // Prevent HTTP Parameter Pollution
+  app.use(hpp());
+
   // Health check endpoint
-  app.get("/health", (req, res) => {
-    res.json({ 
-      status: "ok", 
+  app.get("/health", (_req, res) => {
+    res.json({
+      status: "ok",
       timestamp: new Date().toISOString(),
       environment: env.NODE_ENV,
       version: process.env.npm_package_version || "unknown",
