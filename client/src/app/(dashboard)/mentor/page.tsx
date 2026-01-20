@@ -10,6 +10,10 @@ import { MentorDashboardStats } from '@/components/features/dashboard/MentorDash
 import { StudentsList } from '@/components/features/dashboard/StudentsList';
 import { RecentApplications } from '@/components/features/dashboard/RecentApplications';
 import { FeedbackActivity } from '@/components/features/dashboard/FeedbackActivity';
+import { RealTimeStats } from '@/components/features/dashboard/RealTimeStats';
+import { PerformanceChart } from '@/components/features/dashboard/PerformanceChart';
+import { MentorStudentOverview } from '@/components/features/dashboard/MentorStudentOverview';
+import { QuickActions } from '@/components/features/dashboard/QuickActions';
 import type { MentorDashboardData } from '@/lib/types';
 import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority } from '@/lib/types';
 
@@ -194,19 +198,30 @@ export default async function MentorDashboard() {
           </Link>
         </div>
 
-        {/* Dashboard Statistics */}
-        <MentorDashboardStats 
-          students={dashboardData.students}
-          applications={dashboardData.applications}
-          feedback={dashboardData.feedback}
+        {/* Enhanced Dashboard Statistics with Real-time Updates */}
+        <RealTimeStats 
+          type="mentor"
+          data={dashboardData}
+          refreshInterval={30000}
         />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Recent Applications */}
-            <RecentApplications applications={dashboardData.applications.recent} />
+            {/* Enhanced Student Overview */}
+            <MentorStudentOverview 
+              students={dashboardData.students}
+              applications={dashboardData.applications.recent}
+              feedback={dashboardData.feedback.recent}
+            />
+
+            {/* Performance Chart for Students */}
+            <PerformanceChart 
+              applications={dashboardData.applications}
+              title="Students' Application Progress"
+              showPercentages={true}
+            />
 
             {/* Feedback Activity */}
             <FeedbackActivity feedback={dashboardData.feedback.recent} />
@@ -214,27 +229,12 @@ export default async function MentorDashboard() {
 
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
-            {/* Students List */}
-            <StudentsList students={dashboardData.students} />
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Link href="/mentor/feedback" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    ✍️ Provide Feedback
-                  </Button>
-                </Link>
-                <Link href="/mentor/students" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    👥 View All Students
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            {/* Context-aware Quick Actions */}
+            <QuickActions 
+              userRole={dashboardData.user.role}
+              applications={dashboardData.applications.recent}
+              feedback={dashboardData.feedback.recent}
+            />
 
             {/* Statistics Summary */}
             <Card>

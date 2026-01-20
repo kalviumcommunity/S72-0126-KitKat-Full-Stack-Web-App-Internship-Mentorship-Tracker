@@ -13,3 +13,10 @@ export { MentorDashboardStats } from './MentorDashboardStats';
 export { StudentsList } from './StudentsList';
 export { RecentApplications } from './RecentApplications';
 export { FeedbackActivity } from './FeedbackActivity';
+
+// Day 9 Enhanced Components - Performance Optimized
+export { RealTimeStats } from './RealTimeStats';
+export { PerformanceChart } from './PerformanceChart';
+export { EnhancedApplicationSummary } from './EnhancedApplicationSummary';
+export { MentorStudentOverview } from './MentorStudentOverview';
+export { QuickActions } from './QuickActions';

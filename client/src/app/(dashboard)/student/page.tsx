@@ -12,6 +12,10 @@ import { DashboardStats } from '@/components/features/dashboard/DashboardStats';
 import { RecentActivity } from '@/components/features/dashboard/RecentActivity';
 import { UpcomingDeadlines } from '@/components/features/dashboard/UpcomingDeadlines';
 import { MentorInfo } from '@/components/features/dashboard/MentorInfo';
+import { RealTimeStats } from '@/components/features/dashboard/RealTimeStats';
+import { PerformanceChart } from '@/components/features/dashboard/PerformanceChart';
+import { EnhancedApplicationSummary } from '@/components/features/dashboard/EnhancedApplicationSummary';
+import { QuickActions } from '@/components/features/dashboard/QuickActions';
 import type { StudentDashboardData } from '@/lib/types';
 import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority } from '@/lib/types';
 
@@ -209,18 +213,30 @@ export default async function StudentDashboard() {
           </Link>
         </div>
 
-        {/* Dashboard Statistics */}
-        <DashboardStats 
-          applications={dashboardData.applications}
-          feedback={dashboardData.feedback}
+        {/* Enhanced Dashboard Statistics with Real-time Updates */}
+        <RealTimeStats 
+          type="student"
+          data={dashboardData}
+          refreshInterval={30000}
         />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Recent Applications */}
-            <ApplicationSummary applications={dashboardData.applications.recent} />
+            {/* Enhanced Applications Summary */}
+            <EnhancedApplicationSummary 
+              applications={dashboardData.applications.recent} 
+              maxItems={6}
+              showFilters={true}
+            />
+
+            {/* Performance Chart */}
+            <PerformanceChart 
+              applications={dashboardData.applications}
+              title="Application Progress Overview"
+              showPercentages={true}
+            />
 
             {/* Recent Activity */}
             <RecentActivity 
@@ -231,6 +247,13 @@ export default async function StudentDashboard() {
 
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
+            {/* Context-aware Quick Actions */}
+            <QuickActions 
+              userRole={dashboardData.user.role}
+              applications={dashboardData.applications.recent}
+              feedback={dashboardData.feedback.recent}
+            />
+
             {/* Upcoming Deadlines */}
             <UpcomingDeadlines applications={dashboardData.applications.recent} />
 
@@ -242,30 +265,6 @@ export default async function StudentDashboard() {
 
             {/* Mentor Information */}
             <MentorInfo mentors={dashboardData.mentors} />
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Link href="/student/applications/new" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    ➕ Add Application
-                  </Button>
-                </Link>
-                <Link href="/student/applications" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    📋 View All Applications
-                  </Button>
-                </Link>
-                <Link href="/student/feedback" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    💬 View All Feedback
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
