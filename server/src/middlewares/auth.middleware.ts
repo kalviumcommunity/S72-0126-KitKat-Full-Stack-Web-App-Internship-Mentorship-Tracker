@@ -12,20 +12,6 @@ declare global {
   }
 }
 
-import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../lib/jwt";
-import { RequestUser } from "../types/api";
-import { AuthenticationError } from "./error.middleware";
-import { logger } from "../lib/logger";
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: RequestUser;
-    }
-  }
-}
-
 export function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
     // Try to get token from cookie first, then from Authorization header
@@ -50,11 +36,6 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
     // Additional validation
     if (!user || !user.id || !user.email || !user.role) {
       throw new AuthenticationError("Invalid token payload");
-    }
-
-    // Check if user is active (if this field exists)
-    if (user.isActive === false) {
-      throw new AuthenticationError("Account is deactivated");
     }
 
     req.user = user;
@@ -112,14 +93,11 @@ export function optionalAuthenticate(req: Request, res: Response, next: NextFunc
       
       // Additional validation for optional auth
       if (user && user.id && user.email && user.role) {
-        // Only set user if token is valid and user is active
-        if (user.isActive !== false) {
-          req.user = user;
-          logger.debug("User optionally authenticated", { 
-            userId: user.id,
-            ip: req.ip 
-          });
-        }
+        req.user = user;
+        logger.debug("User optionally authenticated", { 
+          userId: user.id,
+          ip: req.ip 
+        });
       }
     }
     

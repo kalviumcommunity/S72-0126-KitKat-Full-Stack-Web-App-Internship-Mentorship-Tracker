@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Theme System for Visual Consistency
 // Comprehensive design system with consistent styling
 

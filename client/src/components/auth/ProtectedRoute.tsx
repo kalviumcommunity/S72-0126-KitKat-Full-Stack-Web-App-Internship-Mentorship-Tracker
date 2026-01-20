@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 import { useAuth } from '@/contexts/AuthContext';
-import type { UserRole } from '@/lib/types';
+import { UserRole } from '@/lib/types';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface ProtectedRouteProps {
