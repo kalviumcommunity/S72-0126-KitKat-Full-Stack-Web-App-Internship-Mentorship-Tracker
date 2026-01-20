@@ -12,6 +12,20 @@ export interface RateLimitOptions {
   message?: string; // Custom error message
 }
 
+import { Request, Response, NextFunction } from "express";
+import { redis } from "../lib/redis";
+import { RateLimitError } from "./error.middleware";
+import { logger } from "../lib/logger";
+
+export interface RateLimitOptions {
+  windowMs: number; // Time window in milliseconds
+  maxRequests: number; // Maximum requests per window
+  keyGenerator?: (req: Request) => string; // Custom key generator
+  skipSuccessfulRequests?: boolean; // Don't count successful requests
+  skipFailedRequests?: boolean; // Don't count failed requests
+  message?: string; // Custom error message
+}
+
 export function rateLimit(options: RateLimitOptions) {
   const {
     windowMs,
@@ -28,13 +42,35 @@ export function rateLimit(options: RateLimitOptions) {
       const now = Date.now();
       const windowStart = now - windowMs;
 
-      // Remove old entries and count current requests
-      // TODO: Fix Redis method compatibility
-      // await redis.zRemRangeByScore(key, 0, windowStart);
-      // const currentRequests = await redis.zCard(key);
-      const currentRequests = 0; // Temporarily disabled
+      // Use Redis sliding window approach with sorted sets
+      const multi = redis.multi();
+      
+      // Remove expired entries
+      multi.zremrangebyscore(key, 0, windowStart);
+      
+      // Count current requests in window
+      multi.zcard(key);
+      
+      // Add current request
+      const requestId = `${now}-${Math.random()}`;
+      multi.zadd(key, now, requestId);
+      
+      // Set expiration
+      multi.expire(key, Math.ceil(windowMs / 1000));
+      
+      const results = await multi.exec();
+      
+      if (!results) {
+        throw new Error("Redis transaction failed");
+      }
+      
+      // Get current request count (before adding new one)
+      const currentRequests = results[1][1] as number;
 
       if (currentRequests >= maxRequests) {
+        // Remove the request we just added since we're rejecting it
+        await redis.zrem(key, requestId);
+        
         logger.warn("Rate limit exceeded", {
           key,
           currentRequests,
@@ -42,20 +78,16 @@ export function rateLimit(options: RateLimitOptions) {
           ip: req.ip,
           userAgent: req.get("User-Agent"),
         });
+        
         throw new RateLimitError(message);
       }
-
-      // Add current request
-      // TODO: Fix Redis method compatibility
-      // await redis.zAdd(key, { score: now, value: `${now}-${Math.random()}` });
-      await redis.expire(key, Math.ceil(windowMs / 1000));
 
       // Set rate limit headers
       res.setHeader("X-RateLimit-Limit", maxRequests);
       res.setHeader("X-RateLimit-Remaining", Math.max(0, maxRequests - currentRequests - 1));
       res.setHeader("X-RateLimit-Reset", new Date(now + windowMs).toISOString());
 
-      // Handle response counting
+      // Handle response counting for skip options
       if (skipSuccessfulRequests || skipFailedRequests) {
         const originalSend = res.send;
         res.send = function (body) {
@@ -64,11 +96,10 @@ export function rateLimit(options: RateLimitOptions) {
             (skipFailedRequests && res.statusCode >= 400);
 
           if (shouldSkip) {
-            // Remove the request we just added
-            // TODO: Fix Redis method compatibility
-            // redis.zRem(key, `${now}-${Math.random()}`).catch((err: any) => {
-            //   logger.error("Failed to remove rate limit entry", err);
-            // });
+            // Remove the request we added
+            redis.zrem(key, requestId).catch((err: any) => {
+              logger.error("Failed to remove rate limit entry", err);
+            });
           }
 
           return originalSend.call(this, body);
@@ -82,7 +113,8 @@ export function rateLimit(options: RateLimitOptions) {
       }
       
       logger.error("Rate limiting error", error);
-      // If Redis is down, allow the request to proceed
+      // If Redis is down, allow the request to proceed with warning
+      logger.warn("Rate limiting disabled due to Redis error, allowing request");
       next();
     }
   };
