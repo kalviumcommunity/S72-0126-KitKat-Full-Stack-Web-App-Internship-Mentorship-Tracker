@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { BlobServiceClient, StorageSharedKeyCredential } from "@azure/storage-blob";
+import { BlobServiceClient, StorageSharedKeyCredential, BlobSASPermissions } from "@azure/storage-blob";
 import { env } from "../config/env";
 import { logger } from "./logger";
 import crypto from "crypto";
@@ -209,7 +209,7 @@ class AzureBlobStorageService implements StorageService {
 
       const expiresOn = new Date(Date.now() + expiresIn * 1000);
       const sasUrl = await blockBlobClient.generateSasUrl({
-        permissions: "r",
+        permissions: BlobSASPermissions.parse("r"),
         expiresOn,
       });
 

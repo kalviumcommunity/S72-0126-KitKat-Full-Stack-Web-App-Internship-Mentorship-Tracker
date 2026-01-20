@@ -10,7 +10,7 @@ import {
   feedbackQuerySchema,
   uuidParamSchema 
 } from "./feedback.schema";
-import { rateLimit } from "../../middlewares/rate-limit.middleware";
+import { createUserRateLimit } from "../../middlewares/rate-limit.middleware";
 import { UserRole } from "../../types/roles";
 
 const router = Router();
@@ -19,17 +19,8 @@ const router = Router();
 router.use(authenticate);
 
 // Rate limiters
-const feedbackCreateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 20, // 20 feedback per 15 minutes
-  message: "Too many feedback submissions, please try again later",
-});
-
-const feedbackReadLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  maxRequests: 100, // 100 requests per 15 minutes
-  message: "Too many requests, please try again later",
-});
+const feedbackCreateLimiter = createUserRateLimit(20, 15 * 60 * 1000); // 20 feedback per 15 minutes
+const feedbackReadLimiter = createUserRateLimit(100, 15 * 60 * 1000); // 100 requests per 15 minutes
 
 /**
  * @route   POST /api/feedback
