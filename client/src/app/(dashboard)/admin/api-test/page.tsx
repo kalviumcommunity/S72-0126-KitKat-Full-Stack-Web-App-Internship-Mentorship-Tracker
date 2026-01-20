@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { runAllTests, type TestSuite, type TestResult } from '@/lib/api-test';
+import { runAllTests, type TestSuite } from '@/lib/api-test';
 import { getApiStatus, type ApiIntegrationStatus } from '@/lib/api-integration';
 
 export default function ApiTestPage() {

@@ -4,8 +4,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { ROUTES, PUBLIC_ROUTES, PROTECTED_ROUTES } from '@/lib/constants';
-import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
+import { PUBLIC_ROUTES, PROTECTED_ROUTES } from '@/lib/constants';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackPriority, NotificationType } from '@/lib/types';
 
 // Mock function to verify JWT token - replace with actual implementation
 async function verifyToken(token: string): Promise<{ 

@@ -77,7 +77,7 @@ export function ProtectedRoute({
 // Convenience components for specific roles
 export function StudentRoute({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
   return (
-    <ProtectedRoute allowedRoles={['STUDENT']} fallback={fallback}>
+    <ProtectedRoute allowedRoles={[UserRole.STUDENT]} fallback={fallback}>
       {children}
     </ProtectedRoute>
   );
@@ -85,7 +85,7 @@ export function StudentRoute({ children, fallback }: { children: ReactNode; fall
 
 export function MentorRoute({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
   return (
-    <ProtectedRoute allowedRoles={['MENTOR']} fallback={fallback}>
+    <ProtectedRoute allowedRoles={[UserRole.MENTOR]} fallback={fallback}>
       {children}
     </ProtectedRoute>
   );
@@ -93,7 +93,7 @@ export function MentorRoute({ children, fallback }: { children: ReactNode; fallb
 
 export function AdminRoute({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']} fallback={fallback}>
+    <ProtectedRoute allowedRoles={[UserRole.ADMIN]} fallback={fallback}>
       {children}
     </ProtectedRoute>
   );

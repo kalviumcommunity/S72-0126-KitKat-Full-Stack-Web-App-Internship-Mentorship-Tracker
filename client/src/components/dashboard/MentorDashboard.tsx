@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState, NoStudentsState } from '@/components/ui/EmptyState';
 import { DashboardAction } from './DashboardAction';
 import Link from 'next/link';
-import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackPriority, NotificationType } from '@/lib/types';
 
 // TODO: Replace with real data from API
 const mockData = {
