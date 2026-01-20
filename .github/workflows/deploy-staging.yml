@@ -1,0 +1,128 @@
+# Staging Deployment Pipeline
+# Automated deployment to staging environment
+
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18.x'
+  STAGING_URL: 'https://uimp-staging.vercel.app'
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Build application
+      run: |
+        cd client
+        npm run build
+      env:
+        NODE_ENV: production
+        NEXT_PUBLIC_API_URL: ${{ secrets.STAGING_API_URL }}
+        NEXT_PUBLIC_APP_ENV: staging
+
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./client
+        scope: ${{ secrets.VERCEL_ORG_ID }}
+        alias-domains: |
+          uimp-staging.vercel.app
+
+    - name: Run smoke tests
+      run: |
+        echo "Running smoke tests against staging..."
+        sleep 30 # Wait for deployment to be ready
+        
+        # Health check
+        curl -f ${{ env.STAGING_URL }}/api/health || exit 1
+        
+        # Basic page loads
+        curl -f ${{ env.STAGING_URL }}/ || exit 1
+        curl -f ${{ env.STAGING_URL }}/login || exit 1
+
+    - name: Run E2E tests against staging
+      run: |
+        cd client
+        npm run test:e2e:staging
+      env:
+        PLAYWRIGHT_BASE_URL: ${{ env.STAGING_URL }}
+
+    - name: Notify deployment success
+      uses: 8398a7/action-slack@v3
+      if: success()
+      with:
+        status: success
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        fields: repo,message,commit,author
+        custom_payload: |
+          {
+            text: "🚀 Staging deployment successful!",
+            attachments: [{
+              color: "good",
+              fields: [{
+                title: "Environment",
+                value: "Staging",
+                short: true
+              }, {
+                title: "URL",
+                value: "${{ env.STAGING_URL }}",
+                short: true
+              }, {
+                title: "Commit",
+                value: "${{ github.sha }}",
+                short: true
+              }]
+            }]
+          }
+
+    - name: Notify deployment failure
+      uses: 8398a7/action-slack@v3
+      if: failure()
+      with:
+        status: failure
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        fields: repo,message,commit,author
+        custom_payload: |
+          {
+            text: "❌ Staging deployment failed!",
+            attachments: [{
+              color: "danger",
+              fields: [{
+                title: "Environment",
+                value: "Staging",
+                short: true
+              }, {
+                title: "Commit",
+                value: "${{ github.sha }}",
+                short: true
+              }]
+            }]
+          }
