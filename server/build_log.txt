@@ -1,0 +1,87 @@
+
+> uimp-server@0.1.0 build
+> tsc
+
+src/api/applications/application.controller.ts(5,51): error TS6133: 'NotFoundError' is declared but its value is never read.
+src/api/applications/application.controller.ts(63,72): error TS2345: Argument of type 'ParsedQs' is not assignable to parameter of type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+  Type 'ParsedQs' is missing the following properties from type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }': page, limit
+src/api/applications/application.controller.ts(187,81): error TS2345: Argument of type 'ParsedQs' is not assignable to parameter of type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+  Type 'ParsedQs' is missing the following properties from type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }': page, limit
+src/api/applications/application.service.optimized.ts(4,81): error TS6133: 'BulkUpdateStatusInput' is declared but its value is never read.
+src/api/applications/application.service.optimized.ts(168,23): error TS2339: Property 'sortBy' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.optimized.ts(169,26): error TS2339: Property 'sortOrder' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.optimized.ts(186,53): error TS2339: Property 'sortBy' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.optimized.ts(186,67): error TS2339: Property 'sortOrder' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.optimized.ts(393,80): error TS2345: Argument of type '{}' is not assignable to parameter of type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+  Type '{}' is missing the following properties from type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }': page, limit
+src/api/applications/application.service.optimized.ts(472,11): error TS2322: Type 'string' is not assignable to type 'ApplicationStatus | EnumApplicationStatusFieldUpdateOperationsInput | undefined'.
+src/api/applications/application.service.optimized.ts(505,17): error TS2339: Property 'startDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.optimized.ts(506,69): error TS2339: Property 'startDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.optimized.ts(508,17): error TS2339: Property 'endDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.optimized.ts(509,69): error TS2339: Property 'endDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.ts(2,81): error TS6133: 'BulkUpdateStatusInput' is declared but its value is never read.
+src/api/applications/application.service.ts(139,53): error TS2339: Property 'sortBy' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.ts(139,67): error TS2339: Property 'sortOrder' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.ts(313,67): error TS2345: Argument of type '{}' is not assignable to parameter of type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+  Type '{}' is missing the following properties from type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }': page, limit
+src/api/applications/application.service.ts(389,11): error TS2322: Type 'string' is not assignable to type 'ApplicationStatus | EnumApplicationStatusFieldUpdateOperationsInput | undefined'.
+src/api/applications/application.service.ts(415,17): error TS2339: Property 'startDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.ts(416,69): error TS2339: Property 'startDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.ts(418,17): error TS2339: Property 'endDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/applications/application.service.ts(419,69): error TS2339: Property 'endDate' does not exist on type '{ page: number; limit: number; search?: string | undefined; status?: "DRAFT" | "APPLIED" | "SHORTLISTED" | "INTERVIEW" | "OFFER" | "REJECTED" | undefined; company?: string | undefined; platform?: "LINKEDIN" | ... 5 more ... | undefined; }'.
+src/api/auth-test.routes.ts(19,43): error TS6133: 'req' is declared but its value is never read.
+src/api/auth/auth.controller.ts(5,1): error TS6133: 'logger' is declared but its value is never read.
+src/api/auth/auth.controller.ts(7,31): error TS6133: 'ConflictError' is declared but its value is never read.
+src/api/auth/auth.controller.ts(47,32): error TS6133: 'req' is declared but its value is never read.
+src/api/auth/auth.service.ts(4,35): error TS6133: 'CreateApplicationInput' is declared but its value is never read.
+src/api/example.routes.ts(17,20): error TS6133: 'password' is declared but its value is never read.
+src/api/example.routes.ts(74,26): error TS6133: 'search' is declared but its value is never read.
+src/api/example.routes.ts(74,34): error TS6133: 'role' is declared but its value is never read.
+src/api/feedback/feedback.routes.ts(5,10): error TS6133: 'requireRole' is declared but its value is never read.
+src/api/feedback/feedback.routes.ts(6,10): error TS2305: Module '"../../middlewares/validation.middleware"' has no exported member 'validate'.
+src/api/feedback/feedback.routes.ts(13,10): error TS2724: '"../../middlewares/rate-limit.middleware"' has no exported member named 'createRateLimiter'. Did you mean 'createUserRateLimit'?
+src/api/feedback/feedback.routes.ts(14,1): error TS6133: 'UserRole' is declared but its value is never read.
+src/api/feedback/feedback.service.ts(3,45): error TS6133: 'ValidationError' is declared but its value is never read.
+src/api/upload/upload.controller.ts(179,25): error TS7053: Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{ [fieldname: string]: File[]; } | File[]'.
+  No index signature with a parameter of type 'number' was found on type '{ [fieldname: string]: File[]; } | File[]'.
+src/api/upload/upload.routes.ts(11,10): error TS2724: '"../../middlewares/rate-limit.middleware"' has no exported member named 'createRateLimiter'. Did you mean 'createUserRateLimit'?
+src/api/users/user.controller.ts(5,1): error TS6192: All imports in import declaration are unused.
+src/api/users/user.routes.ts(7,3): error TS6133: 'requireMentorOrAdmin' is declared but its value is never read.
+src/api/users/user.routes.ts(14,1): error TS6133: 'z' is declared but its value is never read.
+src/app.ts(94,23): error TS6133: 'req' is declared but its value is never read.
+src/lib/cache.ts(10,5): error TS6133: 'target' is declared but its value is never read.
+src/lib/email.ts(29,11): error TS2300: Duplicate identifier 'isConfigured'.
+src/lib/email.ts(589,3): error TS2300: Duplicate identifier 'isConfigured'.
+src/lib/jwt.ts(13,14): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: null, options?: (SignOptions & { algorithm: "none"; }) | undefined): string', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'null'.
+  Overload 2 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | PrivateKeyInput | JsonWebKeyInput, options?: SignOptions | undefined): string', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue | undefined'.
+  Overload 3 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | PrivateKeyInput | JsonWebKeyInput, callback: SignCallback): void', gave the following error.
+    Object literal may only specify known properties, and 'expiresIn' does not exist in type 'SignCallback'.
+src/lib/storage.ts(212,9): error TS2322: Type 'string' is not assignable to type 'BlobSASPermissions'.
+src/lib/storage.ts(243,11): error TS6133: 'uploadDir' is declared but its value is never read.
+src/lib/storage.ts(272,35): error TS6133: 'expiresIn' is declared but its value is never read.
+src/middlewares/application-security.middleware.ts(12,31): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/application-security.middleware.ts(88,31): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/application-security.middleware.ts(125,31): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/application-security.middleware.ts(175,31): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/application-security.middleware.ts(252,25): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/application-security.middleware.ts(292,31): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/auth.middleware.ts(15,44): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/auth.middleware.ts(48,52): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/error.middleware.ts(66,17): error TS7030: Not all code paths return a value.
+src/middlewares/rate-limit.middleware.ts(32,19): error TS2339: Property 'zremrangebyscore' does not exist on type 'RedisClient'.
+src/middlewares/rate-limit.middleware.ts(33,43): error TS2339: Property 'zcard' does not exist on type 'RedisClient'.
+src/middlewares/rate-limit.middleware.ts(47,19): error TS2339: Property 'zadd' does not exist on type 'RedisClient'.
+src/middlewares/rate-limit.middleware.ts(65,19): error TS2339: Property 'zrem' does not exist on type 'RedisClient'.
+src/middlewares/rate-limit.middleware.ts(65,63): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/middlewares/rate-limit.middleware.ts(147,5): error TS2322: Type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>) => string | undefined' is not assignable to type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>) => string'.
+  Type 'string | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/middlewares/rbac.middleware.ts(14,25): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/rbac.middleware.ts(47,25): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/rbac.middleware.ts(79,31): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/rbac.middleware.ts(114,31): error TS6133: 'res' is declared but its value is never read.
+src/middlewares/validate.middleware.ts(16,28): error TS6133: 'stripUnknown' is declared but its value is never read.
+src/middlewares/validate.middleware.ts(18,10): error TS7030: Not all code paths return a value.

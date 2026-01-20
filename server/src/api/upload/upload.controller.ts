@@ -176,7 +176,7 @@ export class UploadController {
           key: result.key,
           size: result.size,
           mimeType: result.mimeType,
-          originalName: req.files![index].originalname,
+          originalName: Array.isArray(req.files) ? req.files[index].originalname : 'unknown',
         })),
       },
       message: `${results.length} documents uploaded successfully`,

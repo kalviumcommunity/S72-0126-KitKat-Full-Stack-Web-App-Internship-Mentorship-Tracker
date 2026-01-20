@@ -252,7 +252,7 @@ The UIMP Team
   private getPasswordResetEmailTemplate(name: string, resetToken: string): EmailTemplate {
     const subject = "Password Reset Request - UIMP";
     const resetUrl = `${env.CORS_ORIGIN}/reset-password?token=${resetToken}`;
-    
+
     const text = `
 Hello ${name},
 
@@ -321,7 +321,7 @@ The UIMP Team
     feedbackPreview: string
   ): EmailTemplate {
     const subject = `New Feedback from ${mentorName} - ${applicationCompany}`;
-    
+
     const text = `
 Hello ${studentName},
 
@@ -387,7 +387,7 @@ The UIMP Team
     newStatus: string
   ): EmailTemplate {
     const subject = `Application Status Update - ${company}`;
-    
+
     const text = `
 Hello ${studentName},
 
@@ -460,7 +460,7 @@ The UIMP Team
     const subject = isStudent
       ? `New Mentor Assigned - ${mentorName}`
       : `New Student Assigned - ${studentName}`;
-    
+
     const text = isStudent
       ? `
 Hello ${studentName},
@@ -586,7 +586,7 @@ The UIMP Team
     return { subject, text, html };
   }
 
-  isConfigured(): boolean {
+  isServiceConfigured(): boolean {
     return this.isConfigured;
   }
 }

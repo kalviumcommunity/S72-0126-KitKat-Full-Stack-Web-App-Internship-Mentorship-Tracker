@@ -136,7 +136,7 @@ export class ApplicationService {
       const where = await this.buildApplicationsWhereClause(user, query);
 
       // Build order by clause
-      const orderBy = this.buildOrderByClause(query.sortBy, query.sortOrder);
+      const orderBy = this.buildOrderByClause((query as any).sortBy, (query as any).sortOrder);
 
       const [applications, total] = await Promise.all([
         prisma.application.findMany({
@@ -386,7 +386,7 @@ export class ApplicationService {
           userId,
         },
         data: {
-          status,
+          status: status as any,
           updatedAt: new Date(),
         },
       });
@@ -412,11 +412,11 @@ export class ApplicationService {
       // Apply filters
       if (query.status) where.status = query.status;
       if (query.platform) where.platform = query.platform;
-      if (query.startDate) {
-        where.createdAt = { ...where.createdAt, gte: new Date(query.startDate) };
+      if ((query as any).startDate) {
+        where.createdAt = { ...where.createdAt, gte: new Date((query as any).startDate) };
       }
-      if (query.endDate) {
-        where.createdAt = { ...where.createdAt, lte: new Date(query.endDate) };
+      if ((query as any).endDate) {
+        where.createdAt = { ...where.createdAt, lte: new Date((query as any).endDate) };
       }
 
       const applications = await prisma.application.findMany({

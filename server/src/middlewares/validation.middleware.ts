@@ -15,7 +15,7 @@ export interface ValidationConfig {
  * Comprehensive validation middleware that can validate multiple parts of the request
  */
 export function validateRequest(config: ValidationConfig) {
-  return (req: Request, _res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       const errors: Record<string, string[]> = {};
 
@@ -85,9 +85,9 @@ export function validateRequest(config: ValidationConfig) {
       next();
     } catch (error) {
       if (error instanceof ValidationError) {
-        next(error);
+        return next(error);
       } else {
-        next(new ValidationError("Validation error occurred"));
+        return next(new ValidationError("Validation error occurred"));
       }
     }
   };
