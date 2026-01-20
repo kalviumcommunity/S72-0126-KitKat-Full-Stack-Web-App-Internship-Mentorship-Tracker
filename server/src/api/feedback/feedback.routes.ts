@@ -3,14 +3,14 @@ import { z } from "zod";
 import { feedbackController } from "./feedback.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { requireRole, requireMentor, requireMentorOrAdmin } from "../../middlewares/rbac.middleware";
-import { validate } from "../../middlewares/validation.middleware";
+import { validateBody, validateQuery, validateParams } from "../../middlewares/validation.middleware";
 import { 
   createFeedbackSchema, 
   updateFeedbackSchema, 
   feedbackQuerySchema,
   uuidParamSchema 
 } from "./feedback.schema";
-import { createRateLimiter } from "../../middlewares/rate-limit.middleware";
+import { rateLimit } from "../../middlewares/rate-limit.middleware";
 import { UserRole } from "../../types/roles";
 
 const router = Router();
@@ -19,15 +19,15 @@ const router = Router();
 router.use(authenticate);
 
 // Rate limiters
-const feedbackCreateLimiter = createRateLimiter({
+const feedbackCreateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 feedback per 15 minutes
+  maxRequests: 20, // 20 feedback per 15 minutes
   message: "Too many feedback submissions, please try again later",
 });
 
-const feedbackReadLimiter = createRateLimiter({
+const feedbackReadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100, // 100 requests per 15 minutes
+  maxRequests: 100, // 100 requests per 15 minutes
   message: "Too many requests, please try again later",
 });
 
@@ -40,7 +40,7 @@ router.post(
   "/",
   requireMentor,
   feedbackCreateLimiter,
-  validate(createFeedbackSchema),
+  validateBody(createFeedbackSchema),
   feedbackController.createFeedback
 );
 
@@ -52,7 +52,7 @@ router.post(
 router.get(
   "/",
   feedbackReadLimiter,
-  validate(feedbackQuerySchema),
+  validateQuery(feedbackQuerySchema),
   feedbackController.listFeedback
 );
 
@@ -75,10 +75,8 @@ router.get(
 router.get(
   "/application/:applicationId",
   feedbackReadLimiter,
-  validate(z.object({
-    params: z.object({
-      applicationId: z.string().uuid("Invalid application ID"),
-    }),
+  validateParams(z.object({
+    applicationId: z.string().uuid("Invalid application ID"),
   })),
   feedbackController.getApplicationFeedback
 );
@@ -91,7 +89,7 @@ router.get(
 router.get(
   "/:id",
   feedbackReadLimiter,
-  validate(uuidParamSchema),
+  validateParams(uuidParamSchema),
   feedbackController.getFeedback
 );
 
@@ -104,8 +102,8 @@ router.patch(
   "/:id",
   requireMentor,
   feedbackCreateLimiter,
-  validate(uuidParamSchema),
-  validate(updateFeedbackSchema),
+  validateParams(uuidParamSchema),
+  validateBody(updateFeedbackSchema),
   feedbackController.updateFeedback
 );
 
@@ -117,7 +115,7 @@ router.patch(
 router.delete(
   "/:id",
   requireMentorOrAdmin,
-  validate(uuidParamSchema),
+  validateParams(uuidParamSchema),
   feedbackController.deleteFeedback
 );
 
