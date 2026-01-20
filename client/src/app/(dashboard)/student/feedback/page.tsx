@@ -9,7 +9,7 @@ import { FeedbackList } from '@/components/features/feedback/FeedbackList';
 import { FeedbackFilters } from '@/components/features/feedback/FeedbackFilters';
 import { FeedbackStats } from '@/components/features/feedback/FeedbackStats';
 import type { FeedbackWithRelations, FeedbackFilters as FilterType } from '@/lib/types';
-import { ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority } from '@/lib/types';
+import { ApplicationStatus, ApplicationPlatform, FeedbackPriority } from '@/lib/types';
 
 // Mock function to get feedback
 async function getFeedback(
@@ -32,7 +32,7 @@ async function getFeedback(
       applicationId: '1',
       mentorId: 'm1',
       content: 'Great progress on the technical assessment! Your coding skills are solid. For the upcoming interview, I recommend focusing on system design concepts. Practice designing scalable systems and be prepared to discuss trade-offs. Also, review common data structures and algorithms, especially trees and graphs.',
-      tags: ['DSA', 'SYSTEM_DESIGN'],
+      tags: [FeedbackTag.DSA.SYSTEM_DESIGN],
       priority: FeedbackPriority.HIGH,
       createdAt: '2024-01-16T09:00:00Z',
       updatedAt: '2024-01-16T09:00:00Z',
@@ -68,7 +68,7 @@ async function getFeedback(
       applicationId: '2',
       mentorId: 'm1',
       content: 'Resume looks good. Consider adding more quantifiable achievements in your project descriptions. Instead of saying "improved performance," try "improved performance by 40%." This makes your impact more concrete and impressive to recruiters.',
-      tags: ['RESUME'],
+      tags: [FeedbackTag.RESUME],
       priority: FeedbackPriority.MEDIUM,
       createdAt: '2024-01-15T11:00:00Z',
       updatedAt: '2024-01-15T11:00:00Z',
@@ -104,7 +104,7 @@ async function getFeedback(
       applicationId: '3',
       mentorId: 'm2',
       content: 'Excellent technical skills demonstrated. Prepare for behavioral questions focusing on leadership principles. Amazon values their leadership principles highly, so make sure you have specific examples ready for each one.',
-      tags: ['DSA', 'COMMUNICATION'],
+      tags: [FeedbackTag.DSA.COMMUNICATION],
       priority: FeedbackPriority.HIGH,
       createdAt: '2024-01-17T10:00:00Z',
       updatedAt: '2024-01-17T10:00:00Z',
@@ -140,7 +140,7 @@ async function getFeedback(
       applicationId: '3',
       mentorId: 'm1',
       content: 'Great referral connection. Make sure to research Amazon\'s leadership principles thoroughly. Have concrete examples from your experience that demonstrate each principle.',
-      tags: ['COMMUNICATION'],
+      tags: [FeedbackTag.COMMUNICATION],
       priority: FeedbackPriority.MEDIUM,
       createdAt: '2024-01-16T15:30:00Z',
       updatedAt: '2024-01-16T15:30:00Z',
@@ -176,7 +176,7 @@ async function getFeedback(
       applicationId: '4',
       mentorId: 'm2',
       content: 'Don\'t be discouraged by the rejection. Your technical skills are strong. Focus on improving data science portfolio projects. Consider adding a project that demonstrates end-to-end ML pipeline development.',
-      tags: ['RESUME'],
+      tags: [FeedbackTag.RESUME],
       priority: FeedbackPriority.MEDIUM,
       createdAt: '2024-01-18T09:00:00Z',
       updatedAt: '2024-01-18T09:00:00Z',

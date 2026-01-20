@@ -5,7 +5,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
-import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority, NotificationType } from '@/lib/types';
+import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackPriority, NotificationType } from '@/lib/types';
 
 // TODO: Replace with real data from API
 const mockData = {
