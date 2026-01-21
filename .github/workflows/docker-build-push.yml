@@ -1,0 +1,289 @@
+# Docker Build and Push Pipeline
+# Dedicated workflow for building and pushing Docker images to GitHub Container Registry
+
+name: Docker Build & Push
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      push_images:
+        description: 'Push images to registry'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Build and push Docker images
+  docker-build-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+
+    strategy:
+      matrix:
+        service: [frontend, backend]
+        include:
+          - service: frontend
+            context: ./client
+            dockerfile: ./client/Dockerfile
+            platforms: linux/amd64,linux/arm64
+          - service: backend
+            context: ./server
+            dockerfile: ./server/Dockerfile
+            platforms: linux/amd64,linux/arm64
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        platforms: ${{ matrix.platforms }}
+
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+        labels: |
+          org.opencontainers.image.title=${{ matrix.service }}
+          org.opencontainers.image.description=UIMP ${{ matrix.service }} service
+          org.opencontainers.image.vendor=UIMP Team
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ matrix.context }}
+        file: ${{ matrix.dockerfile }}
+        platforms: ${{ matrix.platforms }}
+        push: ${{ github.event_name != 'pull_request' && (github.event.inputs.push_images == 'true' || github.event.inputs.push_images == '') }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha,scope=${{ matrix.service }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ steps.meta.outputs.version }}
+        format: 'sarif'
+        output: 'trivy-results-${{ matrix.service }}.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results-${{ matrix.service }}.sarif'
+
+  # Multi-architecture manifest creation
+  create-manifest:
+    name: Create Multi-arch Manifest
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+    if: github.event_name != 'pull_request'
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        service: [frontend, backend]
+
+    steps:
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create and push manifest
+      run: |
+        # Get the image tag from the previous job
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          TAG="latest"
+        elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          TAG="develop"
+        else
+          TAG="${{ github.sha }}"
+        fi
+        
+        IMAGE_BASE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}"
+        
+        # Create manifest list
+        docker manifest create ${IMAGE_BASE}:${TAG} \
+          ${IMAGE_BASE}:${TAG}-amd64 \
+          ${IMAGE_BASE}:${TAG}-arm64
+        
+        # Push manifest
+        docker manifest push ${IMAGE_BASE}:${TAG}
+
+  # Test Docker images
+  test-images:
+    name: Test Docker Images
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+    if: github.event_name != 'pull_request'
+
+    strategy:
+      matrix:
+        service: [frontend, backend]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Test Docker image
+      run: |
+        # Get the image tag
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          TAG="latest"
+        elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          TAG="develop"
+        else
+          TAG="${{ github.sha }}"
+        fi
+        
+        IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${TAG}"
+        
+        # Pull the image
+        docker pull ${IMAGE}
+        
+        # Run basic tests
+        if [[ "${{ matrix.service }}" == "frontend" ]]; then
+          # Test frontend container
+          docker run --rm -d --name test-frontend -p 3000:3000 ${IMAGE}
+          sleep 10
+          
+          # Health check
+          curl -f http://localhost:3000/api/health || exit 1
+          
+          # Cleanup
+          docker stop test-frontend
+          
+        elif [[ "${{ matrix.service }}" == "backend" ]]; then
+          # Test backend container (requires database, so just check if it starts)
+          docker run --rm --name test-backend ${IMAGE} node --version
+        fi
+
+  # Deploy to staging (if on develop branch)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [docker-build-push, test-images]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Deploy to staging environment
+      run: |
+        echo "Deploying to staging environment..."
+        # Add your staging deployment logic here
+        # This could involve updating docker-compose files, Kubernetes manifests, etc.
+        
+        # Example: Update staging docker-compose with new image tags
+        sed -i "s|image: .*frontend.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:develop|g" docker-compose.staging.yml
+        sed -i "s|image: .*backend.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:develop|g" docker-compose.staging.yml
+
+    - name: Notify deployment
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+        custom_payload: |
+          {
+            text: "${{ job.status == 'success' && '🚀' || '❌' }} Docker images built and ${{ job.status == 'success' && 'deployed to staging' || 'deployment failed' }}",
+            attachments: [{
+              color: "${{ job.status == 'success' && 'good' || 'danger' }}",
+              fields: [{
+                title: "Repository",
+                value: "${{ github.repository }}",
+                short: true
+              }, {
+                title: "Branch",
+                value: "${{ github.ref_name }}",
+                short: true
+              }, {
+                title: "Commit",
+                value: "${{ github.sha }}",
+                short: true
+              }, {
+                title: "Images",
+                value: "frontend, backend",
+                short: true
+              }]
+            }]
+          }
+
+  # Clean up old images
+  cleanup-images:
+    name: Cleanup Old Images
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+    if: github.event_name != 'pull_request'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Delete old images
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: '${{ env.IMAGE_NAME }}/frontend'
+        package-type: 'container'
+        min-versions-to-keep: 10
+        delete-only-untagged-versions: true
+
+    - name: Delete old backend images
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: '${{ env.IMAGE_NAME }}/backend'
+        package-type: 'container'
+        min-versions-to-keep: 10
+        delete-only-untagged-versions: true
