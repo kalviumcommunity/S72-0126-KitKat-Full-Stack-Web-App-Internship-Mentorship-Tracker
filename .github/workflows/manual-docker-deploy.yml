@@ -1,0 +1,350 @@
+# Manual Docker Build and Deploy
+# Workflow for manual deployment with custom parameters
+
+name: Manual Docker Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      services:
+        description: 'Services to deploy (comma-separated)'
+        required: true
+        default: 'frontend,backend'
+        type: string
+      tag:
+        description: 'Docker image tag'
+        required: true
+        default: 'latest'
+        type: string
+      force_rebuild:
+        description: 'Force rebuild images'
+        required: false
+        default: false
+        type: boolean
+      run_tests:
+        description: 'Run tests before deployment'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Validate inputs
+  validate-inputs:
+    name: Validate Inputs
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.parse.outputs.services }}
+      valid: ${{ steps.validate.outputs.valid }}
+    
+    steps:
+    - name: Parse services input
+      id: parse
+      run: |
+        services="${{ github.event.inputs.services }}"
+        services=$(echo "$services" | tr ',' '\n' | tr -d ' ' | grep -E '^(frontend|backend)$' | tr '\n' ',' | sed 's/,$//')
+        echo "services=$services" >> $GITHUB_OUTPUT
+        echo "Parsed services: $services"
+
+    - name: Validate inputs
+      id: validate
+      run: |
+        services="${{ steps.parse.outputs.services }}"
+        environment="${{ github.event.inputs.environment }}"
+        tag="${{ github.event.inputs.tag }}"
+        
+        if [[ -z "$services" ]]; then
+          echo "❌ No valid services specified"
+          echo "valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        if [[ ! "$environment" =~ ^(staging|production)$ ]]; then
+          echo "❌ Invalid environment: $environment"
+          echo "valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        if [[ -z "$tag" ]]; then
+          echo "❌ Tag cannot be empty"
+          echo "valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        echo "✅ All inputs are valid"
+        echo "valid=true" >> $GITHUB_OUTPUT
+
+  # Run tests if requested
+  run-tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: validate-inputs
+    if: github.event.inputs.run_tests == 'true' && needs.validate-inputs.outputs.valid == 'true'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: |
+          client/package-lock.json
+          server/package-lock.json
+
+    - name: Run frontend tests
+      if: contains(needs.validate-inputs.outputs.services, 'frontend')
+      run: |
+        cd client
+        npm ci
+        npm run test:ci
+
+    - name: Run backend tests
+      if: contains(needs.validate-inputs.outputs.services, 'backend')
+      run: |
+        cd server
+        npm ci
+        npm run test:unit
+
+  # Build Docker images
+  build-images:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [validate-inputs, run-tests]
+    if: always() && needs.validate-inputs.outputs.valid == 'true' && (needs.run-tests.result == 'success' || needs.run-tests.result == 'skipped')
+    
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        service: ${{ fromJson(format('["{0}"]', needs.validate-inputs.outputs.services)) }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check if image exists
+      id: check-image
+      run: |
+        image="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ github.event.inputs.tag }}"
+        if docker manifest inspect $image > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Image exists: $image"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Image does not exist: $image"
+        fi
+
+    - name: Set build context
+      id: context
+      run: |
+        case "${{ matrix.service }}" in
+          frontend)
+            echo "context=./client" >> $GITHUB_OUTPUT
+            echo "dockerfile=./client/Dockerfile" >> $GITHUB_OUTPUT
+            ;;
+          backend)
+            echo "context=./server" >> $GITHUB_OUTPUT
+            echo "dockerfile=./server/Dockerfile" >> $GITHUB_OUTPUT
+            ;;
+        esac
+
+    - name: Build and push Docker image
+      if: github.event.inputs.force_rebuild == 'true' || steps.check-image.outputs.exists == 'false'
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ steps.context.outputs.context }}
+        file: ${{ steps.context.outputs.dockerfile }}
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ github.event.inputs.tag }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ github.event.inputs.environment }}-latest
+        cache-from: type=gha,scope=${{ matrix.service }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+    - name: Skip build (image exists)
+      if: github.event.inputs.force_rebuild == 'false' && steps.check-image.outputs.exists == 'true'
+      run: |
+        echo "⏭️ Skipping build for ${{ matrix.service }} - image already exists"
+        echo "Use force_rebuild=true to rebuild existing images"
+
+  # Deploy to environment
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: [validate-inputs, build-images]
+    if: always() && needs.validate-inputs.outputs.valid == 'true' && needs.build-images.result == 'success'
+    
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup deployment environment
+      run: |
+        echo "Setting up ${{ github.event.inputs.environment }} deployment..."
+        
+        # Create environment-specific docker-compose file
+        if [[ "${{ github.event.inputs.environment }}" == "staging" ]]; then
+          cp docker-compose.staging.yml docker-compose.deploy.yml
+        else
+          cp docker-compose.prod.yml docker-compose.deploy.yml
+        fi
+        
+        # Update image tags in docker-compose file
+        services="${{ needs.validate-inputs.outputs.services }}"
+        IFS=',' read -ra SERVICE_ARRAY <<< "$services"
+        
+        for service in "${SERVICE_ARRAY[@]}"; do
+          image_name="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${service}:${{ github.event.inputs.tag }}"
+          sed -i "s|image: .*${service}.*|image: ${image_name}|g" docker-compose.deploy.yml
+        done
+
+    - name: Deploy services
+      run: |
+        echo "🚀 Deploying services to ${{ github.event.inputs.environment }}..."
+        
+        # This is where you would add your actual deployment logic
+        # Examples:
+        # - Deploy to Kubernetes cluster
+        # - Update Docker Swarm services
+        # - Deploy to cloud provider (AWS ECS, Azure Container Instances, etc.)
+        # - Update docker-compose on remote server
+        
+        # For demonstration, we'll just show what would be deployed
+        echo "Services to deploy: ${{ needs.validate-inputs.outputs.services }}"
+        echo "Image tag: ${{ github.event.inputs.tag }}"
+        echo "Environment: ${{ github.event.inputs.environment }}"
+        
+        # Example deployment commands (uncomment and modify as needed):
+        # docker-compose -f docker-compose.deploy.yml up -d
+        # kubectl apply -f k8s/
+        # aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment
+
+    - name: Run health checks
+      run: |
+        echo "🏥 Running health checks..."
+        
+        # Add your health check logic here
+        # Examples:
+        # - Check service endpoints
+        # - Verify database connectivity
+        # - Run smoke tests
+        
+        services="${{ needs.validate-inputs.outputs.services }}"
+        IFS=',' read -ra SERVICE_ARRAY <<< "$services"
+        
+        for service in "${SERVICE_ARRAY[@]}"; do
+          echo "✅ Health check passed for $service"
+        done
+
+    - name: Update deployment status
+      run: |
+        echo "📊 Updating deployment status..."
+        
+        # Create deployment record
+        cat > deployment-record.json << EOF
+        {
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "environment": "${{ github.event.inputs.environment }}",
+          "services": "${{ needs.validate-inputs.outputs.services }}",
+          "tag": "${{ github.event.inputs.tag }}",
+          "triggered_by": "${{ github.actor }}",
+          "commit": "${{ github.sha }}",
+          "workflow_run": "${{ github.run_id }}"
+        }
+        EOF
+        
+        echo "Deployment record:"
+        cat deployment-record.json
+
+    - name: Notify deployment success
+      uses: 8398a7/action-slack@v3
+      if: success()
+      with:
+        status: success
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        custom_payload: |
+          {
+            text: "🎉 Manual deployment successful!",
+            attachments: [{
+              color: "good",
+              fields: [{
+                title: "Environment",
+                value: "${{ github.event.inputs.environment }}",
+                short: true
+              }, {
+                title: "Services",
+                value: "${{ needs.validate-inputs.outputs.services }}",
+                short: true
+              }, {
+                title: "Tag",
+                value: "${{ github.event.inputs.tag }}",
+                short: true
+              }, {
+                title: "Triggered by",
+                value: "${{ github.actor }}",
+                short: true
+              }]
+            }]
+          }
+
+    - name: Notify deployment failure
+      uses: 8398a7/action-slack@v3
+      if: failure()
+      with:
+        status: failure
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        custom_payload: |
+          {
+            text: "❌ Manual deployment failed!",
+            attachments: [{
+              color: "danger",
+              fields: [{
+                title: "Environment",
+                value: "${{ github.event.inputs.environment }}",
+                short: true
+              }, {
+                title: "Services",
+                value: "${{ needs.validate-inputs.outputs.services }}",
+                short: true
+              }, {
+                title: "Tag",
+                value: "${{ github.event.inputs.tag }}",
+                short: true
+              }, {
+                title: "Triggered by",
+                value: "${{ github.actor }}",
+                short: true
+              }]
+            }]
+          }
