@@ -1,7 +1,13 @@
 import { Router } from "express";
 import { applicationController } from "./application.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
-import { requireStudent } from "../../middlewares/rbac.middleware";
+import { 
+  requireStudentAccess,
+  canCreateApplication,
+  canReadApplication,
+  canUpdateApplication,
+  canDeleteApplication
+} from "../../middlewares/rbac.middleware";
 import { validateBody, validateParams, validateQuery } from "../../middlewares/validation.middleware";
 import { schemas } from "../../lib/validation";
 import { rateLimiters } from "../../middlewares/rate-limit.middleware";
@@ -43,7 +49,7 @@ router.get(
 // Export applications (Students only, own applications)
 router.get(
   "/export/data",
-  requireStudent,
+  requireStudentAccess,
   rateLimiters.general,
   validateQuery(z.object({
     status: schemas.application.create.shape.status.optional(),
@@ -66,7 +72,7 @@ router.get(
 // Create new application (Students only) with comprehensive security
 router.post(
   "/",
-  requireStudent,
+  requireStudentAccess,
   rateLimiters.general,
   sanitizeApplicationData(),
   checkApplicationLimits(),
@@ -78,7 +84,7 @@ router.post(
 // Update application with comprehensive security
 router.put(
   "/:id",
-  requireStudent,
+  requireStudentAccess,
   rateLimiters.general,
   validateParams(schemas.application.getById),
   requireApplicationAccess(),
@@ -93,7 +99,7 @@ router.put(
 // Delete application with comprehensive security
 router.delete(
   "/:id",
-  requireStudent,
+  requireStudentAccess,
   rateLimiters.general,
   validateParams(schemas.application.delete),
   requireApplicationAccess(),
@@ -104,7 +110,7 @@ router.delete(
 // Bulk update application status (Students only) with security
 router.patch(
   "/bulk/status",
-  requireStudent,
+  requireStudentAccess,
   rateLimiters.general,
   validateBody(z.object({
     applicationIds: z.array(z.string().uuid()).min(1).max(50), // Max 50 applications at once

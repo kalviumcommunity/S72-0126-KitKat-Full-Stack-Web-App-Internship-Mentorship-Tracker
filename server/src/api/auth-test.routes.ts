@@ -2,13 +2,10 @@ import { Router } from "express";
 import { asyncHandler } from "../middlewares/error.middleware";
 import { authenticate, optionalAuthenticate } from "../middlewares/auth.middleware";
 import { 
-  requireStudent, 
-  requireMentor, 
-  requireAdmin,
-  requireMentorOrAdmin,
-  requireMinMentor,
-  requireSelfOrAdmin,
-  requireMentorAccess,
+  requireStudentAccess, 
+  requireMentorAccess, 
+  requireAdminAccess,
+  requireSuperAdminAccess
 } from "../middlewares/rbac.middleware";
 import { validateParams } from "../middlewares/validation.middleware";
 import { z } from "zod";
@@ -56,7 +53,7 @@ router.get("/protected",
 // Student only route
 router.get("/student-only", 
   authenticate,
-  requireStudent,
+  requireStudentAccess,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
@@ -69,7 +66,7 @@ router.get("/student-only",
 // Mentor only route
 router.get("/mentor-only", 
   authenticate,
-  requireMentor,
+  requireMentorAccess,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
@@ -82,7 +79,7 @@ router.get("/mentor-only",
 // Admin only route
 router.get("/admin-only", 
   authenticate,
-  requireAdmin,
+  requireAdminAccess,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
@@ -95,7 +92,7 @@ router.get("/admin-only",
 // Mentor or Admin route
 router.get("/mentor-or-admin", 
   authenticate,
-  requireMentorOrAdmin,
+  requireMentorAccess,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
@@ -108,7 +105,7 @@ router.get("/mentor-or-admin",
 // Minimum mentor role (mentor or admin)
 router.get("/min-mentor", 
   authenticate,
-  requireMinMentor,
+  requireMentorAccess,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
@@ -122,7 +119,7 @@ router.get("/min-mentor",
 router.get("/profile/:id", 
   authenticate,
   validateParams(z.object({ id: z.string().uuid() })),
-  requireSelfOrAdmin,
+  requireMentorAccess,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
@@ -139,7 +136,7 @@ router.get("/profile/:id",
 router.get("/student-data/:studentId", 
   authenticate,
   validateParams(z.object({ studentId: z.string().uuid() })),
-  requireMentorAccess((req) => req.params.studentId),
+  requireMentorAccess,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
