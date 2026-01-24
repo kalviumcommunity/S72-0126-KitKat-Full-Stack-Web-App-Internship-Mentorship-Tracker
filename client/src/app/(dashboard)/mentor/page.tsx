@@ -14,7 +14,7 @@ import { RealTimeStats } from '@/components/features/dashboard/RealTimeStats';
 import { PerformanceChart } from '@/components/features/dashboard/PerformanceChart';
 import { MentorStudentOverview } from '@/components/features/dashboard/MentorStudentOverview';
 import { QuickActions } from '@/components/features/dashboard/QuickActions';
-import type { MentorDashboardData } from '@/lib/types';
+import type { MentorDashboardData, ApplicationWithFeedback } from '@/lib/types';
 import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackTag, FeedbackPriority } from '@/lib/types';
 
 // Mock function to get mentor dashboard data
@@ -232,7 +232,6 @@ export default async function MentorDashboard() {
             {/* Context-aware Quick Actions */}
             <QuickActions 
               userRole={dashboardData.user.role}
-              applications={dashboardData.applications.recent}
               feedback={dashboardData.feedback.recent}
             />
 

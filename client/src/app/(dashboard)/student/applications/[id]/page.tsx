@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { ApplicationStatusBadge } from '@/components/features/applications/ApplicationStatusBadge';
 import { ApplicationDetailView } from '@/components/features/applications/ApplicationDetailView';
+import { ApplicationPlatform, ApplicationStatus, FeedbackTag, FeedbackPriority } from '@/lib/types';
 
 // Mock function to get application by ID
 async function getApplication(id: string) {
@@ -22,8 +23,8 @@ async function getApplication(id: string) {
     userId: 'mock-user-id',
     company: 'Google',
     role: 'Software Engineer Intern',
-    platform: 'COMPANY_WEBSITE' as const,
-    status: 'INTERVIEW' as const,
+    platform: ApplicationPlatform.COMPANY_WEBSITE,
+    status: ApplicationStatus.INTERVIEW,
     resumeUrl: '/resumes/resume-google.pdf',
     notes: 'Applied through university career portal. Completed online assessment successfully. Technical interview scheduled for next week. Need to prepare system design questions and review data structures.',
     deadline: '2024-01-20T23:59:59Z',
@@ -36,8 +37,8 @@ async function getApplication(id: string) {
         applicationId: id,
         mentorId: 'm1',
         content: 'Great progress on the technical assessment! Your coding skills are solid. For the upcoming interview, I recommend focusing on system design concepts. Practice designing scalable systems and be prepared to discuss trade-offs. Also, review common data structures and algorithms, especially trees and graphs.',
-        tags: ['DSA', 'SYSTEM_DESIGN'] as const,
-        priority: 'HIGH' as const,
+        tags: [FeedbackTag.DSA, FeedbackTag.SYSTEM_DESIGN],
+        priority: FeedbackPriority.HIGH,
         createdAt: '2024-01-16T09:00:00Z',
         updatedAt: '2024-01-16T09:00:00Z',
         mentor: {
@@ -52,8 +53,8 @@ async function getApplication(id: string) {
         applicationId: id,
         mentorId: 'm2',
         content: 'Your resume looks great for this position. The projects you\'ve highlighted align well with Google\'s tech stack. One suggestion: add more quantifiable metrics to your achievements. For example, instead of "improved performance," say "improved performance by 40%." This makes your impact more concrete.',
-        tags: ['RESUME'] as const,
-        priority: 'MEDIUM' as const,
+        tags: [FeedbackTag.RESUME],
+        priority: FeedbackPriority.MEDIUM,
         createdAt: '2024-01-15T14:00:00Z',
         updatedAt: '2024-01-15T14:00:00Z',
         mentor: {

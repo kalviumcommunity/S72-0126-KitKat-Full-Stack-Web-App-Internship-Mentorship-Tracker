@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 
 import { StudentRoute } from '@/components/auth/ProtectedRoute';
 import { ApplicationEditForm } from '@/components/features/applications/ApplicationEditForm';
+import { ApplicationPlatform, ApplicationStatus } from '@/lib/types';
 
 // Mock function to get application by ID for editing
 async function getApplicationForEdit(id: string) {
@@ -18,8 +19,8 @@ async function getApplicationForEdit(id: string) {
     userId: 'mock-user-id',
     company: 'Google',
     role: 'Software Engineer Intern',
-    platform: 'COMPANY_WEBSITE' as const,
-    status: 'INTERVIEW' as const,
+    platform: ApplicationPlatform.COMPANY_WEBSITE,
+    status: ApplicationStatus.INTERVIEW,
     resumeUrl: '/resumes/resume-google.pdf',
     notes: 'Applied through university career portal. Completed online assessment successfully. Technical interview scheduled for next week. Need to prepare system design questions and review data structures.',
     deadline: '2024-01-20T23:59:59Z',
