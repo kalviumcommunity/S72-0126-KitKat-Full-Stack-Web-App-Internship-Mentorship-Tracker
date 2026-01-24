@@ -4,14 +4,6 @@ import { RequestUser } from "../types/api";
 import { AuthenticationError } from "./error.middleware";
 import { logger } from "../lib/logger";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: RequestUser;
-    }
-  }
-}
-
 export function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
     // Try to get token from cookie first, then from Authorization header

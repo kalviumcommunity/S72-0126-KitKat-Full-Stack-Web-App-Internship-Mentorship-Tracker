@@ -315,11 +315,22 @@ export class RBACService {
     const key = `rate_limit:${context.userId}:${Math.floor(Date.now() / (15 * 60 * 1000))}`;
 
     try {
+      // Use INCR which returns number directly, handles first-time access (starts at 1)
+      // Returns null if Redis is not available
       const current = await redis.incr(key);
+      
+      // If Redis is not available, fail open (allow request)
+      if (current === null) {
+        logger.warn('Rate limit check failed - Redis unavailable, allowing request');
+        return true;
+      }
+      
+      // Set expiration only on first increment to prevent race conditions
       if (current === 1) {
         await redis.expire(key, 15 * 60); // 15 minutes
       }
       
+      // current is guaranteed to be a number >= 1 from INCR operation
       return current <= policy.requests;
     } catch (error) {
       logger.warn('Rate limit check failed, allowing request', { error });
