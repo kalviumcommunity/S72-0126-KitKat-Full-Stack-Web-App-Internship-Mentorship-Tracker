@@ -40,7 +40,7 @@ export function FeedbackCard({
             {/* Mentor Avatar */}
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-sm font-medium text-blue-600">
-                {feedback.mentor.firstName?.[0] || feedback.mentor.email[0].toUpperCase()}
+                {feedback.mentor?.firstName?.[0] || feedback.mentor?.email?.[0]?.toUpperCase() || 'M'}
                 {feedback.mentor.lastName?.[0] || ''}
               </span>
             </div>

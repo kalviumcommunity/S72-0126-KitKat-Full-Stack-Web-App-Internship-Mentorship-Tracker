@@ -41,7 +41,7 @@ export function StudentsList({ students }: StudentsListProps) {
           {students.map((student) => {
             const initials = student.firstName && student.lastName
               ? `${student.firstName[0]}${student.lastName[0]}`.toUpperCase()
-              : student.email[0].toUpperCase();
+              : student?.email?.[0]?.toUpperCase() || 'S';
 
             const displayName = student.firstName && student.lastName
               ? `${student.firstName} ${student.lastName}`

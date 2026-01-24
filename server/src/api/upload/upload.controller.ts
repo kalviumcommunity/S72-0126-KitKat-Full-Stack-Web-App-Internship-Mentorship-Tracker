@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import { storage } from "../../lib/storage";
+import { UploadService } from "./upload.service";
 import { ApiResponse } from "../../types/api";
 import { asyncHandler } from "../../middlewares/error.middleware";
 import { AuthenticationError, ValidationError } from "../../middlewares/error.middleware";
 import { logger } from "../../lib/logger";
+import path from "path";
 
 export class UploadController {
   /**
@@ -18,30 +19,31 @@ export class UploadController {
       throw new ValidationError("No file uploaded");
     }
 
-    const result = await storage.upload({
-      buffer: req.file.buffer,
-      originalName: req.file.originalname,
-      mimeType: req.file.mimetype,
-      folder: "resumes",
-      userId: req.user.id,
-    });
+    // Validate file
+    const validation = UploadService.validateFile(req.file);
+    if (!validation.valid) {
+      throw new ValidationError(validation.error || "Invalid file");
+    }
+
+    const result = await UploadService.processUpload(req.file, req.user.id);
 
     logger.info("Resume uploaded", {
       userId: req.user.id,
       filename: req.file.originalname,
       size: req.file.size,
-      key: result.key,
+      fileId: result.id,
     });
 
     const response: ApiResponse = {
       success: true,
       data: {
         file: {
+          id: result.id,
           url: result.url,
-          key: result.key,
+          filename: result.filename,
+          originalName: result.originalName,
           size: result.size,
-          mimeType: result.mimeType,
-          originalName: req.file.originalname,
+          mimetype: result.mimetype,
         },
       },
       message: "Resume uploaded successfully",
@@ -62,30 +64,31 @@ export class UploadController {
       throw new ValidationError("No file uploaded");
     }
 
-    const result = await storage.upload({
-      buffer: req.file.buffer,
-      originalName: req.file.originalname,
-      mimeType: req.file.mimetype,
-      folder: "profile-images",
-      userId: req.user.id,
-    });
+    // Validate file
+    const validation = UploadService.validateFile(req.file);
+    if (!validation.valid) {
+      throw new ValidationError(validation.error || "Invalid file");
+    }
+
+    const result = await UploadService.processUpload(req.file, req.user.id);
 
     logger.info("Profile image uploaded", {
       userId: req.user.id,
       filename: req.file.originalname,
       size: req.file.size,
-      key: result.key,
+      fileId: result.id,
     });
 
     const response: ApiResponse = {
       success: true,
       data: {
         file: {
+          id: result.id,
           url: result.url,
-          key: result.key,
+          filename: result.filename,
+          originalName: result.originalName,
           size: result.size,
-          mimeType: result.mimeType,
-          originalName: req.file.originalname,
+          mimetype: result.mimetype,
         },
       },
       message: "Profile image uploaded successfully",
@@ -106,30 +109,31 @@ export class UploadController {
       throw new ValidationError("No file uploaded");
     }
 
-    const result = await storage.upload({
-      buffer: req.file.buffer,
-      originalName: req.file.originalname,
-      mimeType: req.file.mimetype,
-      folder: "documents",
-      userId: req.user.id,
-    });
+    // Validate file
+    const validation = UploadService.validateFile(req.file);
+    if (!validation.valid) {
+      throw new ValidationError(validation.error || "Invalid file");
+    }
+
+    const result = await UploadService.processUpload(req.file, req.user.id);
 
     logger.info("Document uploaded", {
       userId: req.user.id,
       filename: req.file.originalname,
       size: req.file.size,
-      key: result.key,
+      fileId: result.id,
     });
 
     const response: ApiResponse = {
       success: true,
       data: {
         file: {
+          id: result.id,
           url: result.url,
-          key: result.key,
+          filename: result.filename,
+          originalName: result.originalName,
           size: result.size,
-          mimeType: result.mimeType,
-          originalName: req.file.originalname,
+          mimetype: result.mimetype,
         },
       },
       message: "Document uploaded successfully",
@@ -150,14 +154,16 @@ export class UploadController {
       throw new ValidationError("No files uploaded");
     }
 
+    // Validate all files
+    for (const file of req.files) {
+      const validation = UploadService.validateFile(file);
+      if (!validation.valid) {
+        throw new ValidationError(`File ${file.originalname}: ${validation.error}`);
+      }
+    }
+
     const uploadPromises = req.files.map((file) =>
-      storage.upload({
-        buffer: file.buffer,
-        originalName: file.originalname,
-        mimeType: file.mimetype,
-        folder: "documents",
-        userId: req.user!.id,
-      })
+      UploadService.processUpload(file, req.user!.id)
     );
 
     const results = await Promise.all(uploadPromises);
@@ -171,12 +177,13 @@ export class UploadController {
     const response: ApiResponse = {
       success: true,
       data: {
-        files: results.map((result, index) => ({
+        files: results.map((result) => ({
+          id: result.id,
           url: result.url,
-          key: result.key,
+          filename: result.filename,
+          originalName: result.originalName,
           size: result.size,
-          mimeType: result.mimeType,
-          originalName: Array.isArray(req.files) ? req.files[index].originalname : 'unknown',
+          mimetype: result.mimetype,
         })),
       },
       message: `${results.length} documents uploaded successfully`,
@@ -199,16 +206,15 @@ export class UploadController {
       throw new ValidationError("File key is required");
     }
 
-    // Verify the file belongs to the user (key should contain userId)
-    if (!key.includes(req.user.id)) {
-      throw new ValidationError("You can only delete your own files");
-    }
+    const deleted = await UploadService.deleteFile(key);
 
-    await storage.delete(key);
+    if (!deleted) {
+      throw new ValidationError("File not found or could not be deleted");
+    }
 
     logger.info("File deleted", {
       userId: req.user.id,
-      key,
+      filename: key,
     });
 
     const response: ApiResponse = {
@@ -220,7 +226,51 @@ export class UploadController {
   });
 
   /**
-   * Get signed URL for file
+   * Get file by filename
+   */
+  getFile = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { filename } = req.params;
+
+    if (!filename) {
+      throw new ValidationError("Filename is required");
+    }
+
+    const file = await UploadService.getFile(filename);
+
+    if (!file.exists) {
+      res.status(404).json({
+        success: false,
+        message: "File not found",
+      });
+      return;
+    }
+
+    // Set appropriate headers
+    const ext = path.extname(filename).toLowerCase();
+    let contentType = 'application/octet-stream';
+    
+    switch (ext) {
+      case '.pdf':
+        contentType = 'application/pdf';
+        break;
+      case '.doc':
+        contentType = 'application/msword';
+        break;
+      case '.docx':
+        contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        break;
+      case '.txt':
+        contentType = 'text/plain';
+        break;
+    }
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    res.sendFile(file.path);
+  });
+
+  /**
+   * Get signed URL for file (for compatibility)
    */
   getSignedUrl = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
@@ -228,26 +278,43 @@ export class UploadController {
     }
 
     const { key } = req.params;
-    const expiresIn = parseInt(req.query.expiresIn as string) || 3600;
 
     if (!key) {
       throw new ValidationError("File key is required");
     }
 
-    const url = await storage.getSignedUrl(key, expiresIn);
+    // For local storage, we'll just return the direct URL
+    const url = `/api/upload/files/${key}`;
 
-    logger.info("Signed URL generated", {
+    logger.info("File URL generated", {
       userId: req.user.id,
-      key,
-      expiresIn,
+      filename: key,
     });
 
     const response: ApiResponse = {
       success: true,
       data: {
         url,
-        expiresIn,
+        expiresIn: 3600, // 1 hour (not enforced for local storage)
       },
+    };
+
+    res.json(response);
+  });
+
+  /**
+   * Get upload statistics
+   */
+  getStats = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required");
+    }
+
+    const stats = await UploadService.getUploadStats();
+
+    const response: ApiResponse = {
+      success: true,
+      data: stats,
     };
 
     res.json(response);

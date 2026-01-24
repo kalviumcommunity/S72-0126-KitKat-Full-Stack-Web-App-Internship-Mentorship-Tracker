@@ -134,7 +134,7 @@ export async function testApplicationEndpoints(): Promise<TestSuite> {
     const response = await applications.getAll();
     tests.push({
       name: 'Get All Applications',
-      passed: response.success || response.error?.includes('Unauthorized'),
+      passed: Boolean(response.success || response.error?.includes('Unauthorized')),
       message: response.success 
         ? `Retrieved ${response.data?.data?.length || 0} applications` 
         : response.error || 'Failed',
@@ -176,7 +176,7 @@ export async function testFeedbackEndpoints(): Promise<TestSuite> {
     const response = await feedback.getAll();
     tests.push({
       name: 'Get All Feedback',
-      passed: response.success || response.error?.includes('Unauthorized'),
+      passed: Boolean(response.success || response.error?.includes('Unauthorized')),
       message: response.success 
         ? `Retrieved ${response.data?.data?.length || 0} feedback items` 
         : response.error || 'Failed',
@@ -218,7 +218,7 @@ export async function testNotificationEndpoints(): Promise<TestSuite> {
     const response = await notifications.getUnread();
     tests.push({
       name: 'Get Unread Notifications',
-      passed: response.success || response.error?.includes('Unauthorized'),
+      passed: Boolean(response.success || response.error?.includes('Unauthorized')),
       message: response.success 
         ? `Retrieved ${response.data?.length || 0} unread notifications` 
         : response.error || 'Failed',
@@ -260,7 +260,7 @@ export async function testDashboardEndpoints(): Promise<TestSuite> {
     const response = await dashboard.getStudentData();
     tests.push({
       name: 'Get Student Dashboard',
-      passed: response.success || response.error?.includes('Unauthorized'),
+      passed: Boolean(response.success || response.error?.includes('Unauthorized')),
       message: response.success 
         ? 'Successfully retrieved dashboard data' 
         : response.error || 'Failed',

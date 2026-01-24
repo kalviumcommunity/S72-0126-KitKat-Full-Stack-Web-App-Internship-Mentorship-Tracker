@@ -23,6 +23,7 @@ const applicationCreateSchema = z.object({
   status: z.nativeEnum(ApplicationStatus),
   deadline: z.string().optional(),
   notes: z.string().optional(),
+  appliedDate: z.string().optional(),
 });
 import { applications } from '@/lib/api';
 
@@ -115,8 +116,16 @@ export function ApplicationCreateForm() {
     resetForm,
   } = useFormValidation({
     schema: applicationCreateSchema,
-    initialValues: initialData,
+    initialValues: {
+      ...initialData,
+      appliedDate: '',
+    },
   });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFieldValue(name as keyof typeof data, value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,10 +177,11 @@ export function ApplicationCreateForm() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-              label="Company"
               error={errors.company}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company *
+              </label>
               <Input
                 name="company"
                 value={data.company}
@@ -182,10 +192,11 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Role"
               error={errors.role}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Role *
+              </label>
               <Input
                 name="role"
                 value={data.role}
@@ -196,14 +207,15 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Platform"
               error={errors.platform}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Platform *
+              </label>
               <Select
                 name="platform"
                 value={data.platform}
-                onChange={(value) => setFieldValue('platform', value as ApplicationPlatform)}
+                onChange={(value) => setFieldValue('platform', value)}
                 options={platformOptions}
                 placeholder="Select application platform"
                 disabled={isSubmitting}
@@ -211,14 +223,15 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Status"
               error={errors.status}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status *
+              </label>
               <Select
                 name="status"
                 value={data.status}
-                onChange={(value) => setFieldValue('status', value as ApplicationStatus)}
+                onChange={(value) => setFieldValue('status', value)}
                 options={statusOptions}
                 placeholder="Select application status"
                 disabled={isSubmitting}
@@ -236,10 +249,12 @@ export function ApplicationCreateForm() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-              label="Applied Date"
               error={errors.appliedDate}
-              helpText="When did you submit this application? (optional)"
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Applied Date
+              </label>
+              <p className="text-sm text-gray-500 mb-2">When did you submit this application? (optional)</p>
               <Input
                 type="date"
                 name="appliedDate"
@@ -250,10 +265,12 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Application Deadline"
               error={errors.deadline}
-              helpText="When is the application deadline? (optional)"
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Application Deadline
+              </label>
+              <p className="text-sm text-gray-500 mb-2">When is the application deadline? (optional)</p>
               <Input
                 type="date"
                 name="deadline"
@@ -273,10 +290,12 @@ export function ApplicationCreateForm() {
         </CardHeader>
         <CardContent>
           <FormField
-            label="Application Notes"
             error={errors.notes}
-            helpText="Add any relevant notes about this application (optional)"
           >
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Application Notes
+            </label>
+            <p className="text-sm text-gray-500 mb-2">Add any relevant notes about this application (optional)</p>
             <textarea
               name="notes"
               value={data.notes}

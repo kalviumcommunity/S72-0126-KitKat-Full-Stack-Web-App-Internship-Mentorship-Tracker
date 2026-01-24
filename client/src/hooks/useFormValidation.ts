@@ -124,11 +124,17 @@ export function useFormValidation<T extends Record<string, any>>({
     setValidation(prev => ({ ...prev, isValidating: true }));
 
     try {
-      // Validate just this field by creating a partial schema
-      const fieldValue = values[field];
-      const fieldSchema = schema.pick({ [field]: true } as any);
-      
-      await fieldSchema.parseAsync({ [field]: fieldValue });
+      // Validate the entire object and check for field-specific errors
+      const result = schema.safeParse(values);
+      if (!result.success) {
+        const fieldError = result.error.errors.find(err => 
+          err.path.length > 0 && err.path[0] === field
+        );
+        if (fieldError) {
+          setFieldError(field, fieldError.message);
+          return false;
+        }
+      }
       
       // Field is valid, clear any existing error
       clearFieldError(field);

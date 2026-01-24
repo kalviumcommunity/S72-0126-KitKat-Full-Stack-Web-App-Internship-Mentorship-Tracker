@@ -1,6 +1,8 @@
 // Performance Monitoring System
 // Real-time performance tracking and optimization
 
+import React from 'react';
+
 export interface PerformanceMetrics {
   renderTime: number;
   componentCount: number;
@@ -61,9 +63,13 @@ class PerformanceMonitor {
     // Largest Contentful Paint
     const lcpObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      const lastEntry = entries[entries.length - 1];
-      this.webVitals.lcp = lastEntry.startTime;
-      this.logMetric('LCP', lastEntry.startTime);
+      if (entries.length > 0) {
+        const lastEntry = entries[entries.length - 1];
+        if (lastEntry) {
+          this.webVitals.lcp = lastEntry.startTime;
+          this.logMetric('LCP', lastEntry.startTime);
+        }
+      }
     });
     lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
     this.observers.push(lcpObserver);
@@ -240,106 +246,6 @@ export function usePerformanceMonitor(componentName: string) {
     getWebVitals: () => performanceMonitor.getWebVitals(),
   };
 }
-
-// Performance optimization utilities
-export class PerformanceOptimizer {
-  private static imageCache = new Map<string, HTMLImageElement>();
-  private static componentCache = new Map<string, React.ComponentType<any>>();
-
-  // Image optimization
-  static optimizeImage(src: string, width?: number, quality?: number): string {
-    // In a real implementation, this would integrate with an image CDN
-    const params = new URLSearchParams();
-    if (width) params.set('w', width.toString());
-    if (quality) params.set('q', quality.toString());
-    
-    return params.toString() ? `${src}?${params.toString()}` : src;
-  }
-
-  // Preload critical images
-  static preloadImage(src: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (this.imageCache.has(src)) {
-        resolve();
-        return;
-      }
-
-      const img = new Image();
-      img.onload = () => {
-        this.imageCache.set(src, img);
-        resolve();
-      };
-      img.onerror = reject;
-      img.src = src;
-    });
-  }
-
-  // Component memoization
-  static memoizeComponent<P extends object>(
-    Component: React.ComponentType<P>,
-    areEqual?: (prevProps: P, nextProps: P) => boolean
-  ): React.ComponentType<P> {
-    const cacheKey = Component.name || 'AnonymousComponent';
-    
-    if (this.componentCache.has(cacheKey)) {
-      return this.componentCache.get(cacheKey)!;
-    }
-
-    const MemoizedComponent = React.memo(Component, areEqual);
-    this.componentCache.set(cacheKey, MemoizedComponent);
-    
-    return MemoizedComponent;
-  }
-
-  // Bundle analysis
-  static analyzeBundleSize(): Promise<any> {
-    if (typeof window === 'undefined') {
-      return Promise.resolve({});
-    }
-
-    return new Promise((resolve) => {
-      const resources = performance.getEntriesByType('resource');
-      const analysis = {
-        totalSize: 0,
-        jsSize: 0,
-        cssSize: 0,
-        imageSize: 0,
-        resources: resources.map((resource: any) => ({
-          name: resource.name,
-          size: resource.transferSize || 0,
-          type: this.getResourceType(resource.name),
-        })),
-      };
-
-      analysis.resources.forEach((resource: any) => {
-        analysis.totalSize += resource.size;
-        switch (resource.type) {
-          case 'js':
-            analysis.jsSize += resource.size;
-            break;
-          case 'css':
-            analysis.cssSize += resource.size;
-            break;
-          case 'image':
-            analysis.imageSize += resource.size;
-            break;
-        }
-      });
-
-      resolve(analysis);
-    });
-  }
-
-  private static getResourceType(url: string): string {
-    if (url.includes('.js')) return 'js';
-    if (url.includes('.css')) return 'css';
-    if (url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) return 'image';
-    return 'other';
-  }
-}
-
-// Export performance utilities
-export { PerformanceOptimizer };
 
 // Initialize performance monitoring
 if (typeof window !== 'undefined') {

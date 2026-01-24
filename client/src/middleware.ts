@@ -24,7 +24,7 @@ async function verifyToken(token: string): Promise<{
     if (token.startsWith('dev-')) {
       // Development mock token format: dev-{userId}-{role}
       const parts = token.split('-');
-      if (parts.length >= 3) {
+      if (parts.length >= 3 && parts[1] && parts[2]) {
         return {
           valid: true,
           user: {
