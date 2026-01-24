@@ -5,11 +5,15 @@ import applicationRoutes from "./api/applications/application.routes";
 import feedbackRoutes from "./api/feedback/feedback.routes";
 import uploadRoutes from "./api/upload/upload.routes";
 import notificationRoutes from "./api/notifications/notification.routes";
+import healthRoutes from "./api/health/health.routes";
 import exampleRoutes from "./api/example.routes";
 import authTestRoutes from "./api/auth-test.routes";
 import { env } from "./config/env";
 
 const router = Router();
+
+// Health check routes (always available)
+router.use("/health", healthRoutes);
 
 // Main API routes
 router.use("/auth", authRoutes);
