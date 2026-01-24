@@ -41,7 +41,7 @@ export function UserMenu() {
 
   const userInitials = user.firstName && user.lastName 
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
-    : user.email[0].toUpperCase();
+    : user?.email?.[0]?.toUpperCase() || 'U';
 
   const userDisplayName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`

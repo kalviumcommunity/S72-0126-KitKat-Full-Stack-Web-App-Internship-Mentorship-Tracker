@@ -35,7 +35,7 @@ export function MentorInfo({ mentors }: MentorInfoProps) {
           {mentors.map((mentor) => {
             const initials = mentor.firstName && mentor.lastName
               ? `${mentor.firstName[0]}${mentor.lastName[0]}`.toUpperCase()
-              : mentor.email[0].toUpperCase();
+              : mentor?.email?.[0]?.toUpperCase() || 'M';
 
             const displayName = mentor.firstName && mentor.lastName
               ? `${mentor.firstName} ${mentor.lastName}`

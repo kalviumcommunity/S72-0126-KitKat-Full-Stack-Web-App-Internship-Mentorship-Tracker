@@ -15,7 +15,7 @@ export function validate(
 ) {
   const { target = "body", stripUnknown = true } = options;
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     try {
       let dataToValidate: any;
 
@@ -71,7 +71,8 @@ export function validate(
             details,
           },
         };
-        return res.status(422).json(response);
+        res.status(422).json(response);
+        return;
       }
       next(error);
     }

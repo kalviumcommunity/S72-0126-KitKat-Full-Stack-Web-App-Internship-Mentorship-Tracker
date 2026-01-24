@@ -57,10 +57,10 @@ export function ApplicationList() {
 
     const res = await applications.getAll(f, page, limit);
     if (res.success && res.data) {
-      setItems(res.data.items || []);
+      setItems(res.data?.data || []);
       setPagination(res.data.pagination);
     } else {
-      const msg = typeof res.error === 'object' ? res.error?.message : (res.error as any);
+      const msg = typeof res.error === 'string' ? res.error : 'Failed to load applications';
       setError(msg || 'Failed to load applications.');
       setItems([]);
       setPagination({ page, limit, total: 0, totalPages: 0 });

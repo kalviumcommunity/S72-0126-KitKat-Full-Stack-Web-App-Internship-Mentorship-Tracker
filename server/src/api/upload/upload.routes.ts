@@ -1,13 +1,7 @@
 import { Router } from "express";
 import { uploadController } from "./upload.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
-import {
-  uploadResume,
-  uploadImage,
-  uploadDocument,
-  uploadMultipleDocuments,
-  handleMulterError,
-} from "../../middlewares/upload.middleware";
+import { uploadMiddleware } from "./upload.service";
 import { createUserRateLimit } from "../../middlewares/rate-limit.middleware";
 
 const router = Router();
@@ -26,8 +20,7 @@ const uploadLimiter = createUserRateLimit(20, 15 * 60 * 1000); // 20 uploads per
 router.post(
   "/resume",
   uploadLimiter,
-  uploadResume,
-  handleMulterError,
+  uploadMiddleware.single('file'),
   uploadController.uploadResume
 );
 
@@ -39,8 +32,7 @@ router.post(
 router.post(
   "/profile-image",
   uploadLimiter,
-  uploadImage,
-  handleMulterError,
+  uploadMiddleware.single('file'),
   uploadController.uploadProfileImage
 );
 
@@ -52,8 +44,7 @@ router.post(
 router.post(
   "/document",
   uploadLimiter,
-  uploadDocument,
-  handleMulterError,
+  uploadMiddleware.single('file'),
   uploadController.uploadDocument
 );
 
@@ -65,10 +56,16 @@ router.post(
 router.post(
   "/documents",
   uploadLimiter,
-  uploadMultipleDocuments,
-  handleMulterError,
+  uploadMiddleware.array('files', 5),
   uploadController.uploadMultipleDocuments
 );
+
+/**
+ * @route   GET /api/upload/files/:filename
+ * @desc    Get uploaded file
+ * @access  Public (files are served directly)
+ */
+router.get("/files/:filename", uploadController.getFile);
 
 /**
  * @route   DELETE /api/upload/:key
@@ -83,5 +80,12 @@ router.delete("/:key", uploadController.deleteFile);
  * @access  Private
  */
 router.get("/signed-url/:key", uploadController.getSignedUrl);
+
+/**
+ * @route   GET /api/upload/stats
+ * @desc    Get upload statistics
+ * @access  Private
+ */
+router.get("/stats", uploadController.getStats);
 
 export default router;

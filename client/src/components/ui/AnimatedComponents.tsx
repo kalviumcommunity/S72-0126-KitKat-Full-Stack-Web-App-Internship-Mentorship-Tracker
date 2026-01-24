@@ -338,10 +338,11 @@ export const AnimatedToast = memo(function AnimatedToast({
   duration?: number;
 }) {
   useEffect(() => {
-    if (isVisible && duration > 0) {
+    if (isVisible && duration && duration > 0) {
       const timer = setTimeout(onClose, duration);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isVisible, duration, onClose]);
 
   const getTypeStyles = () => {
@@ -484,7 +485,11 @@ export const AnimatedTabs = memo(function AnimatedTabs({
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              ref={(el) => (tabRefs.current[tab.id] = el)}
+              ref={(el) => {
+                if (el) {
+                  tabRefs.current[tab.id] = el;
+                }
+              }}
               onClick={() => onTabChange(tab.id)}
               className={`py-2 px-1 text-sm font-medium transition-colors duration-200 ${
                 activeTab === tab.id

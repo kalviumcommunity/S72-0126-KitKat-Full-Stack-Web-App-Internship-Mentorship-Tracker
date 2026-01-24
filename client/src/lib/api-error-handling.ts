@@ -68,7 +68,7 @@ export async function apiRequest<T>(
   // Add authentication token if available
   const token = getAuthToken();
   if (token) {
-    defaultHeaders['Authorization'] = `Bearer ${token}`;
+    (defaultHeaders as any)['Authorization'] = `Bearer ${token}`;
   }
 
   const requestOptions: RequestInit = {
@@ -220,7 +220,7 @@ function getAuthToken(): string | null {
   const cookies = document.cookie.split(';');
   const authCookie = cookies.find(cookie => cookie.trim().startsWith('auth-token='));
   if (authCookie) {
-    return authCookie.split('=')[1];
+    return authCookie.split('=')[1] || null;
   }
   
   // Fallback to localStorage

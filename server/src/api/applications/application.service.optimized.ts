@@ -390,7 +390,7 @@ export class ApplicationServiceOptimized {
       return await cacheAside(
         cacheKey,
         async () => {
-          const where = await this.buildApplicationsWhereClauseOptimized(user, {});
+          const where = await this.buildApplicationsWhereClauseOptimized(user, { page: 1, limit: 10 });
 
           // Optimized parallel queries
           const [statusStats, platformStats, totalCount, recentCount] = await Promise.all([

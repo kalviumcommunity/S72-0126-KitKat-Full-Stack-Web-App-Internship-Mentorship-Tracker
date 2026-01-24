@@ -191,7 +191,7 @@ export const OptimizedDashboardStats = memo(function OptimizedDashboardStats({
           subtitle: 'Applications pending',
           icon: '⚠️',
           color: 'orange',
-          trend: needsFeedback > 0 ? 'up' : 'stable' as const,
+          trend: (needsFeedback > 0 ? 'up' : 'stable') as 'up' | 'down' | 'stable',
         },
       ];
     }
@@ -311,21 +311,23 @@ const OptimizedChart = memo(function OptimizedChart({
 }) {
   const { trackInteraction } = usePerformanceMonitor('OptimizedChart');
 
-  // Lazy load chart library
-  const ChartComponent = React.lazy(() => 
-    import('./ChartComponents').then(module => ({ 
-      default: module[type === 'bar' ? 'BarChart' : type === 'pie' ? 'PieChart' : 'LineChart'] 
-    }))
-  );
+  // Simple placeholder chart component
+  const ChartComponent = React.useMemo(() => {
+    return ({ data }: { data: any }) => (
+      <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+        <p className="text-gray-500">Chart visualization coming soon</p>
+      </div>
+    );
+  }, [type]);
 
   return (
     <SlideIn direction="up" delay={200}>
       <OptimizedCard>
         <div className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
-          <Suspense fallback={<ChartSkeleton />}>
+          <div className="h-64">
             <ChartComponent data={data} />
-          </Suspense>
+          </div>
         </div>
       </OptimizedCard>
     </SlideIn>

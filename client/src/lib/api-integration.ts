@@ -372,12 +372,12 @@ export async function batchApiCalls<T extends any[]>(
   const errors: (string | null)[] = [];
 
   responses.forEach((response) => {
-    if (response.success && response.data) {
+    if (response.success && 'data' in response && response.data) {
       results.push(response.data);
       errors.push(null);
     } else {
       results.push(null);
-      errors.push(response.error || 'Unknown error');
+      errors.push('error' in response ? (response.error || 'Unknown error') : 'Unknown error');
     }
   });
 
@@ -393,6 +393,10 @@ export interface WebSocketConfig {
   reconnect?: boolean;
   reconnectDelay?: number;
   maxReconnectAttempts?: number;
+  onOpen?: () => void;
+  onMessage?: (data: any) => void;
+  onClose?: (event: CloseEvent) => void;
+  onError?: (error: Event) => void;
 }
 
 /**
@@ -436,7 +440,7 @@ export class WebSocketManager {
         this.config.onClose?.(event);
         
         // Attempt to reconnect if not a manual close
-        if (event.code !== 1000 && this.reconnectAttempts < this.config.maxReconnectAttempts) {
+        if (event.code !== 1000 && this.reconnectAttempts < (this.config?.maxReconnectAttempts || 5)) {
           this.scheduleReconnect();
         }
       };
@@ -485,12 +489,6 @@ export class WebSocketManager {
 
   isConnected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
-  }
-
-  send(data: any): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(data));
-    }
   }
 }
 

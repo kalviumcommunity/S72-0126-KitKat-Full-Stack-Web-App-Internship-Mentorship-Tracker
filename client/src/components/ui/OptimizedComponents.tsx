@@ -261,7 +261,7 @@ export const OptimizedCard = memo(function OptimizedCard({
   [key: string]: any;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const isInView = useIntersectionObserver(cardRef, { threshold: 0.1 });
+  const isInView = useIntersectionObserver(cardRef as React.RefObject<Element>, { threshold: 0.1 });
 
   const cardClasses = useMemo(() => {
     const baseClasses = 'bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:shadow-md';
