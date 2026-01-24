@@ -4,7 +4,7 @@
   "description": "Unified Internship & Mentorship Portal - Backend API Server",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "postinstall": "prisma generate",
@@ -44,9 +44,11 @@
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
+    "ioredis": "^5.9.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.12",
+    "nodemon": "^3.1.11",
     "redis": "^4.7.0",
     "uuid": "^10.0.0",
     "zod": "^3.23.8"

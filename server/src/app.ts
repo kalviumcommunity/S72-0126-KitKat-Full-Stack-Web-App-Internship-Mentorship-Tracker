@@ -90,6 +90,23 @@ export function createApp(): Express {
   // Prevent HTTP Parameter Pollution
   app.use(hpp());
 
+  // Root endpoint - Hello from backend
+  app.get("/", (_req, res) => {
+    res.json({
+      message: "Hello from backend! 🚀",
+      status: "running",
+      timestamp: new Date().toISOString(),
+      environment: env.NODE_ENV,
+      version: process.env.npm_package_version || "0.1.0",
+      server: "UIMP Backend API",
+      endpoints: {
+        health: "/health",
+        api: "/api",
+        docs: "/api/docs (coming soon)"
+      }
+    });
+  });
+
   // Health check endpoint
   app.get("/health", (_req, res) => {
     res.json({
