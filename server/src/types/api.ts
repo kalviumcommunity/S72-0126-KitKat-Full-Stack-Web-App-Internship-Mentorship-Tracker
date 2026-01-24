@@ -34,6 +34,7 @@ export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
+  organizationId?: string; // Added for multi-tenant support
 }
 
 export interface RequestUser extends AuthUser {

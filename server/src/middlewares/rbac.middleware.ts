@@ -15,22 +15,6 @@ import { rbacService } from '../services/rbac.service';
 import { AuthenticationError, AuthorizationError } from './error.middleware';
 import { logger } from '../lib/logger';
 
-// Extend Express Request to include user context
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        role: string;
-        email: string;
-        organizationId?: string;
-      };
-      accessContext?: AccessContext;
-      securityContext?: SecurityContext;
-    }
-  }
-}
-
 /**
  * Main RBAC authorization middleware factory
  */
@@ -183,8 +167,8 @@ async function buildAccessContext(req: Request): Promise<AccessContext> {
 
 function buildSecurityContext(req: Request): SecurityContext {
   return {
-    sessionId: req.sessionID || 'unknown',
-    ipAddress: req.ip || req.connection.remoteAddress || 'unknown',
+    sessionId: req.sessionID || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
     userAgent: req.get('User-Agent') || 'unknown',
     lastActivity: new Date(),
     riskScore: calculateRiskScore(req),

@@ -30,10 +30,11 @@ export const env = {
   
   // Email Configuration
   SMTP_HOST: process.env.SMTP_HOST || "",
-  SMTP_PORT: parseInt(process.env.SMTP_PORT || "587", 10),
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || "2525", 10),
   SMTP_USER: process.env.SMTP_USER || "",
   SMTP_PASS: process.env.SMTP_PASS || "",
   SMTP_FROM: process.env.SMTP_FROM || "",
+  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME || "Your App",
 } as const;
 
 // Validate required environment variables

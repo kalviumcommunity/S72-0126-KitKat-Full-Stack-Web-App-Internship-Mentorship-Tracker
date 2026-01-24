@@ -4,7 +4,7 @@
   "description": "Unified Internship & Mentorship Portal - Backend API Server",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "postinstall": "prisma generate",
@@ -26,7 +26,8 @@
     "test:ci": "jest --ci --coverage --watchAll=false --maxWorkers=1",
     "test:debug": "jest --detectOpenHandles --forceExit --verbose",
     "test:setup": "node -e \"console.log('Run setup-test-db.ps1 or setup-test-db.sh to setup test database')\"",
-    "test:clean": "jest --clearCache && rm -rf coverage"
+    "test:clean": "jest --clearCache && rm -rf coverage",
+    "test:email": "tsx src/scripts/test-email.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
