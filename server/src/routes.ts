@@ -8,6 +8,7 @@ import notificationRoutes from "./api/notifications/notification.routes";
 import healthRoutes from "./api/health/health.routes";
 import exampleRoutes from "./api/example.routes";
 import authTestRoutes from "./api/auth-test.routes";
+// import rbacTestRoutes from "./api/rbac-test/rbac-test.routes"; // Temporarily disabled
 import { env } from "./config/env";
 
 const router = Router();
@@ -27,6 +28,7 @@ router.use("/notifications", notificationRoutes);
 if (env.NODE_ENV === 'development') {
   router.use("/example", exampleRoutes);
   router.use("/auth-test", authTestRoutes);
+  // router.use("/rbac-test", rbacTestRoutes); // Temporarily disabled
 }
 
 export default router;

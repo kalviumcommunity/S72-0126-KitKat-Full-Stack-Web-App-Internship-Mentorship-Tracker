@@ -2,7 +2,13 @@ import { Router } from "express";
 import { z } from "zod";
 import { feedbackController } from "./feedback.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
-import { requireRole, requireMentor, requireMentorOrAdmin } from "../../middlewares/rbac.middleware";
+import { 
+  requireRole, 
+  requireMentorAccess, 
+  requireAdminAccess,
+  canCreateFeedback,
+  canReadFeedback
+} from "../../middlewares/rbac.middleware";
 import { validateBody, validateQuery, validateParams } from "../../middlewares/validation.middleware";
 import { 
   createFeedbackSchema, 
@@ -29,7 +35,7 @@ const feedbackReadLimiter = createUserRateLimit(100, 15 * 60 * 1000); // 100 req
  */
 router.post(
   "/",
-  requireMentor,
+  requireMentorAccess,
   feedbackCreateLimiter,
   validateBody(createFeedbackSchema),
   feedbackController.createFeedback
@@ -91,7 +97,7 @@ router.get(
  */
 router.patch(
   "/:id",
-  requireMentor,
+  requireMentorAccess,
   feedbackCreateLimiter,
   validateParams(uuidParamSchema),
   validateBody(updateFeedbackSchema),
@@ -105,7 +111,7 @@ router.patch(
  */
 router.delete(
   "/:id",
-  requireMentorOrAdmin,
+  requireAdminAccess,
   validateParams(uuidParamSchema),
   feedbackController.deleteFeedback
 );
