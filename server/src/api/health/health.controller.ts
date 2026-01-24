@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { asyncHandler } from '../../middlewares/async-handler.middleware';
-import { ApiResponse } from '../../types/api-response';
+import { asyncHandler } from '../../middlewares/error.middleware';
+import { ApiResponse } from '../../types/api';
 
 const prisma = new PrismaClient();
 
