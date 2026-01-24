@@ -35,6 +35,9 @@ export const env = {
   SMTP_PASS: process.env.SMTP_PASS || "",
   SMTP_FROM: process.env.SMTP_FROM || "",
   SMTP_FROM_NAME: process.env.SMTP_FROM_NAME || "Your App",
+  
+  // OTP Configuration
+  OTP_TEST_EMAIL: process.env.OTP_TEST_EMAIL || "",
 } as const;
 
 // Validate required environment variables

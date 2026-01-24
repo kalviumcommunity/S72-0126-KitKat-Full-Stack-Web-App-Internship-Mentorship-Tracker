@@ -27,7 +27,8 @@
     "test:debug": "jest --detectOpenHandles --forceExit --verbose",
     "test:setup": "node -e \"console.log('Run setup-test-db.ps1 or setup-test-db.sh to setup test database')\"",
     "test:clean": "jest --clearCache && rm -rf coverage",
-    "test:email": "tsx src/scripts/test-email.ts"
+    "test:email": "tsx src/scripts/test-email.ts",
+    "test:otp": "tsx src/scripts/test-otp-flow.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

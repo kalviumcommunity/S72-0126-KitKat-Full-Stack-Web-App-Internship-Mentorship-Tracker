@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { authService } from "./auth.service";
+import { passwordResetService } from "../../services/password-reset.service";
 import { ApiResponse } from "../../types/api";
 import { JWT } from "../../config/constants";
 import { logger } from "../../lib/logger";
@@ -113,6 +114,53 @@ export class AuthController {
     const response: ApiResponse = {
       success: true,
       message: SUCCESS_MESSAGES.PASSWORD_CHANGED,
+    };
+
+    res.status(200).json(response);
+  });
+
+  // OTP-based Password Reset endpoints
+
+  /**
+   * POST /auth/forgot-password
+   * Initiate password reset by sending OTP to user's email
+   */
+  forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+    await passwordResetService.initiatePasswordReset(req.body);
+
+    const response: ApiResponse = {
+      success: true,
+      message: "If the email exists, an OTP has been sent for password reset",
+    };
+
+    res.status(200).json(response);
+  });
+
+  /**
+   * POST /auth/verify-otp
+   * Verify OTP without resetting password (optional step for UX)
+   */
+  verifyOtp = asyncHandler(async (req: Request, res: Response) => {
+    await passwordResetService.verifyOtp(req.body);
+
+    const response: ApiResponse = {
+      success: true,
+      message: "OTP verified successfully",
+    };
+
+    res.status(200).json(response);
+  });
+
+  /**
+   * POST /auth/reset-password
+   * Reset password using OTP verification
+   */
+  resetPassword = asyncHandler(async (req: Request, res: Response) => {
+    await passwordResetService.resetPassword(req.body);
+
+    const response: ApiResponse = {
+      success: true,
+      message: "Password reset successfully",
     };
 
     res.status(200).json(response);

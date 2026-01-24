@@ -98,34 +98,51 @@ export const notificationTypeSchema = z.enum([
 ]);
 
 // Authentication schemas
-export const authSchemas = {
-  signup: z.object({
-    email: commonSchemas.email,
-    password: commonSchemas.simplePassword, // Use simple password for MVP
-    role: userRoleSchema,
-    firstName: commonSchemas.name.optional(),
-    lastName: commonSchemas.name.optional(),
-  }),
-  
-  login: z.object({
-    email: commonSchemas.email,
-    password: z.string().min(1, "Password is required"),
-  }),
-  
-  changePassword: z.object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: commonSchemas.simplePassword,
-  }),
-  
-  resetPassword: z.object({
-    token: z.string().min(1, "Reset token is required"),
-    newPassword: commonSchemas.simplePassword,
-  }),
-  
-  forgotPassword: z.object({
-    email: commonSchemas.email,
-  }),
+export const schemas = {
+  auth: {
+    signup: z.object({
+      email: commonSchemas.email,
+      password: commonSchemas.password,
+      role: userRoleSchema,
+      firstName: commonSchemas.name,
+      lastName: commonSchemas.name,
+    }),
+
+    login: z.object({
+      email: commonSchemas.email,
+      password: z.string().min(1, "Password is required"),
+    }),
+
+    changePassword: z.object({
+      currentPassword: z.string().min(1, "Current password is required"),
+      newPassword: commonSchemas.password,
+    }),
+
+    // OTP Password Reset schemas
+    forgotPassword: z.object({
+      email: commonSchemas.email,
+    }),
+
+    verifyOtp: z.object({
+      email: commonSchemas.email,
+      otp: z.string().regex(/^\d{6}$/, "OTP must be exactly 6 digits"),
+    }),
+
+    resetPassword: z.object({
+      email: commonSchemas.email,
+      otp: z.string().regex(/^\d{6}$/, "OTP must be exactly 6 digits"),
+      newPassword: commonSchemas.password,
+    }),
+  },
 };
+
+// Export types for TypeScript
+export type SignupInput = z.infer<typeof schemas.auth.signup>;
+export type LoginInput = z.infer<typeof schemas.auth.login>;
+export type ChangePasswordInput = z.infer<typeof schemas.auth.changePassword>;
+export type ForgotPasswordInput = z.infer<typeof schemas.auth.forgotPassword>;
+export type VerifyOtpInput = z.infer<typeof schemas.auth.verifyOtp>;
+export type ResetPasswordInput = z.infer<typeof schemas.auth.resetPassword>;
 
 // User schemas
 export const userSchemas = {
