@@ -1,10 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  typescript: {
-    // Temporarily ignore TypeScript errors during build
-    // TODO: Fix all TypeScript errors and remove this
-    ignoreBuildErrors: true,
+  // TypeScript errors will now be caught during build
+  experimental: {
+    typedRoutes: true,
+  },
+  // Enable strict mode for better performance
+  reactStrictMode: true,
+  // Optimize images
+  images: {
+    domains: ['localhost'],
   },
 };
 

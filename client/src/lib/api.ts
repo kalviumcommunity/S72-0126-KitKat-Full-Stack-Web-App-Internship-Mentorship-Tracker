@@ -28,7 +28,28 @@ import {
 // API CONFIGURATION
 // ============================================
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// Environment variable validation
+function validateEnvironment(): string {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  
+  if (!apiUrl) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEXT_PUBLIC_API_URL environment variable is required in production');
+    }
+    console.warn('NEXT_PUBLIC_API_URL not set, using default localhost URL');
+    return 'http://localhost:3001/api';
+  }
+  
+  // Validate URL format
+  try {
+    new URL(apiUrl);
+    return apiUrl;
+  } catch {
+    throw new Error(`Invalid NEXT_PUBLIC_API_URL format: ${apiUrl}`);
+  }
+}
+
+const API_BASE_URL = validateEnvironment();
 
 class ApiClient {
   private baseURL: string;

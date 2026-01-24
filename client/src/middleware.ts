@@ -12,23 +12,56 @@ async function verifyToken(token: string): Promise<{
   valid: boolean; 
   user?: { id: string; role: string; email: string } 
 }> {
-  // TODO: Replace with actual JWT verification
-  // This is a mock implementation for development
   if (!token) {
     return { valid: false };
   }
   
   try {
-    // Mock user data - replace with actual JWT decode
-    return {
-      valid: true,
-      user: {
-        id: '1',
-        role: UserRole.STUDENT,
-        email: 'user@example.com',
-      },
-    };
-  } catch {
+    // For development, we'll use a simple token format: base64(JSON)
+    // In production, use proper JWT verification with jsonwebtoken library
+    
+    // Check if it's a development mock token
+    if (token.startsWith('dev-')) {
+      // Development mock token format: dev-{userId}-{role}
+      const parts = token.split('-');
+      if (parts.length >= 3) {
+        return {
+          valid: true,
+          user: {
+            id: parts[1],
+            role: parts[2].toUpperCase(),
+            email: `user${parts[1]}@example.com`,
+          },
+        };
+      }
+    }
+    
+    // Try to decode as base64 JSON (simple development format)
+    try {
+      const decoded = JSON.parse(atob(token));
+      if (decoded.id && decoded.role && decoded.email) {
+        return {
+          valid: true,
+          user: {
+            id: decoded.id,
+            role: decoded.role,
+            email: decoded.email,
+          },
+        };
+      }
+    } catch {
+      // Not a valid base64 JSON token
+    }
+    
+    // TODO: Implement actual JWT verification for production
+    // Example with jsonwebtoken library:
+    // const jwt = require('jsonwebtoken');
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // return { valid: true, user: decoded };
+    
+    return { valid: false };
+  } catch (error) {
+    console.error('Token verification error:', error);
     return { valid: false };
   }
 }
@@ -47,10 +80,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // Get authentication token from cookies
-  const token = request.cookies.get('auth-token')?.value;
+  const tokenCookie = request.cookies.get('auth-token');
+  const token = tokenCookie?.value || '';
   
   // Verify token
-  const { valid: isAuthenticated, user } = await verifyToken(token || '');
+  const { valid: isAuthenticated, user } = await verifyToken(token);
 
   // Check if route is public
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname as any);
@@ -79,11 +113,10 @@ export async function middleware(request: NextRequest) {
     const userRole = user.role;
     
     // Check if user has access to the requested route
+    const roleRoutes = PROTECTED_ROUTES[userRole as keyof typeof PROTECTED_ROUTES];
     const hasAccess = 
       PROTECTED_ROUTES.ALL.some(route => pathname.startsWith(route)) ||
-      PROTECTED_ROUTES[userRole as keyof typeof PROTECTED_ROUTES]?.some(route => 
-        pathname.startsWith(route)
-      );
+      (Array.isArray(roleRoutes) && roleRoutes.some(route => pathname.startsWith(route)));
 
     if (!hasAccess) {
       // Redirect to appropriate dashboard based on role
