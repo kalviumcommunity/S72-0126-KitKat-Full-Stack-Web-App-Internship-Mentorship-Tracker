@@ -476,14 +476,14 @@ export class ThemeUtils {
 
 // CSS-in-JS helper for styled components
 export function createStyledComponent(
-  tag: keyof JSX.IntrinsicElements,
+  tag: keyof React.JSX.IntrinsicElements,
   styles: (theme: Theme) => React.CSSProperties
 ) {
   return React.forwardRef<HTMLElement, any>((props, ref) => {
     const theme = useTheme();
     const computedStyles = styles(theme);
     
-    return React.createElement(tag, {
+    return React.createElement(tag as any, {
       ...props,
       ref,
       style: { ...computedStyles, ...props.style },

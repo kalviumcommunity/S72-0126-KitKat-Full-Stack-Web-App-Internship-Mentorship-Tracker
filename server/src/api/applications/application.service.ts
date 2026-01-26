@@ -310,7 +310,7 @@ export class ApplicationService {
 
   async getApplicationStats(user: RequestUser) {
     try {
-      const where = await this.buildApplicationsWhereClause(user, {});
+      const where = await this.buildApplicationsWhereClause(user, { page: 1, limit: 10 });
 
       const [statusStats, platformStats, totalCount, recentCount] = await Promise.all([
         // Status distribution

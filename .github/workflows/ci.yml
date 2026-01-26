@@ -204,6 +204,18 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: write
+
+    strategy:
+      matrix:
+        service: [frontend, backend]
+        include:
+          - service: frontend
+            context: ./client
+            dockerfile: ./client/Dockerfile
+          - service: backend
+            context: ./server
+            dockerfile: ./server/Dockerfile
 
     steps:
     - name: Checkout code
@@ -211,6 +223,8 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+      with:
+        platforms: linux/amd64,linux/arm64
 
     - name: Log in to Container Registry
       uses: docker/login-action@v3
@@ -223,36 +237,42 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
+        images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ matrix.service }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
+        labels: |
+          org.opencontainers.image.title=${{ matrix.service }}
+          org.opencontainers.image.description=UIMP ${{ matrix.service }} service
 
-    - name: Build and push Frontend Docker image
+    - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: ./client
-        file: ./client/Dockerfile
+        context: ${{ matrix.context }}
+        file: ${{ matrix.dockerfile }}
         push: true
-        tags: ${{ steps.meta.outputs.tags }}-frontend
+        tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=${{ matrix.service }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.service }}
         platforms: linux/amd64,linux/arm64
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
 
-    - name: Build and push Backend Docker image
-      uses: docker/build-push-action@v5
+    - name: Run Trivy vulnerability scanner on image
+      uses: aquasecurity/trivy-action@master
       with:
-        context: ./server
-        file: ./server/Dockerfile
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}-backend
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64
+        image-ref: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:${{ steps.meta.outputs.version }}
+        format: 'sarif'
+        output: 'trivy-results-${{ matrix.service }}.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results-${{ matrix.service }}.sarif'
 
   # Deployment Verification
   deployment-verification:

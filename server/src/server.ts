@@ -1,3 +1,5 @@
+/// <reference path="./types/express.d.ts" />
+
 import { createApp } from "./app";
 import { env } from "./config/env";
 import { logger } from "./lib/logger";

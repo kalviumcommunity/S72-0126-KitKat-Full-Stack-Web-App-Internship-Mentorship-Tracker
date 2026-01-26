@@ -127,7 +127,7 @@ export function ApplicationDetailView({ application }: ApplicationDetailViewProp
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                             <span className="text-sm font-medium text-blue-600">
-                              {feedback.mentor.firstName?.[0] || feedback.mentor.email[0].toUpperCase()}
+                              {feedback.mentor?.firstName?.[0] || feedback.mentor?.email?.[0]?.toUpperCase() || 'M'}
                             </span>
                           </div>
                           <div>
@@ -237,11 +237,15 @@ export function ApplicationDetailView({ application }: ApplicationDetailViewProp
                   <div>
                     <p className="text-sm font-medium text-gray-900">First Feedback Received</p>
                     <p className="text-xs text-gray-500">
-                      {formatDateTime(
-                        application.feedback.sort((a, b) => 
-                          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-                        )[0].createdAt
-                      )}
+                      {application.feedback && application.feedback.length > 0 ? 
+                        (() => {
+                          const sortedFeedback = application.feedback.sort((a, b) => 
+                            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                          );
+                          const firstFeedback = sortedFeedback[0];
+                          return firstFeedback?.createdAt ? formatDateTime(firstFeedback.createdAt) : 'No feedback yet';
+                        })() : 'No feedback yet'
+                      }
                     </p>
                   </div>
                 </div>

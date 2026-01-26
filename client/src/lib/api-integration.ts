@@ -372,12 +372,12 @@ export async function batchApiCalls<T extends any[]>(
   const errors: (string | null)[] = [];
 
   responses.forEach((response) => {
-    if (response.success && response.data) {
+    if (response.success && 'data' in response && response.data) {
       results.push(response.data);
       errors.push(null);
     } else {
       results.push(null);
-      errors.push(response.error || 'Unknown error');
+      errors.push('error' in response ? (response.error || 'Unknown error') : 'Unknown error');
     }
   });
 
@@ -393,6 +393,10 @@ export interface WebSocketConfig {
   reconnect?: boolean;
   reconnectDelay?: number;
   maxReconnectAttempts?: number;
+  onOpen?: () => void;
+  onMessage?: (data: any) => void;
+  onClose?: (event: CloseEvent) => void;
+  onError?: (error: Event) => void;
 }
 
 /**
@@ -408,21 +412,83 @@ export class WebSocketManager {
   }
 
   connect(): void {
-    // TODO: Implement WebSocket connection
-    console.log('WebSocket connection not yet implemented');
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      return; // Already connected
+    }
+
+    try {
+      const wsUrl = this.config.url.replace('http', 'ws');
+      this.ws = new WebSocket(wsUrl);
+
+      this.ws.onopen = () => {
+        console.log('WebSocket connected');
+        this.reconnectAttempts = 0;
+        this.config.onOpen?.();
+      };
+
+      this.ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          this.config.onMessage?.(data);
+        } catch (error) {
+          console.error('Failed to parse WebSocket message:', error);
+        }
+      };
+
+      this.ws.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason);
+        this.config.onClose?.(event);
+        
+        // Attempt to reconnect if not a manual close
+        if (event.code !== 1000 && this.reconnectAttempts < (this.config?.maxReconnectAttempts || 5)) {
+          this.scheduleReconnect();
+        }
+      };
+
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        this.config.onError?.(error);
+      };
+    } catch (error) {
+      console.error('Failed to create WebSocket connection:', error);
+      this.config.onError?.(error as Event);
+    }
+  }
+
+  private scheduleReconnect(): void {
+    this.reconnectAttempts++;
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000); // Exponential backoff, max 30s
+    
+    console.log(`Scheduling WebSocket reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
+    
+    setTimeout(() => {
+      this.connect();
+    }, delay);
   }
 
   disconnect(): void {
     if (this.ws) {
-      this.ws.close();
+      this.ws.close(1000, 'Manual disconnect'); // Normal closure
       this.ws = null;
     }
   }
 
-  send(data: any): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(data));
+  send(data: any): boolean {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      try {
+        this.ws.send(JSON.stringify(data));
+        return true;
+      } catch (error) {
+        console.error('Failed to send WebSocket message:', error);
+        return false;
+      }
     }
+    console.warn('WebSocket is not connected');
+    return false;
+  }
+
+  isConnected(): boolean {
+    return this.ws?.readyState === WebSocket.OPEN;
   }
 }
 

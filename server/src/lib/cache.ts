@@ -28,8 +28,10 @@ export function cached(key: string | ((...args: any[]) => string), ttl: number =
       logger.debug("Cache miss", { key: cacheKey, method: propertyKey });
       const result = await originalMethod.apply(this, args);
 
-      // Store in cache
-      await redis.set(cacheKey, result, ttl);
+      // Store in cache (only if result is not null/undefined)
+      if (result !== null && result !== undefined) {
+        await redis.set(cacheKey, result, ttl);
+      }
 
       return result;
     };
@@ -133,8 +135,10 @@ export async function cacheAside<T>(
   logger.debug("Cache miss", { key: cacheKey });
   const result = await fetchFn();
 
-  // Store in cache
-  await redis.set(cacheKey, result, ttl);
+  // Store in cache (only if result is not null/undefined)
+  if (result !== null && result !== undefined) {
+    await redis.set(cacheKey, result, ttl);
+  }
 
   return result;
 }
@@ -152,15 +156,15 @@ export async function batchGet<T>(
     return new Map();
   }
 
-  // Get all from cache
+  // Get all from cache - mget returns (T | null)[] where null means cache miss
   const cachedValues = await redis.mget<T>(keys);
   const result = new Map<string, T>();
   const missingKeys: string[] = [];
 
-  // Separate cached and missing
+  // Separate cached and missing - handle null values properly
   keys.forEach((key, index) => {
     const value = cachedValues[index];
-    if (value !== null) {
+    if (value !== null && value !== undefined) {
       result.set(key, value);
     } else {
       missingKeys.push(key);
@@ -172,11 +176,14 @@ export async function batchGet<T>(
     logger.debug("Batch cache miss", { count: missingKeys.length });
     const fetched = await fetchFn(missingKeys);
 
-    // Store fetched items in cache
+    // Store fetched items in cache - only cache non-null values
     const toCache: Record<string, T> = {};
     fetched.forEach((value, key) => {
       result.set(key, value);
-      toCache[key] = value;
+      // Only cache non-null/undefined values
+      if (value !== null && value !== undefined) {
+        toCache[key] = value;
+      }
     });
 
     if (Object.keys(toCache).length > 0) {

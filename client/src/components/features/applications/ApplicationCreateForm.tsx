@@ -13,8 +13,19 @@ import { Select } from '@/components/ui/Select';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { z } from 'zod';
+import { ApplicationPlatform, ApplicationStatus } from '@/lib/types';
+
+const applicationCreateSchema = z.object({
+  company: z.string().min(1, 'Company name is required'),
+  role: z.string().min(1, 'Role is required'),
+  platform: z.nativeEnum(ApplicationPlatform),
+  status: z.nativeEnum(ApplicationStatus),
+  deadline: z.string().optional(),
+  notes: z.string().optional(),
+  appliedDate: z.string().optional(),
+});
 import { applications } from '@/lib/api';
-import { ApplicationStatus, ApplicationPlatform } from '@/lib/types';
 
 interface ApplicationCreateData {
   company: string;
@@ -49,14 +60,13 @@ export function ApplicationCreateForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const initialData: ApplicationCreateData = {
+  const initialData = {
     company: '',
     role: '',
-    platform: '',
+    platform: ApplicationPlatform.COMPANY_WEBSITE,
     status: ApplicationStatus.DRAFT,
     notes: '',
     deadline: '',
-    appliedDate: '',
   };
 
   const validationRules = {
@@ -98,15 +108,35 @@ export function ApplicationCreateForm() {
   };
 
   const {
-    data,
-    errors,
-    isValid,
-    handleChange,
-    handleSubmit,
-    setFieldValue,
-  } = useFormValidation(initialData, validationRules);
+    values: data,
+    validation: { errors, isValid },
+    setValue: setFieldValue,
+    getFieldProps,
+    validateForm,
+    resetForm,
+  } = useFormValidation({
+    schema: applicationCreateSchema,
+    initialValues: {
+      ...initialData,
+      appliedDate: '',
+    },
+  });
 
-  const onSubmit = async (formData: ApplicationCreateData) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFieldValue(name as keyof typeof data, value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const isFormValid = await validateForm();
+    if (!isFormValid) return;
+    
+    await onSubmit(data);
+  };
+
+  const onSubmit = async (formData: typeof data) => {
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -115,11 +145,10 @@ export function ApplicationCreateForm() {
       const createData = {
         company: formData.company,
         role: formData.role,
-        platform: formData.platform as ApplicationPlatform,
-        status: formData.status as ApplicationStatus,
+        platform: formData.platform,
+        status: formData.status,
         notes: formData.notes || undefined,
         deadline: formData.deadline ? new Date(formData.deadline).toISOString() : undefined,
-        appliedDate: formData.appliedDate ? new Date(formData.appliedDate).toISOString() : undefined,
       };
 
       const response = await applications.create(createData);
@@ -139,7 +168,7 @@ export function ApplicationCreateForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Information */}
       <Card>
         <CardHeader>
@@ -148,10 +177,11 @@ export function ApplicationCreateForm() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-              label="Company"
               error={errors.company}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company *
+              </label>
               <Input
                 name="company"
                 value={data.company}
@@ -162,10 +192,11 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Role"
               error={errors.role}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Role *
+              </label>
               <Input
                 name="role"
                 value={data.role}
@@ -176,14 +207,15 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Platform"
               error={errors.platform}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Platform *
+              </label>
               <Select
                 name="platform"
                 value={data.platform}
-                onChange={(value) => setFieldValue('platform', value as ApplicationPlatform)}
+                onChange={(value) => setFieldValue('platform', value)}
                 options={platformOptions}
                 placeholder="Select application platform"
                 disabled={isSubmitting}
@@ -191,14 +223,15 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Status"
               error={errors.status}
-              required
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status *
+              </label>
               <Select
                 name="status"
                 value={data.status}
-                onChange={(value) => setFieldValue('status', value as ApplicationStatus)}
+                onChange={(value) => setFieldValue('status', value)}
                 options={statusOptions}
                 placeholder="Select application status"
                 disabled={isSubmitting}
@@ -216,10 +249,12 @@ export function ApplicationCreateForm() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
-              label="Applied Date"
               error={errors.appliedDate}
-              helpText="When did you submit this application? (optional)"
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Applied Date
+              </label>
+              <p className="text-sm text-gray-500 mb-2">When did you submit this application? (optional)</p>
               <Input
                 type="date"
                 name="appliedDate"
@@ -230,10 +265,12 @@ export function ApplicationCreateForm() {
             </FormField>
 
             <FormField
-              label="Application Deadline"
               error={errors.deadline}
-              helpText="When is the application deadline? (optional)"
             >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Application Deadline
+              </label>
+              <p className="text-sm text-gray-500 mb-2">When is the application deadline? (optional)</p>
               <Input
                 type="date"
                 name="deadline"
@@ -253,10 +290,12 @@ export function ApplicationCreateForm() {
         </CardHeader>
         <CardContent>
           <FormField
-            label="Application Notes"
             error={errors.notes}
-            helpText="Add any relevant notes about this application (optional)"
           >
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Application Notes
+            </label>
+            <p className="text-sm text-gray-500 mb-2">Add any relevant notes about this application (optional)</p>
             <textarea
               name="notes"
               value={data.notes}

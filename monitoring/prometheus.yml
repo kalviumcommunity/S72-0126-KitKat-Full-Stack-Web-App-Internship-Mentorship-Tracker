@@ -1,4 +1,4 @@
-# Prometheus Configuration for UIMP Monitoring
+# Prometheus configuration for UIMP Backend monitoring
 
 global:
   scrape_interval: 15s
@@ -14,46 +14,35 @@ alerting:
           - alertmanager:9093
 
 scrape_configs:
-  # Prometheus self-monitoring
+  # Prometheus itself
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+
+  # UIMP Backend
+  - job_name: 'uimp-backend'
+    static_configs:
+      - targets: ['backend:3001']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
 
   # Node Exporter (system metrics)
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['node-exporter:9100']
 
-  # Backend API metrics
-  - job_name: 'uimp-backend'
-    static_configs:
-      - targets: ['backend:3001']
-    metrics_path: '/api/metrics'
-    scrape_interval: 30s
-
-  # Frontend metrics
-  - job_name: 'uimp-frontend'
-    static_configs:
-      - targets: ['frontend:3000']
-    metrics_path: '/api/metrics'
-    scrape_interval: 30s
-
-  # Nginx metrics
-  - job_name: 'nginx'
-    static_configs:
-      - targets: ['nginx:9113']
-
-  # PostgreSQL metrics
-  - job_name: 'postgres'
+  # PostgreSQL Exporter
+  - job_name: 'postgres-exporter'
     static_configs:
       - targets: ['postgres-exporter:9187']
 
-  # Redis metrics
-  - job_name: 'redis'
+  # Redis Exporter
+  - job_name: 'redis-exporter'
     static_configs:
       - targets: ['redis-exporter:9121']
 
-  # Docker container metrics
-  - job_name: 'cadvisor'
+  # Nginx Exporter
+  - job_name: 'nginx-exporter'
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ['nginx-exporter:9113']

@@ -90,21 +90,21 @@ export function ApplicationCard({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
                   <span className="font-medium text-gray-700">Applied:</span>
-                  <p className="text-gray-600">{formatDate(application.appliedDate)}</p>
+                  <p className="text-gray-600">{application.appliedDate ? formatDate(application.appliedDate) : 'Not specified'}</p>
                 </div>
                 
                 <div>
                   <span className="font-medium text-gray-700">Deadline:</span>
                   <p className={`${
-                    isOverdue(application.deadline) ? 'text-red-600' :
-                    isDeadlineApproaching(application.deadline) ? 'text-yellow-600' :
+                    application.deadline && isOverdue(application.deadline) ? 'text-red-600' :
+                    application.deadline && isDeadlineApproaching(application.deadline) ? 'text-yellow-600' :
                     'text-gray-600'
                   }`}>
-                    {formatDate(application.deadline)}
-                    {isDeadlineApproaching(application.deadline) && !isOverdue(application.deadline) && (
+                    {application.deadline ? formatDate(application.deadline) : 'Not specified'}
+                    {application.deadline && isDeadlineApproaching(application.deadline) && !isOverdue(application.deadline) && (
                       <span className="ml-1 text-xs">(Soon)</span>
                     )}
-                    {isOverdue(application.deadline) && (
+                    {application.deadline && isOverdue(application.deadline) && (
                       <span className="ml-1 text-xs">(Overdue)</span>
                     )}
                   </p>

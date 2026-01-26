@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Performance Optimization Utilities
 // Comprehensive performance tuning for UIMP frontend
 
@@ -54,7 +56,9 @@ export function useIntersectionObserver(
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsIntersecting(entry.isIntersecting);
+        if (entry) {
+          setIsIntersecting(entry.isIntersecting);
+        }
       },
       {
         threshold: 0.1,
@@ -145,7 +149,7 @@ export function useLazyImage(src: string, placeholder?: string) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isError, setIsError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
-  const isInView = useIntersectionObserver(imgRef);
+  const isInView = useIntersectionObserver(imgRef as React.RefObject<Element>);
 
   useEffect(() => {
     if (isInView && src && !isLoaded && !isError) {
@@ -212,8 +216,12 @@ export function measureWebVitals() {
   // Measure Largest Contentful Paint
   const lcpObserver = new PerformanceObserver((list) => {
     const entries = list.getEntries();
-    const lastEntry = entries[entries.length - 1];
-    console.log('LCP:', lastEntry.startTime);
+    if (entries.length > 0) {
+      const lastEntry = entries[entries.length - 1];
+      if (lastEntry) {
+        console.log('LCP:', lastEntry.startTime);
+      }
+    }
   });
 
   lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
@@ -347,7 +355,7 @@ export function checkPerformanceBudget() {
     domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
     loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
     firstByte: navigation.responseStart - navigation.requestStart,
-    domInteractive: navigation.domInteractive - navigation.navigationStart,
+    domInteractive: navigation.domInteractive - navigation.fetchStart,
   };
 
   // Performance budgets (in milliseconds)

@@ -2,16 +2,13 @@ import { Router } from "express";
 import { userController } from "./user.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { 
-  requireAdmin, 
-  requireSelfOrAdmin, 
-  requireMentorOrAdmin,
-  requireOwnershipOrAdmin,
+  requireAdminAccess,
   requireMentorAccess,
+  canManageUsers
 } from "../../middlewares/rbac.middleware";
 import { validateBody, validateParams, validateQuery } from "../../middlewares/validation.middleware";
 import { schemas } from "../../lib/validation";
 import { rateLimiters } from "../../middlewares/rate-limit.middleware";
-import { z } from "zod";
 
 const router = Router();
 
@@ -21,7 +18,7 @@ router.use(authenticate);
 // List all users (Admin only)
 router.get(
   "/",
-  requireAdmin,
+  requireAdminAccess,
   rateLimiters.general,
   validateQuery(schemas.user.listUsers),
   userController.listUsers
@@ -32,7 +29,7 @@ router.get(
   "/:id",
   rateLimiters.general,
   validateParams(schemas.user.getUserById),
-  requireMentorAccess((req) => req.params.id),
+  requireMentorAccess,
   userController.getUserById
 );
 
@@ -42,14 +39,14 @@ router.put(
   rateLimiters.general,
   validateParams(schemas.user.getUserById),
   validateBody(schemas.user.updateProfile),
-  requireSelfOrAdmin,
+  requireMentorAccess,
   userController.updateProfile
 );
 
 // Deactivate user (Admin only)
 router.post(
   "/:id/deactivate",
-  requireAdmin,
+  requireAdminAccess,
   validateParams(schemas.user.getUserById),
   userController.deactivateUser
 );
@@ -57,7 +54,7 @@ router.post(
 // Activate user (Admin only)
 router.post(
   "/:id/activate",
-  requireAdmin,
+  requireAdminAccess,
   validateParams(schemas.user.getUserById),
   userController.activateUser
 );
@@ -67,7 +64,7 @@ router.get(
   "/:id/mentors",
   rateLimiters.general,
   validateParams(schemas.user.getUserById),
-  requireMentorAccess((req) => req.params.id),
+  requireMentorAccess,
   userController.getUserMentors
 );
 
@@ -76,14 +73,14 @@ router.get(
   "/:id/students",
   rateLimiters.general,
   validateParams(schemas.user.getUserById),
-  requireOwnershipOrAdmin((req) => req.params.id),
+  requireMentorAccess,
   userController.getMentorStudents
 );
 
 // Assign mentor to student (Admin only)
 router.post(
   "/assign-mentor",
-  requireAdmin,
+  requireAdminAccess,
   validateBody(schemas.mentorAssignment.assign),
   userController.assignMentor
 );
@@ -91,7 +88,7 @@ router.post(
 // Unassign mentor from student (Admin only)
 router.post(
   "/unassign-mentor",
-  requireAdmin,
+  requireAdminAccess,
   validateBody(schemas.mentorAssignment.unassign),
   userController.unassignMentor
 );

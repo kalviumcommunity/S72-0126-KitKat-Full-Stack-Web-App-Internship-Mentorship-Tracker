@@ -16,6 +16,9 @@ export const emailSchema = z
     
     const [localPart, domain] = parts;
     
+    // Check if parts exist
+    if (!localPart || !domain) return false;
+    
     // Local part validation
     if (localPart.length === 0 || localPart.length > 64) return false;
     if (localPart.startsWith('.') || localPart.endsWith('.')) return false;

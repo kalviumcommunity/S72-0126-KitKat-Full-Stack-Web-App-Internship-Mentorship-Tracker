@@ -24,6 +24,31 @@ router.post(
   authController.login
 );
 
+// OTP-based Password Reset routes
+router.post(
+  "/forgot-password",
+  rateLimiters.auth,
+  createEmailRateLimit(3, 60 * 60 * 1000), // 3 password reset requests per hour per email
+  validateBody(schemas.auth.forgotPassword),
+  authController.forgotPassword
+);
+
+router.post(
+  "/verify-otp",
+  rateLimiters.auth,
+  createEmailRateLimit(10, 15 * 60 * 1000), // 10 OTP verification attempts per 15 minutes per email
+  validateBody(schemas.auth.verifyOtp),
+  authController.verifyOtp
+);
+
+router.post(
+  "/reset-password",
+  rateLimiters.auth,
+  createEmailRateLimit(5, 15 * 60 * 1000), // 5 password reset attempts per 15 minutes per email
+  validateBody(schemas.auth.resetPassword),
+  authController.resetPassword
+);
+
 // Protected routes
 router.post(
   "/logout",

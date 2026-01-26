@@ -53,7 +53,7 @@ export function MentorStudentOverview({
       const allDates = [
         ...studentApps.map(app => app.updatedAt),
         ...studentFeedback.map(fb => fb.createdAt)
-      ].sort((a, b) => new Date(b).getTime() - new Date(a.getTime()));
+      ].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
       
       const lastActivity = allDates[0] || student.email; // Fallback
       
@@ -190,7 +190,7 @@ export function MentorStudentOverview({
                       {student.name}
                     </h4>
                     {student.needsAttention && (
-                      <Badge variant="orange" size="sm">
+                      <Badge variant="warning" size="sm">
                         Needs Attention
                       </Badge>
                     )}

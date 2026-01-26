@@ -60,7 +60,7 @@ export class ApplicationController {
       throw new AuthenticationError("Authentication required");
     }
 
-    const result = await applicationService.listApplications(req.user, req.query);
+    const result = await applicationService.listApplications(req.user, req.query as any);
 
     const response: ApiResponse<PaginatedResponse<any>> = {
       success: true,
@@ -184,7 +184,7 @@ export class ApplicationController {
       throw new AuthorizationError("Only students can export their applications");
     }
 
-    const exportData = await applicationService.exportApplications(req.user.id, req.query);
+    const exportData = await applicationService.exportApplications(req.user.id, req.query as any);
 
     const response: ApiResponse = {
       success: true,
