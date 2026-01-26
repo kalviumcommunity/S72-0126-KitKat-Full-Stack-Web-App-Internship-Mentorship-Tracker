@@ -222,6 +222,7 @@ router.post('/test-batch-permissions',
         timestamp: new Date().toISOString()
       }
     });
+    return;
   }
 );
 

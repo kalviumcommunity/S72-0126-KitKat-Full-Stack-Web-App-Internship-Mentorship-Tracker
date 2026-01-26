@@ -9,3 +9,6 @@ export async function comparePassword(password: string, hash: string): Promise<b
   return bcrypt.compare(password, hash);
 }
 
+// Alias for compatibility with existing imports
+export const verifyPassword = comparePassword;
+

@@ -15,6 +15,9 @@ export function generateToken(payload: JWTPayload): string {
   } as jwt.SignOptions);
 }
 
+// Alias for compatibility with existing imports
+export const signToken = generateToken;
+
 export function verifyToken(token: string): RequestUser {
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET) as JWTPayload & {

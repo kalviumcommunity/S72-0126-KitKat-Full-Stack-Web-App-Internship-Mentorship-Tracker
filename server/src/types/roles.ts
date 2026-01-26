@@ -1,8 +1,5 @@
-export enum UserRole {
-  STUDENT = "STUDENT",
-  MENTOR = "MENTOR",
-  ADMIN = "ADMIN",
-}
+// Re-export UserRole from rbac.ts to maintain consistency
+export { UserRole } from "./rbac";
 
-export type Role = UserRole.STUDENT | UserRole.MENTOR | UserRole.ADMIN;
+export type Role = "STUDENT" | "MENTOR" | "ADMIN";
 

@@ -38,16 +38,39 @@ export const env = {
   
   // OTP Configuration
   OTP_TEST_EMAIL: process.env.OTP_TEST_EMAIL || "",
+  
+  // Production Security
+  TRUST_PROXY: process.env.TRUST_PROXY === "true",
+  RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000", 10), // 15 minutes
+  RATE_LIMIT_MAX: parseInt(process.env.RATE_LIMIT_MAX || "100", 10),
+  
+  // Logging
+  LOG_LEVEL: process.env.LOG_LEVEL || "info",
+  
+  // Health Check
+  HEALTH_CHECK_PATH: process.env.HEALTH_CHECK_PATH || "/health",
 } as const;
 
 // Validate required environment variables
 const requiredEnvVars = ["DATABASE_URL", "JWT_SECRET"];
 
 if (env.NODE_ENV === "production") {
+  requiredEnvVars.push("REDIS_URL", "SMTP_HOST", "SMTP_USER", "SMTP_PASS");
+  
   requiredEnvVars.forEach((varName) => {
     if (!process.env[varName]) {
       throw new Error(`Missing required environment variable: ${varName}`);
     }
   });
+  
+  // Validate JWT secret strength in production
+  if (env.JWT_SECRET.length < 32) {
+    throw new Error("JWT_SECRET must be at least 32 characters long in production");
+  }
+  
+  // Validate CORS origin in production
+  if (env.CORS_ORIGIN === "http://localhost:3000") {
+    console.warn("WARNING: Using localhost CORS origin in production");
+  }
 }
 

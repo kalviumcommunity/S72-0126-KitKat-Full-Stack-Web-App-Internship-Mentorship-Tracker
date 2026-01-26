@@ -1,5 +1,6 @@
 import { getMailTransporter, getDefaultMailOptions, isMailConfigured } from '../config/mail';
 import { logger } from '../lib/logger';
+import * as nodemailer from 'nodemailer';
 
 /**
  * Mail Service
@@ -28,7 +29,15 @@ export interface EmailResult {
 }
 
 class MailService {
-  private transporter = getMailTransporter();
+  private transporter: nodemailer.Transporter | null = null;
+
+  constructor() {
+    this.initializeTransporter();
+  }
+
+  private initializeTransporter(): void {
+    this.transporter = getMailTransporter();
+  }
 
   /**
    * Send email using Mailtrap Sandbox SMTP

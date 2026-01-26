@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { env } from './env';
 import { logger } from '../lib/logger';
 
@@ -45,7 +45,10 @@ export const createMailTransporter = () => {
   // Verify connection configuration
   transporter.verify((error, success) => {
     if (error) {
-      logger.error('SMTP connection verification failed:', error);
+      logger.error('SMTP connection verification failed:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
     } else {
       logger.info('SMTP server connection verified successfully');
     }

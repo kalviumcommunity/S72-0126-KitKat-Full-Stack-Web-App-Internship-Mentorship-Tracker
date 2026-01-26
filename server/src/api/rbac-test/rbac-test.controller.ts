@@ -146,6 +146,7 @@ export const rbacTestController = {
     };
 
     res.json(response);
+    return;
   }),
 
   // ============================================
@@ -187,6 +188,7 @@ export const rbacTestController = {
     };
 
     res.json(response);
+    return;
   }),
 
   // POST /api/rbac-test/authorize - Test authorization for specific action
@@ -254,6 +256,7 @@ export const rbacTestController = {
     };
 
     res.json(response);
+    return;
   }),
 
   // ============================================
@@ -263,7 +266,11 @@ export const rbacTestController = {
   // GET /api/rbac-test/scenarios - Test common RBAC scenarios
   testScenarios: asyncHandler(async (req: Request, res: Response) => {
     const users = await generateTestUsers();
-    const scenarios = [];
+    const scenarios: Array<{
+      name: string;
+      user: string;
+      result: any;
+    }> = [];
 
     // Scenario 1: Student accessing own application
     const student = users.find(u => u.role === UserRole.STUDENT);

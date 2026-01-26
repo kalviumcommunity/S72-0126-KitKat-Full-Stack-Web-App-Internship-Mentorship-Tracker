@@ -46,7 +46,11 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      logger.error("Signup error", error);
+      logger.error("Signup error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        email: input.email 
+      });
       throw error;
     }
   }
@@ -104,7 +108,11 @@ export class AuthService {
         token,
       };
     } catch (error) {
-      logger.error("Login error", error);
+      logger.error("Login error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        email: input.email 
+      });
       throw error;
     }
   }
@@ -137,7 +145,11 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      logger.error("Get user error", error);
+      logger.error("Get user error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        userId 
+      });
       throw error;
     }
   }
@@ -149,7 +161,10 @@ export class AuthService {
         data: { lastLoginAt: new Date() },
       });
     } catch (error) {
-      logger.error("Update last login error", error);
+      logger.error("Update last login error", { 
+        error: error instanceof Error ? error.message : String(error),
+        userId 
+      });
       // Don't throw error for this non-critical operation
     }
   }
@@ -168,7 +183,10 @@ export class AuthService {
 
       return { token };
     } catch (error) {
-      logger.error("Refresh token error", error);
+      logger.error("Refresh token error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
       throw error;
     }
   }
@@ -204,7 +222,11 @@ export class AuthService {
 
       logger.info("Password changed successfully", { userId });
     } catch (error) {
-      logger.error("Change password error", error);
+      logger.error("Change password error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        userId 
+      });
       throw error;
     }
   }
@@ -221,7 +243,11 @@ export class AuthService {
 
       logger.info("User deactivated", { userId });
     } catch (error) {
-      logger.error("Deactivate user error", error);
+      logger.error("Deactivate user error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        userId 
+      });
       throw error;
     }
   }
@@ -238,7 +264,11 @@ export class AuthService {
 
       logger.info("User activated", { userId });
     } catch (error) {
-      logger.error("Activate user error", error);
+      logger.error("Activate user error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        userId 
+      });
       throw error;
     }
   }

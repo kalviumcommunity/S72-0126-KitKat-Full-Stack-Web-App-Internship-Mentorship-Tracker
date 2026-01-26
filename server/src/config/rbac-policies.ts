@@ -195,9 +195,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'analytics:manage',
     
     // Security Management
-    'system:security_configure',
-    'system:backup',
-    'system:restore',
+    'system:configure',
+    'system:manage',
+    'system:audit',
   ]
 };
 

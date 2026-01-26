@@ -112,7 +112,10 @@ export function rateLimit(options: RateLimitOptions) {
         throw error;
       }
       
-      logger.error("Rate limiting error", error);
+      logger.error("Rate limiting error", { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
       // If Redis is down, allow the request to proceed with warning
       logger.warn("Rate limiting disabled due to Redis error, allowing request");
       next();

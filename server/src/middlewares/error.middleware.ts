@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { ApiResponse } from "../types/api";
 import { logger } from "../lib/logger";
+import { monitoring } from "../lib/monitoring";
 import { env } from "../config/env";
 
 // Custom error classes
@@ -69,15 +70,24 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ) {
+  // Create error context for monitoring
+  const errorContext = {
+    userId: (req as any).user?.id,
+    requestId: (req as any).requestId,
+    ip: req.ip,
+    userAgent: req.get("User-Agent"),
+    url: req.url,
+    method: req.method,
+  };
+
+  // Track error in monitoring system
+  monitoring.trackError(err, errorContext);
+
   // Log error details
   logger.error("Error occurred", {
     error: err.message,
     stack: err.stack,
-    url: req.url,
-    method: req.method,
-    ip: req.ip,
-    userAgent: req.get("User-Agent"),
-    userId: (req as any).user?.id,
+    ...errorContext,
   });
 
   // Handle custom application errors
@@ -219,6 +229,20 @@ export function errorHandler(
     return res.status(400).json(response);
   }
 
+  // Handle CORS errors
+  if (err.message.includes("Not allowed by CORS")) {
+    monitoring.trackSecurityEvent("CORS_VIOLATION", errorContext);
+    
+    const response: ApiResponse = {
+      success: false,
+      error: {
+        code: "CORS_ERROR",
+        message: "Origin not allowed by CORS policy",
+      },
+    };
+    return res.status(403).json(response);
+  }
+
   // Default error response
   const response: ApiResponse = {
     success: false,
@@ -242,4 +266,3 @@ export function asyncHandler<T extends Request, U extends Response>(
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 }
-

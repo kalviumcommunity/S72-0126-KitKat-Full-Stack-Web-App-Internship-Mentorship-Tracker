@@ -1,4 +1,5 @@
-import nodemailer, { Transporter } from "nodemailer";
+import * as nodemailer from "nodemailer";
+import { Transporter } from "nodemailer";
 import { env } from "../config/env";
 import { logger } from "./logger";
 

@@ -86,7 +86,10 @@ export class UploadService {
         url: fileUrl,
       };
     } catch (error) {
-      logger.error('Error processing upload:', error);
+      logger.error('Error processing upload:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
       throw new Error('Failed to process uploaded file');
     }
   }
@@ -108,7 +111,10 @@ export class UploadService {
         return { path: filePath, exists: false };
       }
     } catch (error) {
-      logger.error('Error getting file:', error);
+      logger.error('Error getting file:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
       throw new Error('Failed to retrieve file');
     }
   }
@@ -125,11 +131,17 @@ export class UploadService {
         logger.info(`File deleted: ${filename}`);
         return true;
       } catch (error) {
-        logger.warn(`Failed to delete file: ${filename}`, error);
+        logger.warn(`Failed to delete file: ${filename}`, { 
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined 
+        });
         return false;
       }
     } catch (error) {
-      logger.error('Error deleting file:', error);
+      logger.error('Error deleting file:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
       throw new Error('Failed to delete file');
     }
   }
@@ -178,7 +190,10 @@ export class UploadService {
           const stats = await fs.stat(filePath);
           totalSize += stats.size;
         } catch (error) {
-          logger.warn(`Error getting stats for file ${file}:`, error);
+          logger.warn(`Error getting stats for file ${file}:`, { 
+            error: error instanceof Error ? error.message : String(error),
+            file 
+          });
         }
       }
 
@@ -188,7 +203,10 @@ export class UploadService {
         uploadDir: UPLOAD_DIR,
       };
     } catch (error) {
-      logger.error('Error getting upload stats:', error);
+      logger.error('Error getting upload stats:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
       throw new Error('Failed to get upload statistics');
     }
   }
@@ -216,14 +234,20 @@ export class UploadService {
             logger.info(`Cleaned up old file: ${file}`);
           }
         } catch (error) {
-          logger.warn(`Error cleaning up file ${file}:`, error);
+          logger.warn(`Error cleaning up file ${file}:`, { 
+            error: error instanceof Error ? error.message : String(error),
+            file 
+          });
         }
       }
 
       logger.info(`Cleanup completed: ${deletedCount} files deleted`);
       return deletedCount;
     } catch (error) {
-      logger.error('Error during cleanup:', error);
+      logger.error('Error during cleanup:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined 
+      });
       throw new Error('Failed to cleanup old files');
     }
   }

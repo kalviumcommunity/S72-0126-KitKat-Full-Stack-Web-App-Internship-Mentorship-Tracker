@@ -28,7 +28,15 @@
     "test:setup": "node -e \"console.log('Run setup-test-db.ps1 or setup-test-db.sh to setup test database')\"",
     "test:clean": "jest --clearCache && rm -rf coverage",
     "test:email": "tsx src/scripts/test-email.ts",
-    "test:otp": "tsx src/scripts/test-otp-flow.ts"
+    "test:otp": "tsx src/scripts/test-otp-flow.ts",
+    "deploy:production": "chmod +x scripts/deploy-production.sh && ./scripts/deploy-production.sh",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:stop": "pm2 stop uimp-backend",
+    "pm2:restart": "pm2 restart uimp-backend",
+    "pm2:logs": "pm2 logs uimp-backend",
+    "docker:build": "docker build -t uimp-backend .",
+    "docker:run": "docker run -d --name uimp-backend --env-file .env.production -p 3001:3001 --restart unless-stopped uimp-backend",
+    "docker:stop": "docker stop uimp-backend && docker rm uimp-backend"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -39,6 +47,7 @@
     "@azure/storage-blob": "^12.29.1",
     "@prisma/client": "^5.19.1",
     "bcrypt": "^5.1.1",
+    "compression": "^1.8.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -57,6 +66,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
