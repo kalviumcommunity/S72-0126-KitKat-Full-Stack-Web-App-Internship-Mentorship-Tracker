@@ -18,10 +18,10 @@ export default function Home() {
               <Link href="/about">
                 <Button variant="ghost">About</Button>
               </Link>
-              <Link href="/auth/login">
+              <Link href="/login">
                 <Button variant="outline">Sign In</Button>
               </Link>
-              <Link href="/auth/signup">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -42,7 +42,7 @@ export default function Home() {
           </p>
           
           <div className="flex gap-4 justify-center mb-16">
-            <Link href="/auth/signup">
+            <Link href="/signup">
               <Button size="lg" className="px-8">
                 Start Your Journey
               </Button>

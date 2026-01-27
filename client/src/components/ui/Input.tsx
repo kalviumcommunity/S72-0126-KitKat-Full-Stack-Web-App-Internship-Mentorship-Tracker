@@ -24,11 +24,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     startIcon,
     endIcon,
     id,
-    // @ts-ignore - touched is passed by some form libraries but not used in the input directly
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    touched,
     ...props
   }, ref) => {
+    // Extract non-DOM props that shouldn't be passed to the input element
+    const { touched, ...inputProps } = props as any;
+    
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
     const hasError = !!error;
 
@@ -65,7 +65,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               props.disabled && 'bg-gray-50 text-gray-500 cursor-not-allowed',
               className
             )}
-            {...props}
+            {...inputProps}
           />
 
           {(endIcon || hasError) && (

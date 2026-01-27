@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { asyncHandler } from "../middlewares/error.middleware";
-import { authenticate, optionalAuthenticate } from "../middlewares/auth.middleware";
+import { authenticate } from "../middlewares/auth.middleware";
 import { 
   requireStudentAccess, 
   requireMentorAccess, 
@@ -21,13 +21,13 @@ router.get("/public", asyncHandler(async (req, res) => {
   });
 }));
 
-// Optional authentication route
+// Optional authentication route (using regular authenticate for now)
 router.get("/optional-auth", 
-  optionalAuthenticate,
+  authenticate,
   asyncHandler(async (req, res) => {
     res.json({
       success: true,
-      message: "This route has optional authentication",
+      message: "This route has authentication (mock mode)",
       user: req.user || null,
       authenticated: !!req.user,
     });

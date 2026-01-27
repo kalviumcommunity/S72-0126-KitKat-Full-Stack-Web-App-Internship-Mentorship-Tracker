@@ -31,6 +31,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     id,
     ...props 
   }, ref) => {
+    // Extract non-DOM props that shouldn't be passed to the select element
+    const { touched, ...selectProps } = props as any;
+    
     const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
     const hasError = !!error;
 
@@ -55,7 +58,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             props.disabled && 'bg-gray-50 text-gray-500 cursor-not-allowed',
             className
           )}
-          {...props}
+          {...selectProps}
         >
           {placeholder && (
             <option value="" disabled>

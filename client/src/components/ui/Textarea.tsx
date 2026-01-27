@@ -22,6 +22,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     rows = 4,
     ...props 
   }, ref) => {
+    // Extract non-DOM props that shouldn't be passed to the textarea element
+    const { touched, ...textareaProps } = props as any;
+    
     const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-');
     const hasError = !!error;
 
@@ -47,7 +50,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             props.disabled && 'bg-gray-50 text-gray-500 cursor-not-allowed',
             className
           )}
-          {...props}
+          {...textareaProps}
         />
         
         {(error || helperText) && (
