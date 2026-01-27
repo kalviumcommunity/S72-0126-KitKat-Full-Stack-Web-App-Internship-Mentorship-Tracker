@@ -24,6 +24,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     startIcon,
     endIcon,
     id,
+    // @ts-ignore - touched is passed by some form libraries but not used in the input directly
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    touched,
     ...props
   }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');

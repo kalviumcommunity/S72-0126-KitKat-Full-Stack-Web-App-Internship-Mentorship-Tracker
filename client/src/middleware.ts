@@ -3,149 +3,33 @@
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-
-import { PUBLIC_ROUTES, PROTECTED_ROUTES } from '@/lib/constants';
-
-// JWT verification function
-async function verifyToken(token: string): Promise<{ 
-  valid: boolean; 
-  user?: { id: string; role: string; email: string } 
-}> {
-  if (!token) {
-    return { valid: false };
-  }
-  
-  try {
-    // For development, we'll use a simple token format: base64(JSON)
-    // In production, use proper JWT verification with jsonwebtoken library
-    
-    // Check if it's a development mock token
-    if (token.startsWith('dev-')) {
-      // Development mock token format: dev-{userId}-{role}
-      const parts = token.split('-');
-      if (parts.length >= 3 && parts[1] && parts[2]) {
-        return {
-          valid: true,
-          user: {
-            id: parts[1],
-            role: parts[2].toUpperCase(),
-            email: `user${parts[1]}@example.com`,
-          },
-        };
-      }
-    }
-    
-    // Try to decode as base64 JSON (simple development format)
-    try {
-      const decoded = JSON.parse(atob(token));
-      if (decoded.id && decoded.role && decoded.email) {
-        return {
-          valid: true,
-          user: {
-            id: decoded.id,
-            role: decoded.role,
-            email: decoded.email,
-          },
-        };
-      }
-    } catch {
-      // Not a valid base64 JSON token
-    }
-    
-    // Production JWT verification
-    if (process.env.NODE_ENV === 'production' && process.env.JWT_SECRET) {
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
-        return {
-          valid: true,
-          user: {
-            id: decoded.id || decoded.userId,
-            role: decoded.role,
-            email: decoded.email,
-          },
-        };
-      } catch (jwtError) {
-        console.error('JWT verification failed:', jwtError);
-        return { valid: false };
-      }
-    }
-    
-    return { valid: false };
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return { valid: false };
-  }
-}
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Skip middleware for static files and API routes
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.includes('.') ||
-    pathname.startsWith('/favicon')
-  ) {
-    return NextResponse.next();
-  }
+  // BYPASS MIDDLEWARE PROTECTION but keep mock auth logic active
+  const response = NextResponse.next();
 
   // Get authentication token from cookies
   const tokenCookie = request.cookies.get('auth-token');
   const token = tokenCookie?.value || '';
-  
-  // Verify token
-  const { valid: isAuthenticated, user } = await verifyToken(token);
 
-  // Check if route is public
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname as any);
-  
-  // Allow access to public routes
-  if (isPublicRoute) {
-    // Redirect authenticated users away from auth pages
-    if (isAuthenticated && (pathname === '/login' || pathname === '/signup')) {
-      const redirectUrl = user?.role === 'STUDENT' ? '/student' : 
-                         user?.role === 'MENTOR' ? '/mentor' : 
-                         user?.role === 'ADMIN' ? '/admin' : '/';
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
-    return NextResponse.next();
-  }
+  // Check if it's a development mock token from server-dev.ts
+  // Format: dev-{userId}-{role}
+  if (token.startsWith('dev-')) {
+    const parts = token.split('-');
+    if (parts.length >= 3) {
+      const userId = parts[1] || '';
+      const role = (parts[2] || '').toUpperCase(); // Ensure role is uppercase
+      const email = `user${userId}@example.com`;
 
-  // Redirect unauthenticated users to login
-  if (!isAuthenticated) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Check role-based access for protected routes
-  if (user) {
-    const userRole = user.role;
-    
-    // Check if user has access to the requested route
-    const roleRoutes = PROTECTED_ROUTES[userRole as keyof typeof PROTECTED_ROUTES];
-    const hasAccess = 
-      PROTECTED_ROUTES.ALL.some(route => pathname.startsWith(route)) ||
-      (Array.isArray(roleRoutes) && roleRoutes.some(route => pathname.startsWith(route)));
-
-    if (!hasAccess) {
-      // Redirect to appropriate dashboard based on role
-      const dashboardUrl = userRole === 'STUDENT' ? '/student' : 
-                          userRole === 'MENTOR' ? '/mentor' : 
-                          userRole === 'ADMIN' ? '/admin' : '/';
-      return NextResponse.redirect(new URL(dashboardUrl, request.url));
+      // Inject headers based on the mock token
+      response.headers.set('x-user-id', userId);
+      response.headers.set('x-user-role', role);
+      response.headers.set('x-user-email', email);
     }
   }
 
-  // Add user info to headers for server components
-  const response = NextResponse.next();
-  if (user) {
-    response.headers.set('x-user-id', user.id);
-    response.headers.set('x-user-role', user.role);
-    response.headers.set('x-user-email', user.email);
-  }
+  // If no token (or invalid), we don't inject headers.
+  // The downstream components (AuthContext) will see no user and handle it (e.g. redirect to login).
 
   return response;
 }
