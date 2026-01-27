@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import { logger } from "../../lib/logger";
 import { NotFoundError, ConflictError } from "../../middlewares/error.middleware";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 
 export class UserService {
   async listUsers(query: any) {

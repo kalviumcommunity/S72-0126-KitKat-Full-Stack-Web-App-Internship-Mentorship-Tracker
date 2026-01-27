@@ -4,7 +4,7 @@ import { requireRole, requireMinRole } from '../../src/middlewares/rbac.middlewa
 import { validateRequest } from '../../src/middlewares/validation.middleware';
 import { errorHandler } from '../../src/middlewares/error.middleware';
 import { verifyToken } from '../../src/lib/jwt';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 import { z } from 'zod';
 
 // Mock dependencies

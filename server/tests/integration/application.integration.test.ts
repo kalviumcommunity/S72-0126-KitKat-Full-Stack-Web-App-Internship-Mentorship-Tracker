@@ -7,7 +7,7 @@ import {
   expectApiError, 
   expectValidationError 
 } from '../utils/test-helpers';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 
 describe('Application API Integration Tests', () => {
   let app: any;

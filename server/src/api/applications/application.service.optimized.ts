@@ -4,7 +4,7 @@ import { cacheAside, CacheInvalidator } from "../../lib/cache";
 import { CreateApplicationInput, UpdateApplicationInput, ListApplicationsQuery, BulkUpdateStatusInput, ExportApplicationsQuery } from "../../lib/validation";
 import { RequestUser, PaginationMeta } from "../../types/api";
 import { logger } from "../../lib/logger";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 import { NotFoundError, AuthorizationError, ConflictError } from "../../middlewares/error.middleware";
 
 export class ApplicationServiceOptimized {

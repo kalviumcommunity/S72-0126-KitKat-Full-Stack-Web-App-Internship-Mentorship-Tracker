@@ -2,7 +2,7 @@ import { prisma } from "../../lib/prisma";
 import { hashPassword, comparePassword } from "../../lib/password";
 import { generateToken } from "../../lib/jwt";
 import { SignupInput, LoginInput, CreateApplicationInput } from "../../lib/validation";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 import { logger } from "../../lib/logger";
 import { ConflictError, AuthenticationError, NotFoundError } from "../../middlewares/error.middleware";
 

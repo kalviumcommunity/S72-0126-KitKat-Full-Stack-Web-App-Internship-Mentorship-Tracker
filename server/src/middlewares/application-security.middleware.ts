@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../lib/prisma";
 import { AuthorizationError, NotFoundError, ConflictError } from "./error.middleware";
-import { UserRole } from "../types/roles";
+import { UserRole } from "@prisma/client";
 import { logger } from "../lib/logger";
 
 /**

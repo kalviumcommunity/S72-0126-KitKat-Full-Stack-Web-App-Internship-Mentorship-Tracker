@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { createApp } from '../../src/app';
 import { TestDataFactory, expectApiSuccess, expectApiError, expectValidationError } from '../utils/test-helpers';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 
 describe('Auth API Integration Tests', () => {
   let app: any;

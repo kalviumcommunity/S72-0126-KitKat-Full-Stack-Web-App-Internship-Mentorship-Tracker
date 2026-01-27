@@ -5,7 +5,7 @@ import { asyncHandler } from "../../middlewares/error.middleware";
 import { AuthenticationError, AuthorizationError } from "../../middlewares/error.middleware";
 import { SUCCESS_MESSAGES } from "../../constants/errors";
 import { logger } from "../../lib/logger";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 
 export class FeedbackController {
   // Create feedback (Mentors only)

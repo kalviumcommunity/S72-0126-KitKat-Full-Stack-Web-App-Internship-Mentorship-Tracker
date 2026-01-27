@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import { emailService } from "../../lib/email";
 import { NotFoundError, AuthorizationError, ValidationError } from "../../middlewares/error.middleware";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 import { RequestUser } from "../../types/api";
 import { CreateFeedbackInput, UpdateFeedbackInput, FeedbackQueryParams } from "./feedback.schema";
 import { logger } from "../../lib/logger";

@@ -17,7 +17,7 @@ import {
   uuidParamSchema 
 } from "./feedback.schema";
 import { createUserRateLimit } from "../../middlewares/rate-limit.middleware";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 
 const router = Router();
 

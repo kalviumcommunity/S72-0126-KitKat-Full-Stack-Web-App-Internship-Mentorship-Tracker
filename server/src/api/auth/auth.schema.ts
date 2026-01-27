@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 import { PASSWORD } from "../../config/constants";
 
 export const signupSchema = z.object({

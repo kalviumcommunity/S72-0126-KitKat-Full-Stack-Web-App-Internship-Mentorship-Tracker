@@ -5,7 +5,7 @@ import { asyncHandler } from "../../middlewares/error.middleware";
 import { AuthenticationError, AuthorizationError, NotFoundError } from "../../middlewares/error.middleware";
 import { SUCCESS_MESSAGES } from "../../constants/errors";
 import { logger } from "../../lib/logger";
-import { UserRole } from "../../types/roles";
+import { UserRole } from "@prisma/client";
 
 export class ApplicationController {
   // Create new application (Students only)

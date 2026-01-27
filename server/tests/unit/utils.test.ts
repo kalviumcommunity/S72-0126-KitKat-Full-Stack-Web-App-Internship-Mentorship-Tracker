@@ -1,6 +1,6 @@
 import { generateToken, verifyToken } from '../../src/lib/jwt';
 import { hashPassword, comparePassword } from '../../src/lib/password';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 
 // Don't mock these utilities as we want to test them directly
 describe('Utility Functions Tests', () => {

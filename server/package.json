@@ -5,6 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "dev:mock": "tsx watch src/server-dev.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "postinstall": "prisma generate",

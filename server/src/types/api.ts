@@ -1,4 +1,4 @@
-import { UserRole } from "./roles";
+import { UserRole } from "@prisma/client";
 
 export interface ApiResponse<T = any> {
   success: boolean;

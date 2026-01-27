@@ -1,7 +1,7 @@
 import { ApplicationService } from '../../src/api/applications/application.service';
 import { prisma } from '../../src/lib/prisma';
 import { NotFoundError, ValidationError } from '../../src/middlewares/error.middleware';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 
 // Mock dependencies
 jest.mock('../../src/lib/prisma');

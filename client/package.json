@@ -28,8 +28,10 @@
     "lighthouse": "lhci autorun"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "jsonwebtoken": "^9.0.3",
     "next": "^16.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

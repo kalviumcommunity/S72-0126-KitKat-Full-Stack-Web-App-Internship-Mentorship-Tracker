@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 import { RequestUser } from "../types/api";
-import { UserRole } from "../types/roles";
+import { UserRole } from "@prisma/client";
 
 export interface JWTPayload {
   id: string;

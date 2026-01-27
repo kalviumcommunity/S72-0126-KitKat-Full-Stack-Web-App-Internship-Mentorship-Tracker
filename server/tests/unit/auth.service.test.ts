@@ -2,7 +2,7 @@ import { AuthService } from '../../src/api/auth/auth.service';
 import { prisma } from '../../src/lib/prisma';
 import { hashPassword, comparePassword } from '../../src/lib/password';
 import { ConflictError, AuthenticationError } from '../../src/middlewares/error.middleware';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 
 // Mock dependencies
 jest.mock('../../src/lib/prisma');

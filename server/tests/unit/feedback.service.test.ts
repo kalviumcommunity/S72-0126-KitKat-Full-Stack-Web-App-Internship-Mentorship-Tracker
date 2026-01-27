@@ -2,7 +2,7 @@ import { FeedbackService } from '../../src/api/feedback/feedback.service';
 import { prisma } from '../../src/lib/prisma';
 import { emailService } from '../../src/lib/email';
 import { NotFoundError, AuthorizationError } from '../../src/middlewares/error.middleware';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 
 // Mock dependencies
 jest.mock('../../src/lib/prisma');

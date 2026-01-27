@@ -1,6 +1,6 @@
 import { generateToken } from '../../src/lib/jwt';
 import { hashPassword } from '../../src/lib/password';
-import { UserRole } from '../../src/types/roles';
+import { UserRole } from "@prisma/client";
 
 // Import the mocked prisma
 import { prisma } from '../../src/lib/prisma';

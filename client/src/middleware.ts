@@ -3,11 +3,11 @@
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 
 import { PUBLIC_ROUTES, PROTECTED_ROUTES } from '@/lib/constants';
-import { UserRole, ApplicationStatus, ApplicationPlatform, FeedbackPriority, NotificationType } from '@/lib/types';
 
-// Mock function to verify JWT token - replace with actual implementation
+// JWT verification function
 async function verifyToken(token: string): Promise<{ 
   valid: boolean; 
   user?: { id: string; role: string; email: string } 
@@ -53,11 +53,23 @@ async function verifyToken(token: string): Promise<{
       // Not a valid base64 JSON token
     }
     
-    // TODO: Implement actual JWT verification for production
-    // Example with jsonwebtoken library:
-    // const jwt = require('jsonwebtoken');
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // return { valid: true, user: decoded };
+    // Production JWT verification
+    if (process.env.NODE_ENV === 'production' && process.env.JWT_SECRET) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
+        return {
+          valid: true,
+          user: {
+            id: decoded.id || decoded.userId,
+            role: decoded.role,
+            email: decoded.email,
+          },
+        };
+      } catch (jwtError) {
+        console.error('JWT verification failed:', jwtError);
+        return { valid: false };
+      }
+    }
     
     return { valid: false };
   } catch (error) {
