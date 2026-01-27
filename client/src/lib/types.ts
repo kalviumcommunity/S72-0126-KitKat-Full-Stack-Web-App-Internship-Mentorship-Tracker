@@ -189,6 +189,7 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
   message?: string;
+  silent?: boolean; // Flag to indicate errors that should be handled silently
 }
 
 export interface PaginatedResponse<T> {

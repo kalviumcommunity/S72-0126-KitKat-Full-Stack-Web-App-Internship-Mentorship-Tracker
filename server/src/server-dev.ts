@@ -64,7 +64,10 @@ app.post('/api/auth/login', (req, res) => {
 
     res.json({
       success: true,
-      data: mockUser,
+      data: {
+        user: mockUser,
+        token: `dev-${mockUser.id}-${mockUser.role}`
+      },
       message: 'Login successful (mock)',
     });
   } else {

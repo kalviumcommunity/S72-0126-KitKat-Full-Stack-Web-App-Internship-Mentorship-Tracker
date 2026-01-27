@@ -4,6 +4,10 @@ import "./globals.css";
 
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ToastProvider } from '@/contexts/ToastContext';
+import { ErrorSuppression } from '@/components/providers/ErrorSuppression';
+
+// Initialize error suppression for development
+import '@/lib/error-suppression';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="font-sans antialiased bg-gray-50 text-gray-900">
+        <ErrorSuppression />
         <AuthProvider>
           <ToastProvider>
             {children}

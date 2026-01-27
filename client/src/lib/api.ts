@@ -74,8 +74,80 @@ class ApiClient {
     };
 
     try {
+      // For auth endpoints, use a custom approach to avoid console errors
+      if (endpoint.includes('/auth/me') || endpoint.includes('/auth/refresh')) {
+        return await this.handleAuthRequest<T>(url, config);
+      }
+
       const response = await fetch(url, config);
-      const data = await response.json();
+      
+      // Handle response parsing more carefully
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        data = { error: 'Invalid response format' };
+      }
+
+      if (!response.ok) {
+        // Handle 401 Unauthorized responses more gracefully
+        if (response.status === 401) {
+          return {
+            success: false,
+            error: 'UNAUTHORIZED',
+            silent: true
+          };
+        }
+        
+        return {
+          success: false,
+          error: data.error || `HTTP ${response.status}: ${response.statusText}`
+        };
+      }
+
+      return {
+        success: true,
+        data: data.data || data,
+        message: data.message
+      };
+    } catch (error) {
+      // Network errors (connection refused, etc.)
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return {
+          success: false,
+          error: 'Unable to connect to server. Please check if the server is running.'
+        };
+      }
+      
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Network error occurred'
+      };
+    }
+  }
+
+  /**
+   * Special handler for auth requests to minimize console errors
+   */
+  private async handleAuthRequest<T>(url: string, config: RequestInit): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(url, config);
+      
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        data = { error: 'Invalid response format' };
+      }
+
+      if (response.status === 401) {
+        // For auth endpoints, 401 is expected when not authenticated
+        return {
+          success: false,
+          error: 'UNAUTHORIZED',
+          silent: true // Mark as silent to avoid logging
+        };
+      }
 
       if (!response.ok) {
         return {
@@ -92,7 +164,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Network error occurred'
+        error: error instanceof Error ? error.message : 'Network error occurred',
+        silent: true
       };
     }
   }

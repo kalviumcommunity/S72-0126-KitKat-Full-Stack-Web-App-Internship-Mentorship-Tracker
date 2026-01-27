@@ -52,10 +52,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.success && response.data) {
         setUser(response.data);
       } else {
+        // Only log errors that aren't marked as silent
+        if (response.error && !response.silent && !response.error.includes('401') && !response.error.includes('UNAUTHORIZED')) {
+          console.error('Auth initialization failed:', response.error);
+        }
         setUser(null);
       }
     } catch (error) {
-      console.error('Auth initialization failed:', error);
+      // Only log unexpected errors, not authentication failures
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (!errorMessage.includes('401') && !errorMessage.includes('UNAUTHORIZED')) {
+        console.error('Auth initialization failed:', error);
+      }
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -161,10 +169,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.success && response.data) {
         setUser(response.data);
       } else {
+        // Only log errors that aren't marked as silent
+        if (response.error && !response.silent && !response.error.includes('401') && !response.error.includes('UNAUTHORIZED')) {
+          console.error('User refresh failed:', response.error);
+        }
         setUser(null);
       }
     } catch (error) {
-      console.error('User refresh failed:', error);
+      // Only log unexpected errors, not authentication failures
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (!errorMessage.includes('401') && !errorMessage.includes('UNAUTHORIZED')) {
+        console.error('User refresh failed:', error);
+      }
       setUser(null);
     }
   };

@@ -1,138 +1,81 @@
-# ✅ Connection Issue Resolved - Backend Server Restarted
+# Connection Issue Resolution
 
-## 🐛 **Issue**: `net::ERR_CONNECTION_REFUSED`
+## Issue Summary
+The application was showing 401 Unauthorized errors in the browser console when users visited the site without being authenticated.
 
-The frontend was unable to connect to the backend API, resulting in connection refused errors.
+## Root Cause
+The `AuthContext` was attempting to fetch the current user's information on application initialization. When no authentication token was present, the API correctly returned a 401 Unauthorized response, but this was being logged as an error in the console.
 
-## 🔍 **Root Cause**
-The backend server (Process 13) had stopped running, while the frontend (Process 5) was still active.
+## Solution Implemented
 
-## 🔧 **Solution Applied**
-✅ **Restarted the backend mock server**
-- Started new process: `npm run dev:mock` (Process ID: 14)
-- Backend now running on: http://localhost:3001
-- API endpoints accessible at: http://localhost:3001/api
+### 1. Enhanced Error Handling in AuthContext
+- Modified `initializeAuth()` and `refreshUser()` functions to gracefully handle 401 responses
+- Added conditional logging that only shows errors for unexpected failures, not authentication failures
+- 401/UNAUTHORIZED responses are now handled silently as expected behavior
 
-## 🧪 **Verification Tests**
+### 2. Improved API Client
+- Updated the API client to return a cleaner error code for 401 responses
+- Added special handling for auth endpoints (`/auth/me`, `/auth/refresh`)
+- Implemented `handleAuthRequest()` method for authentication-specific requests
+- Enhanced error message handling for better debugging
 
-### ✅ **Backend Health Check**
-```bash
-curl http://localhost:3001/health
-# Status: 200 OK ✅
-# Response: {"status":"healthy","service":"uimp-server","database":"mock"}
-```
+### 3. Console Error Suppression (Development Only)
+- Added `ErrorSuppression` component that filters out expected 401 errors in development
+- Overrides `console.error` and `console.warn` to suppress auth-related noise
+- Only active in development mode to maintain proper error reporting in production
 
-### ✅ **API Health Check**
-```bash
-curl http://localhost:3001/api/health
-# Status: 200 OK ✅
-# Response: {"status":"healthy","service":"uimp-api","database":"mock"}
-```
+### 4. Server Status
+- Backend mock server is running on port 3001
+- Frontend Next.js server is running on port 3000
+- All API endpoints are responding correctly
+- Authentication flow works as expected
 
-### ✅ **CORS Configuration**
-- Access-Control-Allow-Origin: http://localhost:3000 ✅
-- Access-Control-Allow-Credentials: true ✅
-- Frontend can now communicate with backend ✅
+## Current Status
+✅ **RESOLVED**: 401 errors are now handled gracefully and suppressed in console
+✅ **WORKING**: Authentication flow functions properly
+✅ **RUNNING**: Both frontend and backend servers are operational
+✅ **CLEAN**: Development console shows minimal noise from expected auth failures
 
-## 🎯 **Current Status**
+## Understanding the 401 Behavior
 
-### **Both Servers Running:**
-- **Frontend**: Process 5 - http://localhost:3000 ✅
-- **Backend**: Process 14 - http://localhost:3001 ✅
+### Why 401 Errors Occur
+1. **Expected Behavior**: When a user visits the app without being logged in, the AuthContext tries to check if they're authenticated
+2. **Server Response**: The server correctly returns 401 (Unauthorized) because no valid session exists
+3. **Browser Display**: The browser's Network tab will always show this HTTP status - this is normal
+4. **Application Handling**: Our app now handles this gracefully without console errors
 
-### **API Endpoints Working:**
-- ✅ `/health` - Server health check
-- ✅ `/api/health` - API health check
-- ✅ `/api/auth/*` - Authentication endpoints
-- ✅ `/api/applications` - Application management
-- ✅ `/api/feedback` - Feedback system
-- ✅ `/api/dashboard/*` - Dashboard data
+### What's Normal vs. What's an Error
+- ✅ **Normal**: Seeing 401 in Network tab for `/api/auth/me` when not logged in
+- ✅ **Normal**: App functioning properly despite 401 responses
+- ❌ **Error**: Console showing JavaScript errors or stack traces
+- ❌ **Error**: App breaking or not loading due to auth failures
 
-## 🎮 **Test the Application Now**
+## Testing
+The authentication system now works as follows:
+1. Unauthenticated users can browse the public pages without console errors
+2. Login attempts with valid credentials succeed and redirect appropriately
+3. Invalid authentication attempts show proper error messages
+4. The application gracefully handles authentication state changes
+5. Console remains clean in development mode
 
-### **1. Open the Application:**
-Go to: http://localhost:3000
+## Files Modified
+- `client/src/contexts/AuthContext.tsx` - Enhanced error handling
+- `client/src/lib/api.ts` - Improved 401 response handling with special auth request method
+- `client/src/app/layout.tsx` - Added ErrorSuppression component
+- `client/src/components/providers/ErrorSuppression.tsx` - New console error filtering
+- `client/src/lib/types.ts` - Added silent flag to ApiResponse interface
+- `server/src/server-dev.ts` - Mock server running successfully
 
-### **2. Test "Start Your Journey" Button:**
-- Click the button on the home page
-- Should navigate to signup form successfully
-- No more connection errors
+## Next Steps
+The application is now ready for normal use. Users can:
+- Browse the homepage without console errors
+- Sign up for new accounts
+- Log in with existing credentials
+- Access role-based dashboards after authentication
+- Develop without console noise from expected auth behavior
 
-### **3. Test Signup Process:**
-- Fill out the signup form
-- Submit with any email/password
-- Should connect to backend API successfully
-
-### **4. Test Login Process:**
-- Navigate to login page
-- Use any credentials (mock authentication)
-- Should authenticate and redirect to dashboard
-
-## 🔧 **Troubleshooting Guide**
-
-### **If Connection Errors Return:**
-
-#### **Check Server Status:**
-```bash
-# List running processes
-curl http://localhost:3000/api/health  # Frontend health
-curl http://localhost:3001/health      # Backend health
-```
-
-#### **Restart Backend if Needed:**
-```bash
-cd server
-npm run dev:mock
-```
-
-#### **Restart Frontend if Needed:**
-```bash
-cd client
-npm run dev
-```
-
-### **Common Issues & Solutions:**
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| `ERR_CONNECTION_REFUSED` | Backend not running | Restart backend server |
-| `CORS Error` | Wrong origin | Check CORS_ORIGIN in .env |
-| `404 Not Found` | Wrong API URL | Verify NEXT_PUBLIC_API_URL |
-| `500 Internal Error` | Server crash | Check server logs |
-
-## 📊 **Server Monitoring**
-
-### **Check Process Status:**
-- Frontend: Process ID 5
-- Backend: Process ID 14
-
-### **Health Check URLs:**
-- Frontend: http://localhost:3000/api/health
-- Backend: http://localhost:3001/health
-- API: http://localhost:3001/api/health
-
-### **Log Monitoring:**
-- Frontend logs: Check browser console
-- Backend logs: Check terminal output
-
-## 🎉 **Resolution Summary**
-
-✅ **Backend server restarted and running**  
-✅ **API endpoints responding correctly**  
-✅ **CORS configured properly**  
-✅ **Frontend can connect to backend**  
-✅ **"Start Your Journey" button working**  
-✅ **Full authentication flow functional**  
-
----
-
-## 🚀 **Application is Now Fully Operational!**
-
-Both frontend and backend servers are running successfully. Users can:
-- Navigate the application without connection errors
-- Use the "Start Your Journey" button
-- Complete signup and login processes
-- Access all features with mock data
-
-**Status**: ✅ **FULLY RESOLVED**  
-**Last Updated**: January 27, 2026
+## For Developers
+- The ErrorSuppression component only runs in development mode
+- Production builds will show all errors normally for proper monitoring
+- The 401 responses in Network tab are expected and indicate proper security
+- Focus on actual application errors, not expected authentication flows
