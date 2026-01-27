@@ -3,7 +3,7 @@
 
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { LoginForm } from '@/components/forms/LoginForm';
+import { LoginFormWithQuickFill } from '@/components/forms/LoginFormWithQuickFill';
 
 export const metadata: Metadata = {
   title: 'Login - UIMP',
@@ -18,7 +18,7 @@ export default function LoginPage() {
         <p className="text-gray-600 mt-2">Sign in to your account</p>
       </div>
 
-      <LoginForm />
+      <LoginFormWithQuickFill />
 
       <div className="text-center">
         <p className="text-sm text-gray-600">
@@ -29,6 +29,9 @@ export default function LoginPage() {
           >
             Sign up here
           </Link>
+        </p>
+        <p className="text-xs text-gray-500 mt-2">
+          Note: Signup is disabled in demo mode. Use the credentials above.
         </p>
       </div>
     </div>

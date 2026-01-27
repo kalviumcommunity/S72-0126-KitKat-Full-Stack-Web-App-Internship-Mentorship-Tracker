@@ -69,7 +69,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           />
 
           {(endIcon || hasError) && (
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <div className={cn(
+              "absolute inset-y-0 right-0 pr-3 flex items-center",
+              endIcon && !hasError ? "pointer-events-auto" : "pointer-events-none"
+            )}>
               {endIcon ? (
                 <div className="text-gray-400 text-sm">
                   {endIcon}

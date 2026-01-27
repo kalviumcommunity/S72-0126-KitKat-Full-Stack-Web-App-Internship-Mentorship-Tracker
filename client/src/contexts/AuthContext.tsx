@@ -8,7 +8,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { User } from '@/lib/types';
-import { auth } from '@/lib/api';
+import { hardcodedAuth } from '@/lib/hardcoded-auth';
 
 interface AuthContextType {
   user: User | null;
@@ -47,13 +47,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const initializeAuth = async () => {
     try {
       setIsLoading(true);
-      const response = await auth.getCurrentUser();
+      const response = await hardcodedAuth.getCurrentUser();
       
       if (response.success && response.data) {
         setUser(response.data);
       } else {
         // Only log errors that aren't marked as silent
-        if (response.error && !response.silent && !response.error.includes('401') && !response.error.includes('UNAUTHORIZED')) {
+        if (response.error && !response.silent && typeof response.error === 'string' && !response.error.includes('401') && !response.error.includes('UNAUTHORIZED')) {
           console.error('Auth initialization failed:', response.error);
         }
         setUser(null);
@@ -73,22 +73,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const response = await auth.login({ email, password });
+      const response = await hardcodedAuth.login(email, password);
       
       if (response.success && response.data) {
         setUser(response.data.user);
         
-        // Redirect based on user role
+        // Redirect based on user role and email
         const userRole = response.data.user.role;
+        const userEmail = response.data.user.email;
+        
+        // Check if it's a company user (has company email)
+        const isCompanyUser = userEmail.startsWith('company');
+        
         switch (userRole) {
           case 'STUDENT':
-            router.push('/student');
+            router.push('/dashboard/user');
             break;
           case 'MENTOR':
-            router.push('/mentor');
+            // If it's a company email, redirect to company dashboard
+            if (isCompanyUser) {
+              router.push('/dashboard/company');
+            } else {
+              router.push('/dashboard/mentor');
+            }
             break;
           case 'ADMIN':
-            router.push('/admin');
+            router.push('/dashboard/admin');
             break;
           default:
             router.push('/');
@@ -120,11 +130,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }) => {
     try {
       setIsLoading(true);
-      const response = await auth.signup({
-        ...userData,
-        confirmPassword: userData.password,
-        role: userData.role as any,
-      });
+      const response = await hardcodedAuth.signup();
       
       if (response.success) {
         // Don't auto-login after signup, redirect to login
@@ -149,7 +155,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       setIsLoading(true);
-      await auth.logout();
+      await hardcodedAuth.logout();
       setUser(null);
       router.push('/login');
     } catch (error) {
@@ -164,13 +170,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const refreshUser = async () => {
     try {
-      const response = await auth.getCurrentUser();
+      const response = await hardcodedAuth.getCurrentUser();
       
       if (response.success && response.data) {
         setUser(response.data);
       } else {
         // Only log errors that aren't marked as silent
-        if (response.error && !response.silent && !response.error.includes('401') && !response.error.includes('UNAUTHORIZED')) {
+        if (response.error && !response.silent && typeof response.error === 'string' && !response.error.includes('401') && !response.error.includes('UNAUTHORIZED')) {
           console.error('User refresh failed:', response.error);
         }
         setUser(null);
