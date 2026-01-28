@@ -84,7 +84,7 @@ export function PerformanceInsights({ timeRange }: PerformanceInsightsProps) {
 
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  Companies to follow up with (>14 days):
+                  Companies to follow up with (&gt;14 days):
                 </h4>
                 <div className="space-y-2">
                   {responseTimeData.slowCompanies.map((company, index) => (

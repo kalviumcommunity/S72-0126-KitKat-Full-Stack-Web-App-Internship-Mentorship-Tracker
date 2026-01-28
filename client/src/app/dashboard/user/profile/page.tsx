@@ -8,6 +8,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/lib/types';
 import { StudentDashboardLayout } from '@/components/dashboard/student/StudentDashboardLayout';
 import { ProfileHeader } from '@/components/dashboard/student/profile/ProfileHeader';
+import { AboutSection } from '@/components/dashboard/student/profile/AboutSection';
+import { ExperienceSection } from '@/components/dashboard/student/profile/ExperienceSection';
+import { EducationSection } from '@/components/dashboard/student/profile/EducationSection';
+import { SkillsSection } from '@/components/dashboard/student/profile/SkillsSection';
+import { StatsSection } from '@/components/dashboard/student/profile/StatsSection';
+import { ActivityFeed } from '@/components/dashboard/student/profile/ActivityFeed';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -35,23 +41,26 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column */}
             <div className="lg:col-span-2 space-y-8">
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-xl font-semibold mb-4">Profile sections will be loaded here</h2>
-                <p className="text-gray-600">
-                  The profile components (About, Experience, Education, Activity Feed) 
-                  have been created and will be integrated once the import issues are resolved.
-                </p>
-              </div>
+              {/* About Section */}
+              <AboutSection />
+
+              {/* Experience Section */}
+              <ExperienceSection />
+
+              {/* Education Section */}
+              <EducationSection />
+
+              {/* Activity Feed */}
+              <ActivityFeed />
             </div>
 
             {/* Right Column */}
             <div className="space-y-8">
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-xl font-semibold mb-4">Skills & Stats</h2>
-                <p className="text-gray-600">
-                  Skills and statistics sections will be displayed here.
-                </p>
-              </div>
+              {/* Skills Section */}
+              <SkillsSection />
+
+              {/* Stats Section */}
+              <StatsSection />
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 // Company Dashboard Page
-// Role-based dashboard for companies - Job and Internship Management
+// Main overview dashboard for companies
 
 'use client';
 
@@ -8,86 +8,63 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/lib/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 
-// Mock job data
-const mockJobs = [
+interface Job {
+  id: string;
+  title: string;
+  department: string;
+  location: string;
+  type: 'Internship' | 'Full-time';
+  status: 'Active' | 'Draft' | 'Paused';
+  applications: number;
+  posted: string;
+  deadline: string;
+  description: string;
+  requirements: string[];
+  salary: string;
+}
+
+const mockJobs: Job[] = [
   {
     id: '1',
     title: 'Software Engineer Intern',
-    type: 'Internship',
-    location: 'Remote',
     department: 'Engineering',
+    location: 'San Francisco, CA',
+    type: 'Internship',
     status: 'Active',
     applications: 45,
     posted: '2024-01-15',
     deadline: '2024-02-15',
-    description: 'Join our engineering team to work on cutting-edge web applications using React, Node.js, and cloud technologies.',
-    requirements: ['Computer Science or related field', 'JavaScript/TypeScript', 'React experience preferred'],
+    description: 'Join our engineering team to work on cutting-edge web applications.',
+    requirements: ['Computer Science or related field', 'Experience with React/TypeScript', 'Strong problem-solving skills'],
     salary: '$25-30/hour'
   },
   {
     id: '2',
-    title: 'Product Manager Intern',
-    type: 'Internship',
-    location: 'Hybrid',
+    title: 'Product Manager',
     department: 'Product',
+    location: 'Remote',
+    type: 'Full-time',
     status: 'Active',
     applications: 23,
     posted: '2024-01-10',
     deadline: '2024-02-10',
-    description: 'Work with cross-functional teams to define product roadmaps and drive feature development.',
-    requirements: ['Business or related field', 'Analytical skills', 'Communication skills'],
-    salary: '$22-28/hour'
-  },
-  {
-    id: '3',
-    title: 'Data Science Intern',
-    type: 'Internship',
-    location: 'On-site',
-    department: 'Data',
-    status: 'Draft',
-    applications: 12,
-    posted: '2024-01-20',
-    deadline: '2024-03-01',
-    description: 'Analyze large datasets and build machine learning models to drive business insights.',
-    requirements: ['Statistics or CS background', 'Python/R', 'SQL knowledge'],
-    salary: '$28-35/hour'
-  },
-  {
-    id: '4',
-    title: 'Senior Software Engineer',
-    type: 'Full-time',
-    location: 'Remote',
-    department: 'Engineering',
-    status: 'Active',
-    applications: 78,
-    posted: '2024-01-05',
-    deadline: '2024-02-05',
-    description: 'Lead development of scalable backend systems and mentor junior developers.',
-    requirements: ['5+ years experience', 'System design', 'Leadership skills'],
-    salary: '$120k-150k/year'
-  },
-  {
-    id: '5',
-    title: 'UX Designer',
-    type: 'Full-time',
-    location: 'Hybrid',
-    department: 'Design',
-    status: 'Paused',
-    applications: 34,
-    posted: '2024-01-12',
-    deadline: '2024-02-20',
-    description: 'Design intuitive user experiences for our web and mobile applications.',
-    requirements: ['Design portfolio', 'Figma/Sketch', '3+ years experience'],
-    salary: '$85k-110k/year'
+    description: 'Lead product strategy and work with cross-functional teams.',
+    requirements: ['3+ years PM experience', 'Strong analytical skills', 'Experience with Agile methodologies'],
+    salary: '$120k-150k'
   }
 ];
+
+const Badge = ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  <span className={`px-2 py-1 text-xs font-medium rounded-full ${className}`}>
+    {children}
+  </span>
+);
 
 export default function CompanyDashboardPage() {
   const { user, logout } = useAuth();
   const [selectedFilter, setSelectedFilter] = useState('All');
-  const [selectedJob, setSelectedJob] = useState<typeof mockJobs[0] | null>(null);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
   if (!user || user.role !== UserRole.MENTOR) {
     return (

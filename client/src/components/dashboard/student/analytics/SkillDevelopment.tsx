@@ -119,7 +119,7 @@ export function SkillDevelopment({ timeRange }: SkillDevelopmentProps) {
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded"></div>
-                  <span>Learning (<40%)</span>
+                  <span>Learning (&lt;40%)</span>
                 </div>
               </div>
               <div className="flex items-center space-x-2">

@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   // Enable strict mode for better performance
   reactStrictMode: true,
+  // Add turbopack config to silence warnings
+  turbopack: {},
+  // Set output file tracing root to silence warnings
+  outputFileTracingRoot: __dirname,
   // Optimize images
   images: {
     remotePatterns: [

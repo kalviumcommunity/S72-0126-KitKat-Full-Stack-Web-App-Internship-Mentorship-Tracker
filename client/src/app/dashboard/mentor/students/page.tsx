@@ -1,4 +1,4 @@
-// My Students Page
+// My Students Page - Mentor Dashboard
 // Comprehensive student management for mentors
 
 'use client';
@@ -12,7 +12,6 @@ import { StudentsGridView } from '@/components/dashboard/mentor/students/Student
 import { StudentsListView } from '@/components/dashboard/mentor/students/StudentsListView';
 import { StudentsPerformanceView } from '@/components/dashboard/mentor/students/StudentsPerformanceView';
 import { NewMentorshipRequests } from '@/components/dashboard/mentor/students/NewMentorshipRequests';
-import { StudentDetailModal } from '@/components/dashboard/mentor/students/StudentDetailModal';
 
 export default function MyStudentsPage() {
   const { user } = useAuth();
@@ -33,22 +32,10 @@ export default function MyStudentsPage() {
     );
   }
 
-  const handleViewModeChange = (mode: 'grid' | 'list' | 'performance') => {
-    setViewMode(mode);
-  };
-
-  const handleStudentSelect = (student: any) => {
-    setSelectedStudent(student);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedStudent(null);
-  };
-
   return (
     <MentorDashboardLayout currentPage="students">
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
+        {/* Page Header */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-6">
             <div className="flex items-center justify-between">
@@ -58,7 +45,10 @@ export default function MyStudentsPage() {
               </div>
               <div className="flex items-center space-x-3">
                 <div className="text-sm text-gray-500">
-                  8 Active Students • 3 New Requests
+                  <span className="font-medium text-gray-900">23</span> Active Students
+                </div>
+                <div className="text-sm text-gray-500">
+                  <span className="font-medium text-gray-900">5</span> Pending Requests
                 </div>
               </div>
             </div>
@@ -67,22 +57,24 @@ export default function MyStudentsPage() {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* New Mentorship Requests */}
-          <NewMentorshipRequests />
-
           {/* Toolbar */}
-          <div className="mt-8">
-            <StudentsToolbar
-              viewMode={viewMode}
-              onViewModeChange={handleViewModeChange}
-              filterStatus={filterStatus}
-              onFilterChange={setFilterStatus}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-            />
-          </div>
+          <StudentsToolbar
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            filterStatus={filterStatus}
+            onFilterChange={setFilterStatus}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+          />
+
+          {/* New Mentorship Requests */}
+          {filterStatus === 'new_requests' && (
+            <div className="mb-8">
+              <NewMentorshipRequests />
+            </div>
+          )}
 
           {/* Students Content */}
           <div className="mt-6">
@@ -91,15 +83,14 @@ export default function MyStudentsPage() {
                 filterStatus={filterStatus}
                 searchQuery={searchQuery}
                 sortBy={sortBy}
-                onStudentSelect={handleStudentSelect}
+                onStudentSelect={setSelectedStudent}
               />
             )}
             {viewMode === 'list' && (
               <StudentsListView
-                filterStatus={filterStatus}
-                searchQuery={searchQuery}
-                sortBy={sortBy}
-                onStudentSelect={handleStudentSelect}
+                students={[]} // Will be populated with actual data
+                onStudentSelect={setSelectedStudent}
+                selectedStudent={selectedStudent}
               />
             )}
             {viewMode === 'performance' && (
@@ -107,19 +98,10 @@ export default function MyStudentsPage() {
                 filterStatus={filterStatus}
                 searchQuery={searchQuery}
                 sortBy={sortBy}
-                onStudentSelect={handleStudentSelect}
               />
             )}
           </div>
         </div>
-
-        {/* Student Detail Modal */}
-        {selectedStudent && (
-          <StudentDetailModal
-            student={selectedStudent}
-            onClose={handleCloseModal}
-          />
-        )}
       </div>
     </MentorDashboardLayout>
   );
