@@ -37,7 +37,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-slate-700 mb-2"
           >
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <div className="relative">
           {startIcon && (
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <div className="text-gray-400 text-sm">
+              <div className="text-slate-400 text-sm">
                 {startIcon}
               </div>
             </div>
@@ -58,13 +58,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={cn(
-              'block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-colors',
+              'block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-slate-900 sm:text-sm sm:leading-6 transition-all duration-200 bg-white',
               startIcon && 'pl-10',
               (endIcon || hasError) && 'pr-10',
-              hasError && 'ring-red-300 focus:ring-red-600 text-red-900 placeholder:text-red-300',
-              props.disabled && 'bg-gray-50 text-gray-500 cursor-not-allowed',
+              hasError && 'ring-red-300 focus:ring-red-500 text-red-900 placeholder:text-red-300',
+              props.disabled && 'bg-slate-50 text-slate-500 cursor-not-allowed ring-slate-200',
               className
             )}
+            suppressHydrationWarning={props.suppressHydrationWarning}
             {...inputProps}
           />
 
@@ -88,8 +89,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {(error || helperText) && (
           <p className={cn(
-            'text-sm',
-            hasError ? 'text-red-600' : 'text-gray-500'
+            'text-sm mt-1',
+            hasError ? 'text-red-600' : 'text-slate-500'
           )}>
             {error || helperText}
           </p>

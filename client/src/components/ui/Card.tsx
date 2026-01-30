@@ -15,7 +15,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     className, 
     padding = 'md', 
     shadow = 'sm', 
-    border = true,
+    border = false,
     children,
     ...props 
   }, ref) => {
@@ -23,19 +23,19 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-white rounded-lg',
+          'bg-white rounded-3xl',
           // Padding variants
           padding === 'none' && 'p-0',
-          padding === 'sm' && 'p-4',
-          padding === 'md' && 'p-6',
-          padding === 'lg' && 'p-8',
+          padding === 'sm' && 'p-6',
+          padding === 'md' && 'p-8',
+          padding === 'lg' && 'p-10',
           // Shadow variants
           shadow === 'none' && 'shadow-none',
-          shadow === 'sm' && 'shadow-sm',
-          shadow === 'md' && 'shadow-md',
-          shadow === 'lg' && 'shadow-lg',
+          shadow === 'sm' && 'shadow-sm shadow-slate-900/5',
+          shadow === 'md' && 'shadow-md shadow-slate-900/10',
+          shadow === 'lg' && 'shadow-lg shadow-slate-900/15',
           // Border
-          border && 'border border-gray-200',
+          border && 'border border-slate-200',
           className
         )}
         {...props}
@@ -61,21 +61,21 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
       <div
         ref={ref}
         className={cn(
-          'flex items-center justify-between pb-4 border-b border-gray-200',
+          'flex items-start justify-between pb-6 border-b border-slate-100',
           className
         )}
         {...props}
       >
-        <div className="space-y-1">
+        <div className="space-y-2">
           {title && (
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <h3 className="text-xl font-semibold text-slate-900 tracking-tight">{title}</h3>
           )}
           {subtitle && (
-            <p className="text-sm text-gray-600">{subtitle}</p>
+            <p className="text-sm text-slate-600 leading-relaxed">{subtitle}</p>
           )}
           {children}
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="ml-6">{action}</div>}
       </div>
     );
   }
@@ -91,7 +91,7 @@ const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
     return (
       <div
         ref={ref}
-        className={cn('pt-4', className)}
+        className={cn('pt-6', className)}
         {...props}
       />
     );
@@ -109,7 +109,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
       <div
         ref={ref}
         className={cn(
-          'flex items-center justify-end space-x-2 pt-4 border-t border-gray-200',
+          'flex items-center justify-end space-x-3 pt-6 border-t border-slate-100',
           className
         )}
         {...props}

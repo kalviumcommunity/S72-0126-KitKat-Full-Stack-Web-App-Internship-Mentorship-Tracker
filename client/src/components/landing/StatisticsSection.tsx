@@ -15,32 +15,44 @@ export function StatisticsSection() {
       suffix: '+',
       label: 'Active Students',
       description: 'Students actively using our platform to track their internship journey',
-      icon: '🎓',
-      color: 'from-blue-500 to-cyan-500'
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      )
     },
     {
       number: 500,
       suffix: '+',
       label: 'Partner Companies',
       description: 'Companies posting internship opportunities and finding talent',
-      icon: '🏢',
-      color: 'from-green-500 to-emerald-500'
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      )
     },
     {
       number: 2000,
       suffix: '+',
       label: 'Expert Mentors',
       description: 'Industry professionals providing guidance and feedback',
-      icon: '👨‍🏫',
-      color: 'from-purple-500 to-pink-500'
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+        </svg>
+      )
     },
     {
       number: 85,
       suffix: '%',
       label: 'Placement Success Rate',
       description: 'Students who successfully secured internships through our platform',
-      icon: '🎯',
-      color: 'from-orange-500 to-red-500'
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
     }
   ];
 
@@ -62,17 +74,22 @@ export function StatisticsSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+    <section ref={sectionRef} className="py-24 bg-black relative overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 opacity-[0.02]">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }}></div>
+      </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl lg:text-5xl font-light text-white mb-6 tracking-tight">
             Trusted by Thousands
           </h2>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Our platform has helped thousands of students, mentors, and companies achieve their goals. Here's the impact we've made together.
           </p>
         </div>
@@ -90,26 +107,26 @@ export function StatisticsSection() {
         </div>
 
         {/* Additional Context */}
-        <div className="mt-16 text-center">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <h3 className="text-2xl font-bold text-white mb-4">
+        <div className="mt-20 text-center">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-10 border border-white/10">
+            <h3 className="text-2xl font-light text-white mb-6 tracking-tight">
               Growing Every Day
             </h3>
-            <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
+            <p className="text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
               Our community continues to expand as more students discover the power of structured internship tracking and professional mentorship.
             </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-blue-200">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span>New students join daily</span>
+            <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400">
+              <div className="flex items-center space-x-3">
+                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                <span className="font-medium">New students join daily</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span>Active mentorship sessions</span>
+              <div className="flex items-center space-x-3">
+                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                <span className="font-medium">Active mentorship sessions</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                <span>Companies hiring through UIMP</span>
+              <div className="flex items-center space-x-3">
+                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                <span className="font-medium">Companies hiring through UIMP</span>
               </div>
             </div>
           </div>
@@ -153,24 +170,24 @@ function StatCard({ stat, isVisible, delay }: {
 
   return (
     <div className="text-center group">
-      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2">
+      <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-2">
         {/* Icon */}
-        <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+        <div className="text-gray-300 mb-6 flex justify-center transform group-hover:scale-110 transition-transform duration-300">
           {stat.icon}
         </div>
 
         {/* Number */}
-        <div className={`text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
+        <div className="text-4xl font-light text-white mb-2">
           {count.toLocaleString()}{stat.suffix}
         </div>
 
         {/* Label */}
-        <div className="text-xl font-semibold text-white mb-3">
+        <div className="text-xl font-medium text-white mb-4">
           {stat.label}
         </div>
 
         {/* Description */}
-        <div className="text-blue-200 text-sm leading-relaxed">
+        <div className="text-gray-400 text-sm leading-relaxed">
           {stat.description}
         </div>
       </div>

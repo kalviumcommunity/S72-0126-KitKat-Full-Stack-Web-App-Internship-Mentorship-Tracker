@@ -84,7 +84,7 @@ export function ActiveMentorsSection() {
     }
   ];
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: number, reviewCount: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
     
@@ -132,7 +132,7 @@ export function ActiveMentorsSection() {
                   <p className="text-gray-600 mb-2">
                     {mentor.title} @ {mentor.company}
                   </p>
-                  {renderStars(mentor.rating)}
+                  {renderStars(mentor.rating, mentor.reviewCount)}
                 </div>
               </div>
 

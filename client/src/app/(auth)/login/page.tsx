@@ -12,27 +12,36 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-        <p className="text-gray-600 mt-2">Sign in to your account</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <h1 className="text-3xl font-light text-slate-900 tracking-tight">
+          Sign in
+        </h1>
+        <p className="text-slate-600 text-base">
+          Welcome back to your account
+        </p>
       </div>
 
+      {/* Form */}
       <LoginFormWithQuickFill />
 
-      <div className="text-center">
-        <p className="text-sm text-gray-600">
+      {/* Footer */}
+      <div className="text-center space-y-4">
+        <p className="text-sm text-slate-600">
           Don't have an account?{' '}
           <Link 
             href="/signup" 
-            className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+            className="font-medium text-slate-900 hover:text-slate-700 transition-colors underline underline-offset-4 decoration-slate-300 hover:decoration-slate-500"
           >
-            Sign up here
+            Create one here
           </Link>
         </p>
-        <p className="text-xs text-gray-500 mt-2">
-          Note: Signup is disabled in demo mode. Use the credentials above.
-        </p>
+        <div className="pt-4 border-t border-slate-100">
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Demo mode is active. Use the provided credentials above to explore the platform.
+          </p>
+        </div>
       </div>
     </div>
   );

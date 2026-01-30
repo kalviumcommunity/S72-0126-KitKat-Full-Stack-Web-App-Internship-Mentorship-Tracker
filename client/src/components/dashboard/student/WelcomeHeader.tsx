@@ -55,20 +55,20 @@ export function WelcomeHeader({ user }: WelcomeHeaderProps) {
         </div>
 
         {/* Quick Action Buttons */}
-        <div className="flex flex-wrap gap-3">
-          <Button className="bg-blue-600 hover:bg-blue-700">
+        {/* <div className="flex flex-wrap gap-3">
+          <Button disabled className="bg-gray-400 cursor-not-allowed">
             <span className="mr-2">📝</span>
             New Application
           </Button>
-          <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50">
+          <Button disabled variant="outline" className="border-gray-300 text-gray-400 cursor-not-allowed">
             <span className="mr-2">🔍</span>
             Find Mentor
           </Button>
-          <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
+          <Button disabled variant="outline" className="border-gray-300 text-gray-400 cursor-not-allowed">
             <span className="mr-2">💬</span>
             View Feedback
           </Button>
-        </div>
+        </div> */}
       </div>
     </Card>
   );

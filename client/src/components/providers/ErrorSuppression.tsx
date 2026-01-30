@@ -32,6 +32,16 @@ export function ErrorSuppression() {
       ) {
         return; // Suppress these expected errors
       }
+
+      // Skip hydration errors caused by browser extensions
+      if (
+        message.includes('hydrated but some attributes of the server rendered HTML didn\'t match') ||
+        message.includes('fdprocessedid') ||
+        message.includes('react-hydration-error') ||
+        (message.includes('hydration') && message.includes('browser extension'))
+      ) {
+        return; // Suppress hydration errors from browser extensions
+      }
       
       // Log all other errors normally
       originalError.apply(console, args);
@@ -43,9 +53,12 @@ export function ErrorSuppression() {
       
       if (
         message.includes('401') && message.includes('auth') ||
-        message.includes('Unauthorized') && message.includes('auth')
+        message.includes('Unauthorized') && message.includes('auth') ||
+        message.includes('hydration') ||
+        message.includes('fdprocessedid') ||
+        message.includes('react-hydration-error')
       ) {
-        return; // Suppress auth-related warnings
+        return; // Suppress auth-related warnings and hydration warnings
       }
       
       originalWarn.apply(console, args);

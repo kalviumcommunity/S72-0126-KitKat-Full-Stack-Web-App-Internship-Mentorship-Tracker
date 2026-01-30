@@ -13,6 +13,7 @@ import { UpcomingEventsTimeline } from '@/components/dashboard/student/UpcomingE
 import { RecentMentorFeedback } from '@/components/dashboard/student/RecentMentorFeedback';
 import { RecommendedActions } from '@/components/dashboard/student/RecommendedActions';
 import { ApplicationActivityGraph } from '@/components/dashboard/student/ApplicationActivityGraph';
+import { QuickActions } from '@/components/dashboard/student/QuickActions';
 
 export default function UserDashboardPage() {
   const { user } = useAuth();
@@ -33,6 +34,9 @@ export default function UserDashboardPage() {
       <div className="p-6 space-y-6">
         {/* Welcome Header */}
         <WelcomeHeader user={user} />
+
+        {/* Quick Actions */}
+        <QuickActions />
 
         {/* Key Metrics Row */}
         <KeyMetricsRow />
